@@ -66,7 +66,7 @@ const useStyles = makeStyles({
 		flexDirection: "row",
 		alignItems: "center",
 		alignContent: "center",
-		marginTop: "0.8em",
+		marginTop: "1em",
 	},
 	line: {
 		width: "8em",
@@ -84,7 +84,7 @@ const useStyles = makeStyles({
 		fontWeight: "500",
 		fontSize: "13px",
 		textTransform: "capitalize",
-		marginTop: "0.5em",
+		marginTop: "1em",
 	},
 	signup_div: {
 		display: "flex",
