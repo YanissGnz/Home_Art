@@ -1,24 +1,31 @@
 {
-  "name": "home_art",
-  "version": "1.0.0",
-  "description": "Online Store for home equipement",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/YanissGnz/Home_Art.git"
-  },
-  "author": "Dynamic Code",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/YanissGnz/Home_Art/issues"
-  },
-  "homepage": "https://github.com/YanissGnz/Home_Art#readme",
-  "dependencies": {
-    "express": "^4.17.1",
-    "express-validator": "^6.10.1",
-    "mongoose": "^5.12.5"
-  }
+	"name": "home_art",
+	"version": "1.0.0",
+	"description": "Online Store for home equipement",
+	"main": "server.js",
+	"scripts": {
+		"client-install": "npm install --prefix client",
+		"start": "node server.js",
+		"server": "nodemon serber.js",
+		"client": "npm start --prefix client",
+		"dev": "concurrently \"npm run server\" \"npn run client\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/YanissGnz/Home_Art.git"
+	},
+	"author": "Dynamic Code",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/YanissGnz/Home_Art/issues"
+	},
+	"homepage": "https://github.com/YanissGnz/Home_Art#readme",
+	"dependencies": {
+		"@material-ui/core": "^4.11.4",
+		"concurrently": "^6.0.2",
+		"express": "^4.17.1",
+		"express-validator": "^6.10.1",
+		"mongoose": "^5.12.5",
+		"react-router-dom": "^5.2.0"
+	}
 }
