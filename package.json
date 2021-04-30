@@ -4,7 +4,7 @@
   "description": "Online Store for home equipement",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -16,9 +16,12 @@
     "url": "https://github.com/YanissGnz/Home_Art/issues"
   },
   "homepage": "https://github.com/YanissGnz/Home_Art#readme",
+  "author": "Dynamic Code",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.17.1",
     "express-validator": "^6.10.1",
+    "mongodb": "^3.6.6",
     "mongoose": "^5.12.5"
   }
 }
