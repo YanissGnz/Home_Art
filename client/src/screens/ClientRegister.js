@@ -5,10 +5,18 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import { Link } from "@material-ui/core";
+import {
+	FormControl,
+	IconButton,
+	InputAdornment,
+	InputLabel,
+	Link,
+	OutlinedInput,
+} from "@material-ui/core";
 import GoogleIcon from "../Icons/GoogleIcon";
-import { useHistory } from "react-router";
 import "../Login.css";
+import { Visibility, VisibilityOff } from "@material-ui/icons";
+import { useHistory } from "react-router";
 
 const useStyles = makeStyles({
 	main_card: {
@@ -20,13 +28,12 @@ const useStyles = makeStyles({
 		display: "flex",
 	},
 	right_card: {
-		position: "relative",
-		left: "0em",
+		position: "static",
 		background: "white",
 		margin: "0",
 		paddingLeft: "2em",
 		paddingRight: "2em",
-		width: "20em",
+		width: "40%",
 		height: "100%",
 		alignItems: "center",
 		alignContent: "center",
@@ -38,12 +45,28 @@ const useStyles = makeStyles({
 		fontSize: "17px",
 		marginTop: "5em",
 	},
+	info_div: {
+		alignItems: "center",
+		alignContent: "center",
+		flexDirection: "row",
+	},
+	name_field: {
+		width: "47%",
+		marginTop: "1em",
+		marginRight: "1em",
+		fontFamily: "emPoppins",
+	},
+	lastname_field: {
+		width: "47%",
+		marginTop: "1em",
+		fontFamily: "Poppins",
+	},
 	text_field: {
 		marginTop: "1em",
 		fontFamily: "Poppins",
 	},
 	btn: {
-		marginTop: "1.5em",
+		marginTop: "1.8em",
 	},
 	btn_text: {
 		fontFamily: "Poppins",
@@ -117,13 +140,31 @@ const useStyles = makeStyles({
 	},
 });
 
-export default function ClientLogin() {
+export default function ClientRegister() {
 	const classes = useStyles();
 	const history = useHistory();
+	const [values, setValues] = React.useState({
+		showPassword: false,
+	});
+
+	const handleClickShowPassword = () => {
+		setValues({ ...values, showPassword: !values.showPassword });
+	};
+
+	const handleMouseDownPassword = (event) => {
+		event.preventDefault();
+	};
 
 	return (
 		<div>
 			<Card className={classes.main_card} elevation={0}>
+				<div className={classes.img_div}>
+					<img
+						src="/RegisterImg.gif"
+						alt="register_img"
+						className={classes.img}
+					/>
+				</div>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent>
 						<Typography
@@ -132,8 +173,29 @@ export default function ClientLogin() {
 							align="center"
 							color="primary"
 						>
-							Se Connecter
+							Crée un compte
 						</Typography>
+						<div className={classes.info_div}>
+							{/*name Input */}
+							<TextField
+								variant="outlined"
+								label="Nom"
+								size="small"
+								classes={{ root: classes.name_field }}
+								fullWidth
+								type="name"
+							/>
+							{/*Lastname Input */}
+							<TextField
+								variant="outlined"
+								label="Prénom"
+								size="small"
+								classes={{ root: classes.lastname_field }}
+								fullWidth
+								type="name"
+							/>
+						</div>
+						{/*Email Input */}
 						<TextField
 							variant="outlined"
 							label="Email"
@@ -143,25 +205,39 @@ export default function ClientLogin() {
 							type="email"
 						/>
 						<br />
-						<TextField
-							variant="outlined"
-							label="Mot de passe"
-							size="small"
+
+						{/*Password Input */}
+						<FormControl
 							classes={{ root: classes.text_field }}
+							variant="outlined"
+							size="small"
 							fullWidth
-							type="password"
-						/>
-						<br />
-						<Link
-							component="button"
-							color="primary"
-							underline="none"
-							variant="inherit"
-							classes={{ root: classes.mdps_oublier }}
 						>
-							Mot de passe oublier?
-						</Link>
+							<InputLabel htmlFor="outlined-adornment-password">
+								Mot de passe
+							</InputLabel>
+							<OutlinedInput
+								id="outlined-adornment-password"
+								type={values.showPassword ? "text" : "password"}
+								value={values.password}
+								endAdornment={
+									<InputAdornment position="end">
+										<IconButton
+											aria-label="toggle password visibility"
+											onClick={handleClickShowPassword}
+											onMouseDown={handleMouseDownPassword}
+											edge="end"
+										>
+											{values.showPassword ? <Visibility /> : <VisibilityOff />}
+										</IconButton>
+									</InputAdornment>
+								}
+								labelWidth={100}
+							/>
+						</FormControl>
 						<br />
+
+						{/*Create acount Button */}
 						<Button
 							className={classes.btn}
 							variant="contained"
@@ -170,7 +246,7 @@ export default function ClientLogin() {
 							fullWidth
 							disableElevation
 						>
-							Connexion
+							Crée un compte
 						</Button>
 						<br />
 						<div className={classes.divider}>
@@ -184,6 +260,8 @@ export default function ClientLogin() {
 							</Typography>
 							<div className={classes.line}></div>
 						</div>
+
+						{/*Google Button */}
 						<Button
 							className={classes.google_btn}
 							variant="outlined"
@@ -198,25 +276,23 @@ export default function ClientLogin() {
 								variant="subtitle2"
 								align="center"
 							>
-								Vous n’avez pas un compte?
+								Vous avez déjà un compte?
 							</Typography>
 
+							{/*Login Link */}
 							<Link
 								component="button"
 								color="primary"
 								underline="hover"
 								variant="inherit"
 								classes={{ root: classes.signup_txt }}
-								onClick={() => history.push("/register")}
+								onClick={() => history.push("/login")}
 							>
-								Inscrivez-vous
+								Connecter-vous
 							</Link>
 						</div>
 					</CardContent>
 				</Card>
-				<div className={classes.img_div}>
-					<img src="/LoginImg.gif" className={classes.img} alt="login_img" />
-				</div>
 			</Card>
 		</div>
 	);

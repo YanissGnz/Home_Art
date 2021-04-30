@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core";
 import AdminLogin from "./screens/AdminLogin";
 import ClientLogin from "./screens/ClientLogin";
+import ClientRegister from "./screens/ClientRegister";
 
 const theme = createMuiTheme({
 	palette: {
@@ -22,6 +23,9 @@ export default function App() {
 					</Route>
 					<Route exact path="/login">
 						<ClientLogin />
+					</Route>
+					<Route exact path="/register">
+						<ClientRegister />
 					</Route>
 				</Switch>
 			</Router>
