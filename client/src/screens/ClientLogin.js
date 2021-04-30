@@ -204,7 +204,7 @@ export default function ClientLogin() {
 							<Link
 								component="button"
 								color="primary"
-								underline="none"
+								underline="hover"
 								variant="inherit"
 								classes={{ root: classes.signup_txt }}
 								onClick={() => history.push("/register")}
