@@ -232,7 +232,7 @@ export default function ClientRegister() {
 										</IconButton>
 									</InputAdornment>
 								}
-								labelWidth={70}
+								labelWidth={100}
 							/>
 						</FormControl>
 						<br />
