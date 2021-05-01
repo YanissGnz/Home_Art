@@ -5,6 +5,7 @@ import AdminLogin from "./screens/AdminLogin";
 import ClientLogin from "./screens/ClientLogin";
 import ClientRegister from "./screens/ClientRegister";
 import RecoverPassword from "./screens/RecoverPassword";
+import NotFound from "./screens/404";
 
 const theme = createMuiTheme({
 	palette: {
@@ -30,6 +31,9 @@ export default function App() {
 					</Route>
 					<Route exact path="/recover_password">
 						<RecoverPassword />
+					</Route>
+					<Route exact path="*">
+						<NotFound />
 					</Route>
 				</Switch>
 			</Router>
