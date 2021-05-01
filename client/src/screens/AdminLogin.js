@@ -5,117 +5,138 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import { FormGroup, Link } from "@material-ui/core";
-import "../App.css";
+import { Link } from "@material-ui/core";
+import "../Login.css";
 
 const useStyles = makeStyles({
-	card: {
-		borderRadius: "20px",
-		width: "22em",
-		padding: "0.5em",
+	main_card: {
+		margin: "0",
+		background: "#C4C4C4",
+		borderRadius: "40px",
+		width: "55em",
+		height: "33em",
+		display: "flex",
+		overflow: "hidden",
+	},
+	right_card: {
+		position: "relative",
+		left: "0em",
+		background: "white",
+		margin: "0",
+		width: "40%",
+		height: "100%",
 		display: "flex",
 		justifyContent: "center",
-		alignContent: "center",
+		alignItems: "center",
 		flexDirection: "column",
+	},
+	card_content: {
+		width: "85%",
 	},
 	text: {
 		fontFamily: "Poppins",
-		fontWeight: "520",
-		fontSize: "30px",
-		alignSelf: "center",
+		fontWeight: "600",
+		fontSize: "17px",
 	},
 	text_field: {
+		marginTop: "1em",
 		fontFamily: "Poppins",
-		marginTop: "2em",
 	},
 	btn: {
-		width: "22.9em",
-		marginTop: "2.3em",
+		marginTop: "1.5em",
 	},
 	btn_text: {
+		width: "100%",
 		fontFamily: "Poppins",
 		fontWeight: "500",
 		fontSize: "15px",
 		textTransform: "capitalize",
+		color: "white",
 	},
 	mdps_oublier: {
-		marginTop: "1.5em",
+		position: "relative",
+		left: "4.5em",
+		marginTop: "0.2em",
 		fontFamily: "Poppins",
-		fontSize: "12px",
-		fontWeight: "400",
-		marginInline: "29%",
+		fontWeight: "500",
+		fontSize: "11px",
+		marginLeft: "11.5em",
+	},
+	img_div: {
+		position: "static",
+		height: "100%",
+		width: "60%",
+		display: "flex",
+		justifyContent: "center",
+		alignContent: "center",
+		alignItems: "center",
+	},
+	img: {
+		height: "25em",
+		width: "25em",
 	},
 });
 
-export default function AdminLogin() {
+export default function ClientLogin() {
 	const classes = useStyles();
-
-	const handleSubmit = (e) => {
-		e.preventDefault();
-	};
 
 	return (
 		<div>
-			<Card className={classes.card} elevation={0}>
-				<CardContent>
-					<Typography
-						color="textPrimary"
-						align="center"
-						variant="h5"
-						classes={{ h5: classes.text }}
-					>
-						Connexion
-					</Typography>
-					<form noValidate autoComplete="off" onSubmit={handleSubmit}>
-						<FormGroup>
-							{/*Email Field */}
-							<TextField
-								variant="outlined"
-								label="Email"
-								size="small"
-								align="center"
-								classes={{ root: classes.text_field }}
-								required
-								fullWidth
-								type="email"
-							/>
-
-							{/*Password Field */}
-							<TextField
-								variant="outlined"
-								label="Mot de passe"
-								size="small"
-								align="center"
-								classes={{ root: classes.text_field }}
-								required
-								fullWidth
-								type="password"
-							/>
-							{/*Confirm Button*/}
-							<Button
-								className={classes.btn}
-								variant="contained"
-								color="primary"
-								classes={{ label: classes.btn_text }}
-								fullWidth
-								disableElevation
-							>
-								Connexion
-							</Button>
-						</FormGroup>
-					</form>
-
-					{/*Forget Password Button*/}
-					<Link
-						component="button"
-						color="textPrimary"
-						underline="none"
-						variant="inherit"
-						classes={{ root: classes.mdps_oublier }}
-					>
-						Mot de passe oublier?
-					</Link>
-				</CardContent>
+			<Card className={classes.main_card} elevation={0}>
+				<Card className={classes.right_card} elevation={0}>
+					<CardContent className={classes.card_content}>
+						<Typography
+							className={classes.text}
+							variant="h6"
+							align="center"
+							color="primary"
+						>
+							Se Connecter
+						</Typography>
+						<TextField
+							variant="outlined"
+							label="Email"
+							size="small"
+							classes={{ root: classes.text_field }}
+							fullWidth
+							type="email"
+						/>
+						<br />
+						<TextField
+							variant="outlined"
+							label="Mot de passe"
+							size="small"
+							classes={{ root: classes.text_field }}
+							fullWidth
+							type="password"
+						/>
+						<br />
+						<Link
+							component="button"
+							color="primary"
+							underline="none"
+							variant="inherit"
+							classes={{ root: classes.mdps_oublier }}
+							align="right"
+						>
+							Mot de passe oublier?
+						</Link>
+						<br />
+						<Button
+							className={classes.btn}
+							variant="contained"
+							color="primary"
+							classes={{ label: classes.btn_text }}
+							fullWidth
+							disableElevation
+						>
+							Connexion
+						</Button>
+					</CardContent>
+				</Card>
+				<div className={classes.img_div}>
+					<img src="/AdminLogin.gif" className={classes.img} alt="login_img" />
+				</div>
 			</Card>
 		</div>
 	);
