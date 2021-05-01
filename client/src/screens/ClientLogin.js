@@ -55,11 +55,11 @@ const useStyles = makeStyles({
 	},
 	mdps_oublier: {
 		position: "relative",
+		left: "59%",
 		marginTop: "0.2em",
 		fontFamily: "Poppins",
 		fontWeight: "500",
 		fontSize: "11px",
-		marginLeft: "11.5em",
 	},
 
 	divider: {
@@ -155,9 +155,10 @@ export default function ClientLogin() {
 						<Link
 							component="button"
 							color="primary"
-							underline="none"
+							underline="hover"
 							variant="inherit"
 							classes={{ root: classes.mdps_oublier }}
+							onClick={() => history.push("/recover_password")}
 						>
 							Mot de passe oublier?
 						</Link>

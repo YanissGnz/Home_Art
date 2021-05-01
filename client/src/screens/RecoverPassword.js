@@ -5,7 +5,6 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import { Link } from "@material-ui/core";
 import "../Login.css";
 
 const useStyles = makeStyles({
@@ -16,7 +15,6 @@ const useStyles = makeStyles({
 		width: "55em",
 		height: "33em",
 		display: "flex",
-		overflow: "hidden",
 	},
 	right_card: {
 		position: "relative",
@@ -25,7 +23,7 @@ const useStyles = makeStyles({
 		margin: "0",
 		paddingLeft: "2em",
 		paddingRight: "2em",
-		width: "20em",
+		width: "40%",
 		height: "100%",
 		display: "flex",
 		justifyContent: "center",
@@ -49,20 +47,11 @@ const useStyles = makeStyles({
 		marginTop: "1.5em",
 	},
 	btn_text: {
-		width: "100%",
 		fontFamily: "Poppins",
 		fontWeight: "500",
 		fontSize: "15px",
 		textTransform: "capitalize",
 		color: "white",
-	},
-	mdps_oublier: {
-		position: "relative",
-		left: "56%",
-		marginTop: "0.2em",
-		fontFamily: "Poppins",
-		fontWeight: "500",
-		fontSize: "11px",
 	},
 	img_div: {
 		position: "static",
@@ -79,12 +68,19 @@ const useStyles = makeStyles({
 	},
 });
 
-export default function ClientLogin() {
+export default function RecoverPassword() {
 	const classes = useStyles();
 
 	return (
 		<div>
 			<Card className={classes.main_card} elevation={0}>
+				<div className={classes.img_div}>
+					<img
+						src="/ForgotPassword.gif"
+						alt="register_img"
+						className={classes.img}
+					/>
+				</div>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent className={classes.card_content}>
 						<Typography
@@ -93,8 +89,10 @@ export default function ClientLogin() {
 							align="center"
 							color="primary"
 						>
-							Se Connecter
+							Réinitialiser votre mot de passe.
 						</Typography>
+
+						{/*Email Input */}
 						<TextField
 							variant="outlined"
 							label="Email"
@@ -104,26 +102,6 @@ export default function ClientLogin() {
 							type="email"
 						/>
 						<br />
-						<TextField
-							variant="outlined"
-							label="Mot de passe"
-							size="small"
-							classes={{ root: classes.text_field }}
-							fullWidth
-							type="password"
-						/>
-						<br />
-						<Link
-							component="button"
-							color="primary"
-							underline="hover"
-							variant="inherit"
-							classes={{ root: classes.mdps_oublier }}
-							align="right"
-						>
-							Mot de passe oublier?
-						</Link>
-						<br />
 						<Button
 							className={classes.btn}
 							variant="contained"
@@ -132,13 +110,10 @@ export default function ClientLogin() {
 							fullWidth
 							disableElevation
 						>
-							Connexion
+							Réinitialiser
 						</Button>
 					</CardContent>
 				</Card>
-				<div className={classes.img_div}>
-					<img src="/AdminLogin.gif" className={classes.img} alt="login_img" />
-				</div>
 			</Card>
 		</div>
 	);
