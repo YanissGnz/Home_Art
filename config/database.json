@@ -1,6 +1,3 @@
 {
-    "mongo": {
-      "url": "mongodb+srv://ecommerceweb:home*art2021@cluster0.5rwk6.mongodb.net/test?retryWrites=true&w=majority",
-      "dbName": "home-art"
-    }
+	"mongoURL": "mongodb+srv://dev:homeart123@home-cluster.5rwk6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 }
