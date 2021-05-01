@@ -7,6 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { Link } from "@material-ui/core";
 import "../Login.css";
+import { useHistory } from "react-router";
 
 const useStyles = makeStyles({
 	main_card: {
@@ -81,6 +82,7 @@ const useStyles = makeStyles({
 
 export default function ClientLogin() {
 	const classes = useStyles();
+	const history = useHistory();
 
 	return (
 		<div>
@@ -119,7 +121,7 @@ export default function ClientLogin() {
 							underline="hover"
 							variant="inherit"
 							classes={{ root: classes.mdps_oublier }}
-							align="right"
+							onClick={() => history.push("/recover_password")}
 						>
 							Mot de passe oublier?
 						</Link>
