@@ -28,6 +28,8 @@ const useStyles = makeStyles({
 		paddingRight: "2em",
 		width: "20em",
 		height: "100%",
+		display: "flex",
+		justifyContent: "center",
 		alignItems: "center",
 		alignContent: "center",
 		flexDirection: "row",
@@ -36,10 +38,9 @@ const useStyles = makeStyles({
 		fontFamily: "Poppins",
 		fontWeight: "600",
 		fontSize: "17px",
-		marginTop: "5em",
 	},
 	text_field: {
-		marginTop: "1em",
+		marginTop: "1.5em",
 		fontFamily: "Poppins",
 	},
 	btn: {
@@ -54,12 +55,11 @@ const useStyles = makeStyles({
 	},
 	mdps_oublier: {
 		position: "relative",
-		left: "4.5em",
+		left: "59%",
 		marginTop: "0.2em",
 		fontFamily: "Poppins",
 		fontWeight: "500",
 		fontSize: "11px",
-		marginLeft: "10.7em",
 	},
 
 	divider: {
@@ -155,9 +155,10 @@ export default function ClientLogin() {
 						<Link
 							component="button"
 							color="primary"
-							underline="none"
+							underline="hover"
 							variant="inherit"
 							classes={{ root: classes.mdps_oublier }}
+							onClick={() => history.push("/recover_password")}
 						>
 							Mot de passe oublier?
 						</Link>
