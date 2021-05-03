@@ -6,6 +6,7 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { Link } from "@material-ui/core";
+import AdminIcon from "../Icons/AdminIcon";
 import "../Login.css";
 import { useHistory } from "react-router";
 
@@ -74,10 +75,6 @@ const useStyles = makeStyles({
 		alignContent: "center",
 		alignItems: "center",
 	},
-	img: {
-		height: "25em",
-		width: "25em",
-	},
 });
 
 export default function ClientLogin() {
@@ -139,7 +136,7 @@ export default function ClientLogin() {
 					</CardContent>
 				</Card>
 				<div className={classes.img_div}>
-					<img src="/AdminLogin.gif" className={classes.img} alt="login_img" />
+					<AdminIcon />
 				</div>
 			</Card>
 		</div>

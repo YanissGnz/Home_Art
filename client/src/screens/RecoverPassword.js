@@ -6,6 +6,7 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import "../Login.css";
+import ForgetPassword from "../Icons/ForgetPassword";
 
 const useStyles = makeStyles({
 	main_card: {
@@ -62,10 +63,6 @@ const useStyles = makeStyles({
 		alignContent: "center",
 		alignItems: "center",
 	},
-	img: {
-		height: "25em",
-		width: "25em",
-	},
 });
 
 export default function RecoverPassword() {
@@ -75,11 +72,7 @@ export default function RecoverPassword() {
 		<div>
 			<Card className={classes.main_card} elevation={0}>
 				<div className={classes.img_div}>
-					<img
-						src="/ForgotPassword.gif"
-						alt="register_img"
-						className={classes.img}
-					/>
+					<ForgetPassword />
 				</div>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent className={classes.card_content}>

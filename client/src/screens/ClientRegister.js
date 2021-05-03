@@ -14,6 +14,7 @@ import {
 	OutlinedInput,
 } from "@material-ui/core";
 import GoogleIcon from "../Icons/GoogleIcon";
+import RegisterIcon from "../Icons/RegisterIcon";
 import "../Login.css";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { useHistory } from "react-router";
@@ -134,10 +135,6 @@ const useStyles = makeStyles({
 		alignContent: "center",
 		alignItems: "center",
 	},
-	img: {
-		height: "25em",
-		width: "25em",
-	},
 });
 
 export default function ClientRegister() {
@@ -159,11 +156,7 @@ export default function ClientRegister() {
 		<div>
 			<Card className={classes.main_card} elevation={0}>
 				<div className={classes.img_div}>
-					<img
-						src="/RegisterImg.gif"
-						alt="register_img"
-						className={classes.img}
-					/>
+					<RegisterIcon />
 				</div>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent>
