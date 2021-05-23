@@ -9,15 +9,16 @@ import { Link } from "@material-ui/core";
 import GoogleIcon from "../Icons/GoogleIcon";
 import LoginIcon from "../Icons/LoginIcon";
 import { useHistory } from "react-router";
-import "../Login.css";
+
+import "./index.css";
 
 const useStyles = makeStyles({
 	main_card: {
 		margin: "0",
 		background: "#C4C4C4",
 		borderRadius: "40px",
-		width: "55em",
-		height: "33em",
+		width: "60em",
+		height: "40em",
 		display: "flex",
 	},
 	right_card: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles({
 		margin: "0",
 		paddingLeft: "2em",
 		paddingRight: "2em",
-		width: "20em",
+		width: "40%",
 		height: "100%",
 		display: "flex",
 		justifyContent: "center",
@@ -56,7 +57,7 @@ const useStyles = makeStyles({
 	},
 	mdps_oublier: {
 		position: "relative",
-		left: "59%",
+		left: "54%",
 		marginTop: "0.2em",
 		fontFamily: "Poppins",
 		fontWeight: "500",
@@ -89,12 +90,12 @@ const useStyles = makeStyles({
 		marginTop: "1em",
 	},
 	signup_div: {
+		width: "100%",
 		display: "flex",
 		flexDirection: "row",
 		alignItems: "center",
 		alignContent: "center",
-		alignSelf: "center",
-		marginLeft: "1em",
+		justifyContent: "center",
 		marginTop: "1em",
 	},
 	signup_txt: {
@@ -119,7 +120,7 @@ export default function ClientLogin() {
 	const history = useHistory();
 
 	return (
-		<div>
+		<div className="body">
 			<Card className={classes.main_card} elevation={0}>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent>

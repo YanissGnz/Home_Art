@@ -1,10 +1,11 @@
 import React from "react";
-import "../App.css";
 import ErrorIcon from "../Icons/404Error";
+
+import "./index.css";
 
 export default function NotFound() {
 	return (
-		<div>
+		<div className="body">
 			<ErrorIcon />
 		</div>
 	);

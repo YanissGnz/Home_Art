@@ -7,16 +7,17 @@ import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { Link } from "@material-ui/core";
 import AdminIcon from "../Icons/AdminIcon";
-import "../Login.css";
 import { useHistory } from "react-router";
+
+import "./index.css";
 
 const useStyles = makeStyles({
 	main_card: {
 		margin: "0",
 		background: "#C4C4C4",
 		borderRadius: "40px",
-		width: "55em",
-		height: "33em",
+		width: "60em",
+		height: "40em",
 		display: "flex",
 		overflow: "hidden",
 	},
@@ -27,16 +28,11 @@ const useStyles = makeStyles({
 		margin: "0",
 		paddingLeft: "2em",
 		paddingRight: "2em",
-		width: "20em",
+		width: "40%",
 		height: "100%",
 		display: "flex",
-		justifyContent: "center",
 		alignItems: "center",
-		alignContent: "center",
 		flexDirection: "row",
-	},
-	card_content: {
-		width: "100%",
 	},
 	text: {
 		fontFamily: "Poppins",
@@ -60,7 +56,7 @@ const useStyles = makeStyles({
 	},
 	mdps_oublier: {
 		position: "relative",
-		left: "56%",
+		left: "62%",
 		marginTop: "0.2em",
 		fontFamily: "Poppins",
 		fontWeight: "500",
@@ -82,10 +78,10 @@ export default function ClientLogin() {
 	const history = useHistory();
 
 	return (
-		<div>
+		<div className="body">
 			<Card className={classes.main_card} elevation={0}>
 				<Card className={classes.right_card} elevation={0}>
-					<CardContent className={classes.card_content}>
+					<CardContent>
 						<Typography
 							className={classes.text}
 							variant="h6"

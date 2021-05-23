@@ -15,51 +15,49 @@ import {
 } from "@material-ui/core";
 import GoogleIcon from "../Icons/GoogleIcon";
 import RegisterIcon from "../Icons/RegisterIcon";
-import "../Login.css";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { useHistory } from "react-router";
+
+import "./index.css";
 
 const useStyles = makeStyles({
 	main_card: {
 		margin: "0",
 		background: "#C4C4C4",
 		borderRadius: "40px",
-		width: "55em",
-		height: "33em",
+		width: "60em",
+		height: "40em",
 		display: "flex",
+		flexDirection: "row",
 	},
 	right_card: {
+		display: "flex",
 		position: "static",
 		background: "white",
-		margin: "0",
 		paddingLeft: "2em",
 		paddingRight: "2em",
 		width: "40%",
 		height: "100%",
 		alignItems: "center",
-		alignContent: "center",
-		flexDirection: "row",
+		justifyContent: "center",
+		flexDirection: "column",
 	},
 	text: {
-		fontFamily: "Poppins",
 		fontWeight: "600",
 		fontSize: "17px",
 		marginTop: "5em",
 	},
 	info_div: {
-		alignItems: "center",
-		alignContent: "center",
-		flexDirection: "row",
+		width: "100%",
+		marginTop: "1em",
 	},
 	name_field: {
 		width: "47%",
-		marginTop: "1em",
-		marginRight: "1em",
+		marginRight: "1.1em",
 		fontFamily: "emPoppins",
 	},
 	lastname_field: {
 		width: "47%",
-		marginTop: "1em",
 		fontFamily: "Poppins",
 	},
 	text_field: {
@@ -95,7 +93,7 @@ const useStyles = makeStyles({
 	},
 	line: {
 		width: "8em",
-		height: "0.01em",
+		height: "0.08em",
 		background: "black",
 	},
 	btm_text: {
@@ -111,13 +109,13 @@ const useStyles = makeStyles({
 		textTransform: "capitalize",
 		marginTop: "1em",
 	},
-	signup_div: {
+	signin_div: {
+		width: "100%",
 		display: "flex",
 		flexDirection: "row",
 		alignItems: "center",
 		alignContent: "center",
-		alignSelf: "center",
-		marginLeft: "1em",
+		justifyContent: "center",
 		marginTop: "1em",
 	},
 	signup_txt: {
@@ -153,7 +151,7 @@ export default function ClientRegister() {
 	};
 
 	return (
-		<div>
+		<div className="body">
 			<Card className={classes.main_card} elevation={0}>
 				<div className={classes.img_div}>
 					<RegisterIcon />
@@ -263,7 +261,7 @@ export default function ClientRegister() {
 						>
 							Continue aver Google
 						</Button>
-						<div className={classes.signup_div}>
+						<div className={classes.signin_div}>
 							<Typography
 								className={classes.signup_txt}
 								variant="subtitle2"

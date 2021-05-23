@@ -1,0 +1,23 @@
+.home_body {
+	width: 100%;
+	height: 100%;
+}
+.Logo {
+	padding: 0.3em;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.appbar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+.appbar_text {
+	font-size: 20px;
+}
+.main {
+	padding: 2em;
+}
