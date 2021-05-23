@@ -14,7 +14,7 @@ import "../Login.css";
 const useStyles = makeStyles({
 	main_card: {
 		margin: "0",
-		background: "#C4C4C4",
+		background: "#c3c3c3",
 		borderRadius: "40px",
 		width: "55em",
 		height: "33em",

@@ -23,10 +23,12 @@
 	"dependencies": {
 		"@material-ui/core": "^4.11.4",
 		"@material-ui/icons": "^4.11.2",
+		"bcrypt": "^5.0.1",
 		"body-parser": "^1.19.0",
 		"concurrently": "^6.0.2",
 		"express": "^4.17.1",
 		"express-validator": "^6.10.1",
+		"jsonwebtoken": "^8.5.1",
 		"mongodb": "^3.6.6",
 		"mongoose": "^5.12.5",
 		"react-router": "^5.2.0",
