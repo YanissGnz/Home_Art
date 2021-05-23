@@ -5,7 +5,8 @@ import AdminLogin from "./screens/AdminLogin";
 import ClientLogin from "./screens/ClientLogin";
 import ClientRegister from "./screens/ClientRegister";
 import RecoverPassword from "./screens/RecoverPassword";
-import NotFound from "./screens/404";
+import NotFounded from "./screens/404";
+import { useSelector} from 'react-redux'
 
 const theme = createMuiTheme({
 	palette: {
@@ -16,13 +17,16 @@ const theme = createMuiTheme({
 });
 
 export default function App() {
-	return (
-		<ThemeProvider theme={theme}>
+	const auth = useSelector(state => state.auth)
+    const {isLogged} = auth	
+     
+return (
+
+        <ThemeProvider theme={theme}>
 			<Router>
 				<Switch>
-					<Route exact path="/admin">
-						<AdminLogin />
-					</Route>
+				<Route path="/admin" component={ isLogged ? NotFounded : AdminLogin} exact />
+						
 					<Route exact path="/login">
 						<ClientLogin />
 					</Route>
@@ -33,10 +37,11 @@ export default function App() {
 						<RecoverPassword />
 					</Route>
 					<Route exact path="*">
-						<NotFound />
+						<NotFounded />
 					</Route>
 				</Switch>
 			</Router>
 		</ThemeProvider>
+		
 	);
 }
