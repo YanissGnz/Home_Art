@@ -13,12 +13,12 @@ import {
 	Link,
 	OutlinedInput,
 } from "@material-ui/core";
-import GoogleIcon from "../Icons/GoogleIcon";
-import RegisterIcon from "../Icons/RegisterIcon";
+import GoogleIcon from "../../Icons/GoogleIcon";
+import RegisterIcon from "../../Icons/RegisterIcon";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { useHistory } from "react-router";
 
-import "./index.css";
+import "../index.css";
 
 const useStyles = makeStyles({
 	main_card: {

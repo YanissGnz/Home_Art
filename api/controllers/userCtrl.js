@@ -10,9 +10,7 @@ const userCtrl = {
 				return res.status(400).json({ emailMsg: "Enter votre email." });
 			}
 			if (password == "") {
-				return res
-					.status(400)
-					.json({ passwordMsg: "Enter votre mot de passe." });
+				return res.status(400).json({ passwordMsg: "Enter votre mot de passe." });
 			}
 			const user = await Users.findOne({ email });
 			if (!user)
@@ -30,7 +28,7 @@ const userCtrl = {
 			res.cookie("refreshtoken", refresh_token, {
 				httpOnly: true,
 				path: "/users/refresh_token",
-				maxAge: 60 * 1000, //1 hour
+				maxAge: 7*24*60*60*1000, //7 days
 			});
 
 			res.json({ msg: "Login success!" });
