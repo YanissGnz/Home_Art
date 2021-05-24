@@ -15,13 +15,18 @@ export const useStyles = makeStyles((theme) => {
 			marginLeft: theme.spacing(1),
 			flex: 1,
 		},
-		iconButton: {
+		search_Button: {
 			padding: 6,
 		},
-		button: {
-			fontFamily: "Poppins",
-			textTransform: "capitalize",
+		cart_button: {
+			marginRight: 20,
 			padding: 10,
+			fontWeight: "450",
+			fontSize: "16px",
+			textTransform: "capitalize",
+			"&:hover": {
+				backgroundColor: theme.palette.common.white,
+			},
 		},
 	};
 });

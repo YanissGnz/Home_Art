@@ -56,23 +56,14 @@ const useStyles = makeStyles({
 		color: "white",
 	},
 	mdps_oublier: {
-		position: "relative",
-		left: "54%",
-		marginTop: "0.2em",
+		marginTop: "0.5em",
 		fontFamily: "Poppins",
 		fontWeight: "500",
 		fontSize: "11px",
 	},
 
-	divider: {
-		display: "flex",
-		flexDirection: "row",
-		alignItems: "center",
-		alignContent: "center",
-		marginTop: "1em",
-	},
 	line: {
-		width: "8em",
+		width: "9em",
 		height: "0.01em",
 		background: "black",
 	},
@@ -89,7 +80,7 @@ const useStyles = makeStyles({
 		textTransform: "capitalize",
 		marginTop: "1em",
 	},
-	signup_div: {
+	div: {
 		width: "100%",
 		display: "flex",
 		flexDirection: "row",
@@ -150,17 +141,7 @@ export default function ClientLogin() {
 							type="password"
 						/>
 						<br />
-						<Link
-							component="button"
-							color="primary"
-							underline="hover"
-							variant="inherit"
-							classes={{ root: classes.mdps_oublier }}
-							onClick={() => history.push("/recover_password")}
-						>
-							Mot de passe oublier?
-						</Link>
-						<br />
+
 						<Button
 							className={classes.btn}
 							variant="contained"
@@ -172,7 +153,19 @@ export default function ClientLogin() {
 							Connexion
 						</Button>
 						<br />
-						<div className={classes.divider}>
+						<div className="mdps_oblier">
+							<Link
+								component="button"
+								color="primary"
+								underline="hover"
+								variant="inherit"
+								classes={{ root: classes.mdps_oublier }}
+								onClick={() => history.push("/recover_password")}
+							>
+								Mot de passe oublier?
+							</Link>
+						</div>
+						<div className={classes.div}>
 							<div className={classes.line}></div>
 							<Typography
 								className={classes.btm_text}
@@ -191,7 +184,7 @@ export default function ClientLogin() {
 						>
 							Continue aver Google
 						</Button>
-						<div className={classes.signup_div}>
+						<div className={classes.div}>
 							<Typography
 								className={classes.signup_txt}
 								variant="subtitle2"

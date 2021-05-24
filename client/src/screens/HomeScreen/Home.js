@@ -1,6 +1,5 @@
 import {
 	AppBar,
-	Box,
 	Button,
 	Container,
 	CssBaseline,
@@ -56,7 +55,7 @@ export default function Home(props) {
 							<InputBase className={classes.input} placeholder="Rechercher" />
 							<IconButton
 								type="submit"
-								className={classes.iconButton}
+								className={classes.search_Button}
 								aria-label="search"
 								onClick={handleSearch}
 							>
@@ -67,7 +66,7 @@ export default function Home(props) {
 						<Button
 							disableRipple
 							startIcon={<Cart />}
-							className={classes.button}
+							className={classes.cart_button}
 						>
 							Panier
 						</Button>
@@ -75,16 +74,7 @@ export default function Home(props) {
 				</AppBar>
 			</ElevationScroll>
 
-			<Container maxWidth="xl">
-				{[...new Array(50)]
-					.map(
-						() => `Cras mattis consectetur purus sit amet fermentum.
-Cras justo odio, dapibus ac facilisis in, egestas eget quam.
-Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-Praesent commodo cursus magna, vel scelerisque nisl consectetur et.`
-					)
-					.join("\n")}
-			</Container>
+			<Container maxWidth="xl" className="main"></Container>
 		</div>
 	);
 }
