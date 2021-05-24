@@ -6,8 +6,8 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { Link } from "@material-ui/core";
-import GoogleIcon from "../Icons/GoogleIcon";
-import LoginIcon from "../Icons/LoginIcon";
+import GoogleIcon from "../../Icons/GoogleIcon";
+import LoginIcon from "../../Icons/LoginIcon";
 import { useHistory } from "react-router";
 
 import "./index.css";
