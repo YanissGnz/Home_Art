@@ -132,7 +132,7 @@ export default function AdminLogin() {
 			};
 			getToken();
 		}
-	}, [auth, dispatch]);
+	}, [auth, history, dispatch]);
 
 	return (
 		<div className="body">
