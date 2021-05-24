@@ -6,13 +6,13 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { Link } from "@material-ui/core";
-import AdminIcon from "../Icons/AdminIcon";
+import AdminIcon from "../../Icons/AdminIcon";
 import { useHistory } from "react-router";
 
 import "./index.css";
 
 import { useDispatch, useSelector } from "react-redux";
-import { dispatchLogin } from "../redux/actions/authAction";
+import { dispatchLogin } from "../../redux/actions/authAction";
 import axios from "axios";
 
 const useStyles = makeStyles({

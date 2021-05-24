@@ -1,5 +1,5 @@
 import React from "react";
-import ErrorIcon from "../Icons/404Error";
+import ErrorIcon from "../../Icons/404Error";
 
 import "./index.css";
 

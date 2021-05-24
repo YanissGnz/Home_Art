@@ -2,11 +2,11 @@ import React from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { createMuiTheme, ThemeProvider } from "@material-ui/core";
 
-import AdminLogin from "./screens/AdminLogin";
+import AdminLogin from "./screens/AdminLogin/AdminLogin";
 import ClientLogin from "./screens/ClientLogin";
 import ClientRegister from "./screens/ClientRegister";
 import RecoverPassword from "./screens/RecoverPassword";
-import NotFound from "./screens/404";
+import NotFound from "./screens/404/404";
 import Home from "./screens/HomeScreen/Home";
 import AdminPanel from "./screens/AdminPanel/AdminPanel";
 
