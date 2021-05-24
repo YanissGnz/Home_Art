@@ -104,9 +104,14 @@ export default function AdminLogin() {
 			const res = await axios.post("/users/admin", { email, password });
 			setUser({ ...user, err: "", passwordErr: "", success: res.data.msg });
 
-			localStorage.setItem("firstLogin", true);
+			localStorage.setItem("isLogged", true);
 
 			dispatch(dispatchLogin());
+			const getToken = async () => {
+				const res = await axios.post("/users/refresh_token", null);
+				dispatch({ type: "GET_TOKEN", payload: res.data.access_token });
+			};
+			getToken();
 			history.push("/Admin_panel");
 		} catch (err) {
 			setUser({
@@ -117,22 +122,6 @@ export default function AdminLogin() {
 			});
 		}
 	};
-
-	const auth = useSelector((state) => state.auth);
-
-	useEffect(() => {
-		if (auth) {
-			history.push("/Admin_panel");
-		}
-		const firstLogin = localStorage.getItem("firstLogin");
-		if (firstLogin) {
-			const getToken = async () => {
-				const res = await axios.post("/users/refresh_token", null);
-				dispatch({ type: "GET_TOKEN", payload: res.data.access_token });
-			};
-			getToken();
-		}
-	}, [auth, history, dispatch]);
 
 	return (
 		<div className="body">

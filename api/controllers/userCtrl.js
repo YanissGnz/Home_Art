@@ -33,7 +33,9 @@ const userCtrl = {
 				maxAge: 60 * 1000, //1 hour
 			});
 
-			res.json({ msg: "Login success!" });
+			//const userInfo = await Users.findById(req.user.id).select("-password");
+
+			res.json({ /*user: userInfo,*/ msg: "Login success!" });
 		} catch (err) {
 			return res.status(500).json({ msg: err.message });
 		}
