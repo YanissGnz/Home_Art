@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import ForgetPassword from "../../Icons/ForgetPassword";
 
-import "./index.css";
+import "../index.css";
 
 const useStyles = makeStyles({
 	main_card: {

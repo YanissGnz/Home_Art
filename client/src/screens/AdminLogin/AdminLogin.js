@@ -9,10 +9,11 @@ import { Link } from "@material-ui/core";
 import AdminIcon from "../../Icons/AdminIcon";
 import { useHistory } from "react-router";
 
-import "./index.css";
-
+import "../index.css";
+import {dispatchLogin, fetchUser, dispatchGetUser} from '../../redux/actions/authAction'
+import { fetchAllUsers, dispatchGetAllUsers} from '../../redux/actions/usersAction'
 import { useDispatch, useSelector } from "react-redux";
-import { dispatchLogin } from "../../redux/actions/authAction";
+
 import axios from "axios";
 
 const useStyles = makeStyles({
@@ -95,18 +96,18 @@ export default function AdminLogin() {
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
-		setUser({ ...user, [name]: value, err: "", passwordErr: "", success: "" });
+		setUser({ ...user, [name]: value, err: "", passwordErr: "", success: "" })
 	};
 
 	const handleSubmit = async (e) => {
-		e.preventDefault();
+		e.preventDefault()
 		try {
-			const res = await axios.post("/users/admin", { email, password });
-			setUser({ ...user, err: "", passwordErr: "", success: res.data.msg });
+			const res = await axios.post("/users/admin", { email, password })
+			setUser({ ...user, err: "", passwordErr: "", success: res.data.msg })
 
-			localStorage.setItem("firstLogin", true);
+			localStorage.setItem("firstLogin", true)
 
-			dispatch(dispatchLogin());
+			dispatch(dispatchLogin())
 			history.push("/Admin_panel");
 		} catch (err) {
 			setUser({
@@ -117,13 +118,12 @@ export default function AdminLogin() {
 			});
 		}
 	};
-
+    
+	const token = useSelector(state => state.token)
 	const auth = useSelector((state) => state.auth);
-
+   
 	useEffect(() => {
-		if (auth) {
-			history.push("/Admin_panel");
-		}
+		
 		const firstLogin = localStorage.getItem("firstLogin");
 		if (firstLogin) {
 			const getToken = async () => {
@@ -132,8 +132,38 @@ export default function AdminLogin() {
 			};
 			getToken();
 		}
-	}, [auth, history, dispatch]);
+	}, [auth.isLogged , dispatch]);
+	useEffect(() => {
+		if(token){
+		  const getUser = () => {
+			dispatch(dispatchLogin())
+	
+			return fetchUser(token).then(res => {
+			  dispatch(dispatchGetUser(res))
+			})
+		  }
+		  getUser()
+		}
+    },[token, dispatch])
 
+	useEffect(() => {
+		if(token){
+		  const getUsers = () => {
+			dispatch(dispatchLogin())
+	
+			return fetchAllUsers(token).then(res => {
+			  dispatch(dispatchGetAllUsers(res))
+			})
+		  }
+		  getUsers()
+		}
+	},[token, dispatch])
+
+   /* useEffect(() => {
+		if (auth) {
+			history.push("/Admin_panel");
+		}
+	},[auth, history])*/
 	return (
 		<div className="body">
 			<Card className={classes.main_card} elevation={0}>

@@ -10,7 +10,7 @@ import GoogleIcon from "../../Icons/GoogleIcon";
 import LoginIcon from "../../Icons/LoginIcon";
 import { useHistory } from "react-router";
 
-import "./index.css";
+import "../index.css";
 
 const useStyles = makeStyles({
 	main_card: {

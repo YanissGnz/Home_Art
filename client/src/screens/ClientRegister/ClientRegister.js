@@ -18,7 +18,7 @@ import RegisterIcon from "../../Icons/RegisterIcon";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
 import { useHistory } from "react-router";
 
-import "./index.css";
+import "../index.css";
 
 const useStyles = makeStyles({
 	main_card: {
