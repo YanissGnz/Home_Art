@@ -1,19 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useState } from "react";
+import { useHistory } from "react-router";
+import axios from "axios";
+import { dispatchLogin } from "../../redux/actions/authAction";
+
+import { useDispatch } from "react-redux";
+import { Link } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import { Link } from "@material-ui/core";
+import { makeStyles, useTheme } from "@material-ui/core/styles";
+
+import BounceLoader from "react-spinners/BounceLoader";
+
 import AdminIcon from "../../Icons/AdminIcon";
-import { useHistory } from "react-router";
 
 import "./index.css";
-
-import { useDispatch, useSelector } from "react-redux";
-import { dispatchLogin } from "../../redux/actions/authAction";
-import axios from "axios";
 
 const useStyles = makeStyles({
 	main_card: {
@@ -82,12 +85,15 @@ const initialState = {
 	password: "",
 	err: "",
 	passwordErr: "",
+
 	success: "",
 };
 export default function AdminLogin() {
 	const classes = useStyles();
-
 	const [user, setUser] = useState(initialState);
+	const [isLoading, setIsLoading] = useState(true);
+	const theme = useTheme();
+
 	const dispatch = useDispatch();
 	const history = useHistory();
 
@@ -101,19 +107,22 @@ export default function AdminLogin() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
+			setIsLoading(false);
+
 			const res = await axios.post("/users/admin", { email, password });
 			setUser({ ...user, err: "", passwordErr: "", success: res.data.msg });
 
-			localStorage.setItem("isLogged", true);
-
-			dispatch(dispatchLogin());
 			const getToken = async () => {
 				const res = await axios.post("/users/refresh_token", null);
 				dispatch({ type: "GET_TOKEN", payload: res.data.access_token });
 			};
 			getToken();
-			history.push("/Admin_panel");
+
+			dispatch(dispatchLogin());
+			history.push("/admin_panel");
 		} catch (err) {
+			setIsLoading(true);
+
 			setUser({
 				...user,
 				err: err.response.data.emailMsg,
@@ -177,16 +186,21 @@ export default function AdminLogin() {
 								Mot de passe oublier?
 							</Link>
 							<br />
-							<Button
-								className={classes.btn}
-								variant="contained"
-								type="submit"
-								color="primary"
-								classes={{ label: classes.btn_text }}
-								fullWidth
-							>
-								Connexion
-							</Button>
+							{isLoading && (
+								<Button
+									className={classes.btn}
+									variant="contained"
+									type="submit"
+									color="primary"
+									classes={{ label: classes.btn_text }}
+									fullWidth
+								>
+									Connexion
+								</Button>
+							)}
+							<div>
+								<BounceLoader size={10} loading color={theme.palette.primary} />
+							</div>
 						</form>
 					</CardContent>
 				</Card>

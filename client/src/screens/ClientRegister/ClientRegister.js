@@ -24,7 +24,7 @@ const useStyles = makeStyles({
 	main_card: {
 		margin: "0",
 		background: "#C4C4C4",
-		borderRadius: "40px",
+		borderRadius: 40,
 		width: "60em",
 		height: "40em",
 		display: "flex",
@@ -228,7 +228,7 @@ export default function ClientRegister() {
 						</FormControl>
 						<br />
 
-						{/*Create acount Button */}
+						{/*Create account Button */}
 						<Button
 							className={classes.btn}
 							variant="contained"
