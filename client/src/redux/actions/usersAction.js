@@ -12,5 +12,7 @@ export const dispatchGetAllUsers = (res) => {
     return {
         type: ACTIONS.GET_ALL_USERS,
         payload: res.data
+           
+        
     }
 }
