@@ -10,7 +10,7 @@ import AdminIcon from "../../Icons/AdminIcon";
 import { useHistory } from "react-router";
 
 import "../index.css";
-import {dispatchLogin, fetchUser, dispatchGetUser} from '../../redux/actions/authAction'
+import {dispatchLogin , dispatchGetUser,fetchUser} from '../../redux/actions/authAction'
 import { fetchAllUsers, dispatchGetAllUsers} from '../../redux/actions/usersAction'
 import { useDispatch, useSelector } from "react-redux";
 
@@ -119,7 +119,7 @@ export default function AdminLogin() {
 		}
 	};
     
-	const token = useSelector(state => state.token)
+	const token = useSelector((state) => state.token)
 	const auth = useSelector((state) => state.auth);
    
 	useEffect(() => {
@@ -133,6 +133,7 @@ export default function AdminLogin() {
 			getToken();
 		}
 	}, [auth.isLogged , dispatch]);
+	
 	useEffect(() => {
 		if(token){
 		  const getUser = () => {
@@ -145,7 +146,6 @@ export default function AdminLogin() {
 		  getUser()
 		}
     },[token, dispatch])
-
 	useEffect(() => {
 		if(token){
 		  const getUsers = () => {
@@ -160,10 +160,10 @@ export default function AdminLogin() {
 	},[token, dispatch])
 
    /* useEffect(() => {
-		if (auth) {
+		if (auth.isLogged) {
 			history.push("/Admin_panel");
 		}
-	},[auth, history])*/
+	},[auth.isLogged, history])*/
 	return (
 		<div className="body">
 			<Card className={classes.main_card} elevation={0}>

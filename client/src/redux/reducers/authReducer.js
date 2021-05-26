@@ -1,4 +1,4 @@
-import ACTIONS from '../actions/'
+import ACTIONS from '../actions'
 
 const initialState = {
     user: [],
@@ -25,3 +25,4 @@ const authReducer = (state = initialState, action) => {
 }
 
 export default authReducer
+

@@ -1,8 +1,10 @@
-const Users = require("../models/userModel");
+const Users = require("../models/AdminModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+
 const userCtrl = {
+	
 	login: async (req, res) => {
 		try {
 			const { email, password } = req.body;
@@ -71,6 +73,9 @@ const userCtrl = {
 		}
 	},
 };
+
+
+
 
 const createRefreshToken = (payload) => {
 	return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
