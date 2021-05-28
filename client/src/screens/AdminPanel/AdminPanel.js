@@ -1,16 +1,19 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { useHistory } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import {
+	dispatchGetUser,
+	dispatchLogin,
+	dispatchLogout,
+	fetchUser,
+	removeToken,
+} from "../../redux/actions/authAction";
 import {
 	AppBar,
 	Button,
-	Card,
-	CardContent,
-	CardHeader,
-	Collapse,
-	Container,
 	CssBaseline,
 	Divider,
 	Drawer,
-	Grid,
 	IconButton,
 	InputBase,
 	List,
@@ -25,15 +28,6 @@ import {
 } from "@material-ui/core";
 import clsx from "clsx";
 import { useStyles } from "./useStyles";
-import { useHistory } from "react-router";
-import { useDispatch, useSelector } from "react-redux";
-import {
-	dispatchGetUser,
-	dispatchLogin,
-	dispatchLogout,
-	fetchUser,
-	removeToken,
-} from "../../redux/actions/authAction";
 
 import Logo from "../../Icons/Logo";
 import SearchIcon from "@material-ui/icons/Search";
@@ -44,8 +38,9 @@ import MenuIcon from "@material-ui/icons/Menu";
 import "./adminPanel.css";
 import Catalog from "../../Icons/Catalog";
 import Dashboard from "../../Icons/Dashboard";
-import { ExpandLess, ExpandMore } from "@material-ui/icons";
-import AddProduct from "../../Icons/AddProduct";
+
+import DashboardScreen from "./Components/DashboardScreen";
+import ProductsScreen from "./Components/ProductsScreen";
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -66,11 +61,7 @@ export default function AdminPanel(props) {
 	const dispatch = useDispatch();
 	const theme = useTheme();
 	const [open, setOpen] = React.useState(false);
-	const [itemOpen, setItemOpen] = React.useState(false);
-
-	const handleClick = () => {
-		setItemOpen(!itemOpen);
-	};
+	const [screen, setScreen] = React.useState(true);
 
 	const handleDrawerOpen = () => {
 		setOpen(true);
@@ -82,7 +73,7 @@ export default function AdminPanel(props) {
 
 	const isLogged = useSelector((state) => state.auth.isLogged);
 
-	useEffect(() => {
+	React.useEffect(() => {
 		if (!isLogged) {
 			history.push("/admin");
 		}
@@ -90,7 +81,7 @@ export default function AdminPanel(props) {
 
 	const token = useSelector((state) => state.token);
 
-	useEffect(() => {
+	React.useEffect(() => {
 		if (token) {
 			const getUser = () => {
 				dispatch(dispatchLogin());
@@ -108,7 +99,7 @@ export default function AdminPanel(props) {
 	const handleLogout = (event) => {
 		dispatch(dispatchLogout());
 		dispatch(removeToken());
-		history.push("/Admin");
+		history.push("/admin");
 	};
 
 	return (
@@ -190,79 +181,29 @@ export default function AdminPanel(props) {
 				</div>
 				<Divider />
 				<List>
-					<ListItem button>
+					<ListItem
+						button
+						onClick={() => setScreen(true)}
+						className={screen ? classes.active : null}
+					>
 						<ListItemIcon>
 							<Dashboard />
 						</ListItemIcon>
 						<ListItemText primary="Tableau de bord" />
 					</ListItem>
-					<ListItem button onClick={handleClick}>
+					<ListItem
+						button
+						onClick={() => setScreen(false)}
+						className={!screen ? classes.active : null}
+					>
 						<ListItemIcon>
 							<Catalog />
 						</ListItemIcon>
-						<ListItemText primary="Catalogue" />
-						{itemOpen ? <ExpandLess /> : <ExpandMore />}
+						<ListItemText primary="Produit" />
 					</ListItem>
-					<Collapse in={itemOpen} timeout="auto" unmountOnExit>
-						<List component="div" disablePadding>
-							<ListItem button className={classes.nested}>
-								<ListItemIcon>
-									<AddProduct />
-								</ListItemIcon>
-								<ListItemText primary="Ajouter Produit" />
-							</ListItem>
-						</List>
-					</Collapse>
 				</List>
 			</Drawer>
-			<Container maxWidth="xl" className="dashbord_container">
-				<Toolbar />
-				<Typography variant="h5" className={classes.dashboardText}>
-					Tableau de bord
-				</Typography>
-				<Grid container spacing={5}>
-					<Grid item xs={12} sm={6} md={3}>
-						<Card className={classes.cart} elevation={5}>
-							<CardHeader title="Commandes" />
-							<CardContent>
-								<Typography variant="h4" color="primary">
-									0
-								</Typography>
-							</CardContent>
-						</Card>
-					</Grid>
-					<Grid item xs={12} sm={6} md={3}>
-						<Card className={classes.cart} elevation={5}>
-							<CardHeader title="Client" />
-							<CardContent>
-								<Typography variant="h4" color="primary">
-									0
-								</Typography>
-							</CardContent>
-						</Card>
-					</Grid>
-					<Grid item xs={12} sm={6} md={3}>
-						<Card className={classes.cart} elevation={5}>
-							<CardHeader title="Produit" className={classes} />
-							<CardContent>
-								<Typography variant="h4" color="primary">
-									0
-								</Typography>
-							</CardContent>
-						</Card>
-					</Grid>
-					<Grid item xs={12} sm={6} md={3}>
-						<Card className={classes.cart} elevation={5}>
-							<CardHeader title="Revenu" className={classes} />
-							<CardContent>
-								<Typography variant="h4" color="primary">
-									0 DZD
-								</Typography>
-							</CardContent>
-						</Card>
-					</Grid>
-				</Grid>
-			</Container>
+			{screen ? <DashboardScreen /> : <ProductsScreen />}
 		</div>
 	);
 }

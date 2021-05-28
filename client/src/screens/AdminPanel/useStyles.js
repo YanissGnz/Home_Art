@@ -48,6 +48,9 @@ export const useStyles = makeStyles((theme) => {
 				width: theme.spacing(9) + 1,
 			},
 		},
+		active: {
+			background: "#f4f4f4",
+		},
 		toolbar: {
 			display: "flex",
 			alignItems: "center",
@@ -115,6 +118,26 @@ export const useStyles = makeStyles((theme) => {
 		},
 		dashboardText: {
 			marginBottom: 20,
+		},
+		productInputContainer: {
+			paddingLeft: "0em",
+			display: "flex",
+			flexDirection: "column",
+		},
+		productInputContainer_2: {
+			paddingLeft: "0em",
+			display: "flex",
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "flex-start",
+		},
+		productInput: {
+			marginBottom: "1em",
+			marginRight: "1em",
+		},
+		descriptionInput: {
+			marginBottom: "1em",
+			marginRight: "1em",
 		},
 	};
 });
