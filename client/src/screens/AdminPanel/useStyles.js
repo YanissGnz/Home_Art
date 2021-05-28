@@ -124,20 +124,42 @@ export const useStyles = makeStyles((theme) => {
 			display: "flex",
 			flexDirection: "column",
 		},
-		productInputContainer_2: {
+		productForm: {
 			paddingLeft: "0em",
+			display: "flex",
+			flexDirection: "column",
+		},
+		productInputContainer_2: {
+			width: "100%",
+			padding: "0em",
 			display: "flex",
 			flexDirection: "row",
 			alignItems: "center",
 			justifyContent: "flex-start",
 		},
 		productInput: {
-			marginBottom: "1em",
+			marginBottom: "2em",
 			marginRight: "1em",
 		},
+		lastProductInput: {
+			marginBottom: "2em",
+		},
 		descriptionInput: {
-			marginBottom: "1em",
+			marginBottom: "2em",
 			marginRight: "1em",
+		},
+		imageCard: {
+			maxWidth: 350,
+			maxHeight: 350,
+			alignSelf: "center",
+			marginBottom: "2em",
+		},
+		addProductBtn: {
+			textTransform: "capitalize",
+			color: theme.palette.common.white,
+			width: "20em",
+			marginBottom: "1em",
+			alignSelf: "center",
 		},
 	};
 });

@@ -10,7 +10,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/core/styles";
 
 import AdminIcon from "../../Icons/AdminIcon";
 
@@ -102,7 +102,8 @@ const initialState = {
 };
 export default function AdminLogin() {
 	const classes = useStyles();
-	const theme = useTheme();
+
+	//const theme = useTheme();
 	const [user, setUser] = useState(initialState);
 	const [isLoading, setIsLoading] = useState(false);
 

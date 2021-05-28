@@ -151,7 +151,7 @@ export default function AdminPanel(props) {
 							className={classes.logout_button}
 							onClick={handleLogout}
 						>
-							Logout
+							Se déconnecter
 						</Button>
 					</Toolbar>
 				</AppBar>
