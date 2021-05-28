@@ -104,6 +104,9 @@ export const useStyles = makeStyles((theme) => {
 		cart: {
 			borderRadius: 10,
 		},
+		card_header: {
+			color: theme.palette.primary,
+		},
 		title: {
 			fontSize: 14,
 		},

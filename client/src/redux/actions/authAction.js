@@ -20,7 +20,7 @@ export const removeToken = () => {
 };
 
 export const fetchUser = async (token) => {
-	const res = await axios.get("/users/info", {
+	const res = await axios.get("/users/admin_info", {
 		headers: { Authorization: token },
 	});
 	return res;

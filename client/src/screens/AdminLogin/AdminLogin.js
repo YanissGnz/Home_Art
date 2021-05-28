@@ -4,7 +4,7 @@ import axios from "axios";
 import { dispatchLogin } from "../../redux/actions/authAction";
 
 import { useDispatch } from "react-redux";
-import { Link } from "@material-ui/core";
+import { CircularProgress, Link } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
@@ -12,72 +12,84 @@ import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
-import BounceLoader from "react-spinners/BounceLoader";
-
 import AdminIcon from "../../Icons/AdminIcon";
 
 import "./index.css";
 
-const useStyles = makeStyles({
-	main_card: {
-		margin: "0",
-		background: "#C4C4C4",
-		borderRadius: "40px",
-		width: "60em",
-		height: "40em",
-		display: "flex",
-		overflow: "hidden",
-	},
-	right_card: {
-		position: "relative",
-		left: "0em",
-		background: "white",
-		margin: "0",
-		paddingLeft: "2em",
-		paddingRight: "2em",
-		width: "40%",
-		height: "100%",
-		display: "flex",
-		alignItems: "center",
-		flexDirection: "row",
-	},
-	text: {
-		fontFamily: "Poppins",
-		fontWeight: "600",
-		fontSize: "17px",
-	},
-	text_field: {
-		marginTop: "1em",
-		fontFamily: "Poppins",
-	},
-	btn: {
-		marginTop: "1.5em",
-	},
-	btn_text: {
-		width: "100%",
-		fontFamily: "Poppins",
-		fontWeight: "500",
-		fontSize: "15px",
-		textTransform: "capitalize",
-		color: "white",
-	},
-	mdps_oublier: {
-		position: "relative",
-		left: "62%",
-		marginTop: "0.2em",
-		fontFamily: "Poppins",
-		fontWeight: "500",
-		fontSize: "11px",
-	},
-	img_div: {
-		position: "static",
-		height: "100%",
-		width: "60%",
-		display: "flex",
-		justifyContent: "center",
-		alignContent: "center",
-		alignItems: "center",
-	},
+const useStyles = makeStyles((theme) => {
+	return {
+		main_card: {
+			margin: "0",
+			background: "#C4C4C4",
+			borderRadius: "40px",
+			width: "60em",
+			height: "40em",
+			display: "flex",
+			overflow: "hidden",
+		},
+		right_card: {
+			position: "relative",
+			left: "0em",
+			background: "white",
+			margin: "0",
+			paddingLeft: "2em",
+			paddingRight: "2em",
+			width: "40%",
+			height: "100%",
+			display: "flex",
+			alignItems: "center",
+			flexDirection: "row",
+		},
+		text: {
+			fontFamily: "Poppins",
+			fontWeight: "600",
+			fontSize: "17px",
+		},
+		text_field: {
+			marginTop: "1em",
+			fontFamily: "Poppins",
+		},
+		btn: {
+			marginTop: "1.5em",
+		},
+		btn_text: {
+			width: "100%",
+			fontFamily: "Poppins",
+			fontWeight: "500",
+			fontSize: "15px",
+			textTransform: "capitalize",
+			color: "white",
+		},
+		mdps_oublier: {
+			position: "relative",
+			left: "62%",
+			marginTop: "0.2em",
+			fontFamily: "Poppins",
+			fontWeight: "500",
+			fontSize: "11px",
+		},
+		wrapper: {
+			margin: 0,
+			position: "relative",
+		},
+		buttonProgress: {
+			color: theme.palette.primary,
+			position: "absolute",
+			top: "50%",
+			left: "50%",
+			marginTop: -1,
+			marginLeft: -12,
+		},
+		img_div: {
+			position: "static",
+			height: "100%",
+			width: "60%",
+			display: "flex",
+			justifyContent: "center",
+			alignContent: "center",
+			alignItems: "center",
+		},
+	};
 });
 
 const initialState = {
@@ -90,9 +102,9 @@ const initialState = {
 };
 export default function AdminLogin() {
 	const classes = useStyles();
-	const [user, setUser] = useState(initialState);
-	const [isLoading, setIsLoading] = useState(true);
 	const theme = useTheme();
+	const [user, setUser] = useState(initialState);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const dispatch = useDispatch();
 	const history = useHistory();
@@ -107,7 +119,7 @@ export default function AdminLogin() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			setIsLoading(false);
+			setIsLoading(true);
 
 			const res = await axios.post("/users/admin", { email, password });
 			setUser({ ...user, err: "", passwordErr: "", success: res.data.msg });
@@ -121,7 +133,7 @@ export default function AdminLogin() {
 			dispatch(dispatchLogin());
 			history.push("/admin_panel");
 		} catch (err) {
-			setIsLoading(true);
+			setIsLoading(false);
 
 			setUser({
 				...user,
@@ -131,7 +143,6 @@ export default function AdminLogin() {
 			});
 		}
 	};
-
 	return (
 		<div className="body">
 			<Card className={classes.main_card} elevation={0}>
@@ -186,20 +197,24 @@ export default function AdminLogin() {
 								Mot de passe oublier?
 							</Link>
 							<br />
-							{isLoading && (
+							<div className={classes.wrapper}>
 								<Button
 									className={classes.btn}
 									variant="contained"
 									type="submit"
 									color="primary"
+									disabled={isLoading}
 									classes={{ label: classes.btn_text }}
 									fullWidth
 								>
 									Connexion
 								</Button>
-							)}
-							<div>
-								<BounceLoader size={10} loading color={theme.palette.primary} />
+								{isLoading && (
+									<CircularProgress
+										size={24}
+										className={classes.buttonProgress}
+									/>
+								)}
 							</div>
 						</form>
 					</CardContent>

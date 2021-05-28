@@ -19,11 +19,11 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: Number,
-        default: 1 // 0 = user, 1 = admin
+        default:  0// 0 = user, 1 = admin
     },
    
 }, {
     timestamps: true
 })
 
-module.exports = mongoose.model("Users", userSchema)
+module.exports = mongoose.model("Users2", userSchema)
