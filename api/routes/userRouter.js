@@ -5,9 +5,13 @@ const auth = require("../middleware/auth");
 const authAdmin = require("../middleware/authAdmin");
 
 router.post("/admin", userCtrl.login);
+router.get("/load_admin", auth, userCtrl.loadAdmin);
+
 router.post("/login", userCtrl2.login);
 
-router.post("/refresh_token", userCtrl.getAccessToken);
+//router.post("/loggedin", auth, authAdmin, userCtrl.loggedin);
+
+//router.post("/refresh_token", userCtrl.getAccessToken);
 router.post("/register", userCtrl2.register);
 
 router.post("/activation", userCtrl2.activateEmail);

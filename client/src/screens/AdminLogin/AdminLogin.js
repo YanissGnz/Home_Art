@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router";
 import axios from "axios";
 import { dispatchLogin } from "../../redux/actions/authAction";
+import { returnErrors, clearErrors } from "../../redux/actions/errAction";
 
 import { useDispatch } from "react-redux";
 import { CircularProgress, Link } from "@material-ui/core";
@@ -95,10 +96,6 @@ const useStyles = makeStyles((theme) => {
 const initialState = {
 	email: "",
 	password: "",
-	err: "",
-	passwordErr: "",
-
-	success: "",
 };
 export default function AdminLogin() {
 	const classes = useStyles();
@@ -114,36 +111,43 @@ export default function AdminLogin() {
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
-		setUser({ ...user, [name]: value, err: "", passwordErr: "", success: "" });
+		setUser({ ...user, [name]: value });
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		try {
-			setIsLoading(true);
 
-			const res = await axios.post("/users/admin", { email, password });
-			setUser({ ...user, err: "", passwordErr: "", success: res.data.msg });
+		setIsLoading(true);
 
-			const getToken = async () => {
-				const res = await axios.post("/users/refresh_token", null);
-				dispatch({ type: "GET_TOKEN", payload: res.data.access_token });
-			};
-			getToken();
+		// Headers
+		const config = {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		};
 
-			dispatch(dispatchLogin());
-			history.push("/admin_panel");
-		} catch (err) {
-			setIsLoading(false);
+		// Request body
+		const body = JSON.stringify({ email, password });
 
-			setUser({
-				...user,
-				err: err.response.data.emailMsg,
-				passwordErr: err.response.data.passwordMsg,
-				success: "",
+		axios
+			.post("/users/admin", body, config)
+			.then((res) => {
+				dispatch(dispatchLogin(res));
+				dispatch(clearErrors());
+				history.push("/admin_panel");
+			})
+			.catch((err) => {
+				setIsLoading(false);
+				dispatch(
+					returnErrors(
+						err.response.data.msg,
+						err.response.status,
+						err.response.data.id
+					)
+				);
 			});
-		}
 	};
+
 	return (
 		<div className="body">
 			<Card className={classes.main_card} elevation={0}>

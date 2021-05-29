@@ -2,11 +2,10 @@ import React from "react";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import {
-	dispatchGetUser,
-	dispatchLogin,
+	dispatchAdminError,
+	dispatchAdminLoaded,
+	dispatchAdminLoading,
 	dispatchLogout,
-	fetchUser,
-	removeToken,
 } from "../../redux/actions/authAction";
 import {
 	AppBar,
@@ -41,6 +40,8 @@ import Dashboard from "../../Icons/Dashboard";
 
 import DashboardScreen from "./Components/DashboardScreen";
 import ProductsScreen from "./Components/ProductsScreen";
+import axios from "axios";
+import { returnErrors } from "../../redux/actions/errAction";
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -63,6 +64,35 @@ export default function AdminPanel(props) {
 	const [open, setOpen] = React.useState(false);
 	const [screen, setScreen] = React.useState(true);
 
+	// Get token from localstorage
+	const token = useSelector((state) => state.auth.token);
+
+	React.useEffect(() => {
+		const loadAdmin = async () => {
+			dispatch(dispatchAdminLoading());
+
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
+
+			await axios
+				.get("/users/load_admin", config)
+				.then((res) => {
+					dispatch(dispatchAdminLoaded(res));
+				})
+				.catch((err) => {
+					dispatch(dispatchAdminError());
+					returnErrors(err.response.data.msg, err.response.status);
+				});
+			const isAuthenticated = localStorage.getItem("isAuthenticated");
+			if (isAuthenticated === "false") history.push("/admin");
+		};
+		loadAdmin();
+	}, [dispatch, history, token]);
+
 	const handleDrawerOpen = () => {
 		setOpen(true);
 	};
@@ -71,34 +101,10 @@ export default function AdminPanel(props) {
 		setOpen(false);
 	};
 
-	const isLogged = useSelector((state) => state.auth.isLogged);
-
-	React.useEffect(() => {
-		if (!isLogged) {
-			history.push("/admin");
-		}
-	}, [isLogged, history]);
-
-	const token = useSelector((state) => state.token);
-
-	React.useEffect(() => {
-		if (token) {
-			const getUser = () => {
-				dispatch(dispatchLogin());
-
-				return fetchUser(token).then((res) => {
-					dispatch(dispatchGetUser(res));
-				});
-			};
-			getUser();
-		}
-	}, [token, dispatch]);
-
 	const handleSearch = (event) => event.preventDefault();
 
 	const handleLogout = (event) => {
 		dispatch(dispatchLogout());
-		dispatch(removeToken());
 		history.push("/admin");
 	};
 

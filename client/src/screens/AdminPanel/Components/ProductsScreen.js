@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import NumberFormat from "react-number-format";
 import {
 	Button,
@@ -73,22 +74,56 @@ const categories = [
 	},
 ];
 
+const initialState = {
+	name: "",
+	brand: "",
+	price: "",
+	stock: 0,
+	categorie: "",
+	description: "",
+	receipt: "",
+};
+
 export default function ProductsScreen() {
 	const classes = useStyles();
 	const [categorie, setCategorie] = React.useState("");
+	const [fileName, setFileName] = React.useState("");
 	const [file, setFile] = React.useState("");
+	const [product, setProduct] = React.useState(initialState);
+	const [msg, setMsg] = React.useState("");
 
+	const handleChangeInput = (e) => {
+		const { name, value } = e.target;
+		setProduct({ ...product, [name]: value });
+	};
+	const handleCategorieChange = (e) => {
+		setCategorie(e.target.value);
+		setProduct({ ...product, categorie: categorie });
+	};
 	function handleImageChange(e) {
 		let url = URL.createObjectURL(e.target.files[0]);
 		setFile(url);
+		setFileName(e.target.files[0]);
+		setProduct({ ...product, receipt: fileName });
 	}
-
-	const handleChange = (event) => {
-		setCategorie(event.target.value);
-	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+
+		const formData = new FormData();
+
+		formData.append("name", product.name);
+		formData.append("brand", product.brand);
+		formData.append("price", product.price);
+		formData.append("stock", product.stock);
+		formData.append("categorie", product.categorie);
+		formData.append("description", product.description);
+		formData.append("receipt", fileName);
+
+		axios
+			.post("/products/add_product", formData)
+			.then((res) => setMsg(res.data.msg))
+			.catch((err) => setMsg(err.msg));
 	};
 	return (
 		<Container maxWidth="xl" className="dashbord_container">
@@ -102,23 +137,34 @@ export default function ProductsScreen() {
 			</Typography>
 
 			<Container maxWidth="xl" className={classes.productInputContainer}>
-				<form onSubmit={handleSubmit} className={classes.productForm}>
+				<form
+					onSubmit={handleSubmit}
+					className={classes.productForm}
+					encType="multipart/form-data"
+				>
+					{msg && <Typography>{msg}</Typography>}
 					<div className={classes.productInputContainer_2}>
 						<TextField
 							variant="filled"
 							label="Nom de produit"
+							name="name"
+							onChange={handleChangeInput}
 							className={classes.productInput}
 							fullWidth
 						/>
 						<TextField
 							variant="filled"
 							label="Marque"
+							name="brand"
+							onChange={handleChangeInput}
 							className={classes.productInput}
 							fullWidth
 						/>
 						<TextField
 							variant="filled"
 							label="Prix	"
+							name="price"
+							onChange={handleChangeInput}
 							InputProps={{
 								startAdornment: (
 									<InputAdornment position="start">DZD</InputAdornment>
@@ -132,6 +178,8 @@ export default function ProductsScreen() {
 						<TextField
 							variant="filled"
 							label="Nombre de stock"
+							name="stock"
+							onChange={handleChangeInput}
 							InputProps={{
 								inputComponent: StockFormat,
 							}}
@@ -142,7 +190,7 @@ export default function ProductsScreen() {
 							select
 							label="Categories"
 							value={categorie}
-							onChange={handleChange}
+							onChange={handleCategorieChange}
 							className={classes.lastProductInput}
 							variant="filled"
 							fullWidth
@@ -157,6 +205,8 @@ export default function ProductsScreen() {
 					<TextField
 						variant="filled"
 						label="Descreption"
+						name="description"
+						onChange={handleChangeInput}
 						fullWidth
 						multiline
 						rowsMax={6}

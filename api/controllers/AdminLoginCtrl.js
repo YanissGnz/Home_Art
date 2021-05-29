@@ -2,57 +2,64 @@ const Users = require("../models/AdminModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-
 const userCtrl = {
-	
+	/**
+	 * @route   POST /users/admin
+	 * @desc    Login admin
+	 * @access  Public
+	 */
 	login: async (req, res) => {
 		try {
 			const { email, password } = req.body;
 			if (email == "") {
-				return res.status(400).json({ emailMsg: "Enter votre email." });
+				return res.status(400).json({ msg: "Enter votre email.", id: 0 });
 			}
 			if (password == "") {
-				return res.status(400).json({ passwordMsg: "Enter votre mot de passe." });
+				return res
+					.status(400)
+					.json({ msg: "Enter votre mot de passe.", id: 1 });
 			}
 			const user = await Users.findOne({ email });
 			if (!user)
-				return res.status(400).json({ emailMsg: "Ce email n'exist pas." });
+				return res.status(400).json({ msg: "Ce email n'exist pas.", id: 0 });
 
 			const isMatch = await bcrypt.compare(password, user.password);
 			if (!isMatch)
-				return res.status(400).json({ passwordMsg: "Mot de passe incorrect." });
+				return res.status(400).json({ msg: "Mot de passe incorrect.", id: 1 });
 
 			if (user.role === 0) {
-				return res.status(400).json({ emailMsg: "Vous etes pas un admin." });
+				return res.status(400).json({ msg: "Vous ètes pas un admin.", id: 0 });
 			}
 
-			const refresh_token = createRefreshToken({ id: user._id });
-			res.cookie("refreshtoken", refresh_token, {
-				httpOnly: true,
-				path: "/users/refresh_token",
-				maxAge: 7*24*60*60*1000, //7 days
+			const access_token = createAccessToken({ id: user._id });
+
+			res.status(200).json({
+				access_token,
 			});
-
-			//const userInfo = await Users.findById(req.user.id).select("-password");
-
-			res.json({ /*user: userInfo,*/ msg: "Login success!" });
 		} catch (err) {
-			return res.status(500).json({ msg: err.message });
+			return res.status(400).json({ msg: err.message });
 		}
 	},
-	getAccessToken: (req, res) => {
+
+	/**
+	 * @route   GET /users/load_admin
+	 * @desc    Login admin
+	 * @access  Public
+	 */
+	loadAdmin: async (req, res) => {
 		try {
-			const rf_token = req.cookies.refreshtoken;
-			if (!rf_token) return res.status(400).json({ msg: "Please login now!" });
-
-			jwt.verify(rf_token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-				if (err) return res.status(400).json({ msg: "Please login now!!!" });
-
-				const access_token = createAccessToken({ id: user.id });
-				res.json({ access_token });
+			const user = await Users.findById(req.user.id)
+				.select("-password")
+				.select("-register_date");
+			if (!user) return res.status(50).json({ msg: "User does not exist." });
+			if (user.role !== 1) {
+				return res.status(500).json({ msg: "Vous etes pas un admin." });
+			}
+			res.status(200).json({
+				user,
 			});
-		} catch (err) {
-			return res.status(500).json({ msg: err.message });
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
 		}
 	},
 
@@ -76,18 +83,9 @@ const userCtrl = {
 	},
 };
 
-
-
-
-const createRefreshToken = (payload) => {
-	return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-		expiresIn: "1h",
-	});
-};
-
 const createAccessToken = (payload) => {
 	return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-		expiresIn: "1h",
+		expiresIn: 86400, //1 day,
 	});
 };
 

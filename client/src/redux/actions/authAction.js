@@ -1,11 +1,15 @@
 import ACTIONS from "./index";
 import axios from "axios";
 
-export const dispatchLogin = () => {
+//Login Action
+export const dispatchLogin = (res) => {
 	return {
 		type: ACTIONS.LOGIN,
+		payload: res.data,
 	};
 };
+
+//Logout Action
 
 export const dispatchLogout = () => {
 	return {
@@ -13,9 +17,21 @@ export const dispatchLogout = () => {
 	};
 };
 
-export const removeToken = () => {
+export const dispatchAdminLoading = () => {
 	return {
-		type: ACTIONS.REMOVE_TOKEN,
+		type: ACTIONS.ADMIN_LOADING,
+	};
+};
+export const dispatchAdminLoaded = (res) => {
+	return {
+		type: ACTIONS.ADMIN_LOADED,
+		payload: res.data,
+	};
+};
+
+export const dispatchAdminError = (res) => {
+	return {
+		type: ACTIONS.ADMIN_ERROR,
 	};
 };
 
