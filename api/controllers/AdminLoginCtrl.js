@@ -51,25 +51,15 @@ const userCtrl = {
 			const user = await Users.findById(req.user.id)
 				.select("-password")
 				.select("-register_date");
-			if (!user) return res.status(50).json({ msg: "User does not exist." });
+			if (!user) return res.status(400).json({ msg: "User does not exist." });
 			if (user.role !== 1) {
-				return res.status(500).json({ msg: "Vous etes pas un admin." });
+				return res.status(400).json({ msg: "Vous etes pas un admin." });
 			}
 			res.status(200).json({
 				user,
 			});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
-		}
-	},
-
-	getUserInfo: async (req, res) => {
-		try {
-			const user = await Users.findById(req.user.id).select("-password");
-
-			res.json(user);
-		} catch (err) {
-			return res.status(500).json({ msg: err.message });
 		}
 	},
 	getUsersAllInfo: async (req, res) => {
