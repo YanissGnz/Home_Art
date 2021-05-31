@@ -12,40 +12,49 @@ const {CLIENT_URL} = process.env
 const userCtrl2 = {
 	register: async (req, res) => {
         try {
-            const {name , last_name, email, password } = req.body
+            const {name , last_name, email, password,cf_password } = req.body
             
 			if (name == "") {
-				return res.status(400).json({ nameMsg: "Enter votre nom." });
+				return res.status(400).json({ msg: "Enter votre nom.",id:2 });
+			}
+			if (!validateName(name)) {
+				return res.status(400).json({ msg: "Invalid name",id:2 });
 			}
 			if (last_name == "") {
-				return res.status(400).json({ last_nameMsg: "Enter votre prénom." });
+				return res.status(400).json({msg: "Enter votre prénom.",id:3 });
+			}
+			if (!validateLast_Name(last_name)) {
+				return res.status(400).json({ msg: "Invalid last_name",id:3 });
 			}
 			if (email == "") {
-				return res.status(400).json({ emailMsg: "Enter votre email." });
+				return res.status(400).json({ msg: "Enter votre email." ,id:0});
 			}
 			if (password == "") {
-				return res.status(400).json({ passwordMsg: "Enter votre mot de passe." });
+				return res.status(400).json({ msg: "Enter votre mot de passe.", id:1 });
 			}
             if(!validateEmail(email))
-                return res.status(400).json({emailMsg: "Invalid email."})
+                return res.status(400).json({msg: "Invalid email.",id:0})
 
             const user = await Users2.findOne({email})
-            if(user) return res.status(400).json({emailMsg: "This email already exists."})
+            if(user) return res.status(400).json({msg: "This email already exists.",id:0})
 
             if(password.length < 6)
-                return res.status(400).json({passwordMsg: "Password must be at least 6 characters."})
+                return res.status(400).json({msg: "Password must be at least 6 characters.",id:1})
+
+			if(!isMatch(password, cf_password))
+			    return res.status(400).json({msg: "Password did not match.",id:4})
 
             const passwordHash = await bcrypt.hash(password, 12)
 
             const newUser = {
-                name,last_name, email, password: passwordHash
+                name,last_name, email, password:passwordHash,cf_password: passwordHash
             }
 
             
 
-            const activation_token = createActivationToken(newUser)
+            const access_token = createActivationToken(newUser)
 
-            const url = `${CLIENT_URL}/users/activate/${activation_token}`
+            const url = `${CLIENT_URL}/users/activate/${access_token}`
 			
             sendEmail(email, url ,"Verify your email address")
 
@@ -79,55 +88,54 @@ const userCtrl2 = {
     },
 	
 	login: async (req, res) => {
+		
 		try {
 			const { email, password } = req.body;
 			if (email == "") {
-				return res.status(400).json({ emailMsg: "Enter votre email." });
+				return res.status(400).json({ msg: "Enter votre email.", id: 0 });
 			}
 			if (password == "") {
-				return res.status(400).json({ passwordMsg: "Enter votre mot de passe." });
+				return res.status(400).json({ msg: "Enter votre mot de passe.", id: 1 });
 			}
 			const user = await Users2.findOne({ email });
 			if (!user)
-				return res.status(400).json({ emailMsg: "Ce email n'exist pas." });
+				return res.status(400).json({ msg: "Ce email n'exist pas.", id: 0 });
 
 			const isMatch = await bcrypt.compare(password, user.password);
 			if (!isMatch)
-				return res.status(400).json({ passwordMsg: "Mot de passe incorrect." });
+				return res.status(400).json({ msg: "Mot de passe incorrect.", id: 1 });
 
 			if (user.role === 1) {
-				return res.status(400).json({ emailMsg: "Vous etes pas un utilisateur" });
+				return res.status(400).json({ msg: "Vous ètes pas un utilisateur.", id: 0 });
 			}
 
-			const refresh_token = createRefreshToken({ id: user._id });
-			res.cookie("refreshtoken", refresh_token, {
-				httpOnly: true,
-				path: "/users/refresh_token",
-				maxAge: 7*24*60*60*1000, //7 days
-			});
+			const access_token = createAccessToken({ id: user._id });
 
-			res.json({ msg: "Login success!" });
+			res.status(200).json({
+				access_token,
+			});
 		} catch (err) {
-			return res.status(500).json({ msg: err.message });
+			return res.status(400).json({ msg: err.message });
 		}
 	},
-	getAccessToken: (req, res) => {
+	loadUser: async (req, res) => {
 		try {
-			const rf_token = req.cookies.refreshtoken;
-			if (!rf_token) return res.status(400).json({ msg: "Please login now!" });
-
-			jwt.verify(rf_token, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-				if (err) return res.status(400).json({ msg: "Please login now!!!" });
-
-				const access_token = createAccessToken({ id: user.id });
-				res.json({ access_token });
+			const user = await Users2.findById(req.user.id)
+				.select("-password")
+				.select("-register_date");
+			if (!user) return res.status(400).json({ msg: "User does not exist." });
+			if (user.role !== 0) {
+				return res.status(400).json({ msg: "Vous etes pas un utilisateur" });
+			}
+			res.status(200).json({
+				user,
 			});
-		} catch (err) {
-			return res.status(500).json({ msg: err.message });
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
 		}
 	},
 
-	getUserInfo2: async (req, res) => {
+	getUserInfo: async (req, res) => {
 		try {
 			const user = await Users2.findById(req.user.id).select("-password");
 
@@ -149,7 +157,7 @@ const userCtrl2 = {
 	
 			const passwordHash = await bcrypt.hash(password, 12)
 	
-			if(!email_verified) return res.status(400).json({msg: "Email verification failed."})
+			if(!email_verified) return res.status(400).json({msg: "Email verification failed.",id:0})
 	
 			const user = await Users2.findOne({email})
 	
@@ -157,14 +165,11 @@ const userCtrl2 = {
 				const isMatch = await bcrypt.compare(password, user.password)
 				if(!isMatch) return res.status(400).json({msg: "Password is incorrect."})
 	
-				const refresh_token = createRefreshToken({id: user._id})
-				res.cookie('refreshtoken', refresh_token, {
-					httpOnly: true,
-					path: '/users/refresh_token',
-					maxAge: 7*24*60*60*1000 // 7 days
-				})
-	
-				res.json({msg: "Login success!"})
+				const access_token = createAccessToken({ id: user._id });
+
+			res.status(200).json({
+				access_token,
+			});
 			}else{
 				const newUser = new Users2({
 					name, email, password: passwordHash
@@ -172,19 +177,16 @@ const userCtrl2 = {
 	
 				await newUser.save()
 				
-				const refresh_token = createRefreshToken({id: newUser._id})
-				res.cookie('refreshtoken', refresh_token, {
-					httpOnly: true,
-					path: '/users/refresh_token',
-					maxAge: 7*24*60*60*1000 // 7 days
-				})
-	
-				res.json({msg: "Login success!"})
+				const access_token = createAccessToken({ id: newUser._id });
+
+			res.status(200).json({
+				access_token,
+			});
 			}
 	
 	
 		} catch (err) {
-			return res.status(500).json({msg: err.message})
+			return res.status(400).json({msg: err.message})
 		}
 	},
 };
@@ -194,16 +196,25 @@ function validateEmail(email) {
     const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 }
+function validateName(name) {
+    const re =  /^[a-zA-Z ]*$/;
+    return re.test(name);
+}
+function validateLast_Name(last_name) {
+    const re =  /^[a-zA-Z ]*$/;
+    return re.test(last_name);
+}
+function isMatch (password, cf_password)  {
+    if(password === cf_password) return true
+    return false
+}
+
 
 const createActivationToken = (payload) => {
     return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET, {expiresIn: '5m'})
 }
 
-const createRefreshToken = (payload) => {
-	return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-		expiresIn: "1h",
-	});
-};
+
 
 const createAccessToken = (payload) => {
 	return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {

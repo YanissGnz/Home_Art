@@ -1,23 +1,25 @@
-import React , { useState, useEffect }  from "react";
+import React, { useState} from "react";
+import axios from "axios";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import { Link } from "@material-ui/core";
+import {CircularProgress, Link } from "@material-ui/core";
+import { returnErrors, clearErrors } from "../../redux/actions/errAction";
 
 import LoginIcon from "../../Icons/LoginIcon";
 import { useHistory } from "react-router";
-import GoogleLogin from 'react-google-login';
-import "../index.css";
-import {dispatchLogin} from '../../redux/actions/authAction'
+import GoogleLogin from "react-google-login";
+import { dispatchLogin2 } from "../../redux/actions/authAction";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch ,useSelector} from "react-redux";
 
-import axios from "axios";
+import "./index.css";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => {
+  return{
 	main_card: {
 		margin: "0",
 		background: "#C4C4C4",
@@ -66,7 +68,18 @@ const useStyles = makeStyles({
 		fontWeight: "500",
 		fontSize: "11px",
 	},
-
+    wrapper: {
+		margin: 0,
+		position: "relative",
+	},
+	buttonProgress: {
+		color: theme.palette.primary,
+		position: "absolute",
+		top: "50%",
+		left: "50%",
+		marginTop: -1,
+		marginLeft: -12,
+	},
 	line: {
 		width: "9em",
 		height: "0.01em",
@@ -109,99 +122,105 @@ const useStyles = makeStyles({
 		alignContent: "center",
 		alignItems: "center",
 	},
+  }
 });
 
 const initialState = {
 	email: "",
 	password: "",
-	err: "",
-	passwordErr: "",
-	success: "",
 };
 
 export default function ClientLogin() {
 	const classes = useStyles();
-
 	const [user, setUser] = useState(initialState);
+	const [isLoading, setIsLoading] = useState(false);
+
 	const dispatch = useDispatch();
 	const history = useHistory();
 
-	const { email, password, err, passwordErr } = user;
+	const { email, password } = user;
+    
+	const emailMsg = useSelector((state)  => state.err);
+    const passwordMsg = useSelector((state)  => state.err);
+
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
-		setUser({ ...user, [name]: value, err: "", passwordErr: "", success: "" })
+		setUser({ ...user, [name]: value });
 	};
 
 	const handleSubmit = async (e) => {
-		e.preventDefault()
-		try {
-			const res = await axios.post("/users/login", { email, password })
-			setUser({ ...user, err: "", passwordErr: "", success: res.data.msg })
+		e.preventDefault();
 
-			localStorage.setItem("Login", true)
+		setIsLoading(true);
 
-			dispatch(dispatchLogin())
-			history.push("/");
-		} catch (err) {
-			setUser({
-				...user,
-				err: err.response.data.emailMsg,
-				passwordErr: err.response.data.passwordMsg,
-				success: "",
+		// Headers
+		const config = {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		};
+
+		// Request body
+		const body = JSON.stringify({ email, password });
+
+		axios
+			.post("/users/login", body, config)
+			.then((res) => {
+				dispatch(dispatchLogin2(res));
+				dispatch(clearErrors());
+				history.push("/");
+			})
+			.catch((err) => {
+				setIsLoading(false);
+				dispatch(
+					returnErrors(
+						err.response.data.msg,
+						err.response.status,
+						err.response.data.id
+					)
+				);
 			});
-		}
 	};
-    
 
-	const auth2 = useSelector((state) => state.auth);
-	useEffect(() => {
-		
-		const firstLogin = localStorage.getItem("Login");
-		if (firstLogin) {
-			const getToken = async () => {
-				const res = await axios.post("/users/refresh_token", null);
-				dispatch({ type: "GET_TOKEN", payload: res.data.access_token });
-			};
-			getToken();
-		}
-	}, [auth2.isLogged , dispatch]);
 
-    
-    const responseGoogle = async (response) => {
-        try {
-            const res = await axios.post('/users/google_login', {tokenId: response.tokenId})
 
-            setUser({...user, error:'', success: res.data.msg})
-            localStorage.setItem('Login', true)
+	const responseGoogle = async (response) => {
 
-            dispatch(dispatchLogin())
-            history.push('/')
-        } catch (err) {
-            err.response.data.msg && 
-            setUser({...user, err: err.response.data.msg, success: ''})
-        }
-    }
-	useEffect(() => {
-		if (auth2.isLogged) {
-			history.push("/");
-		}
-	},[auth2.isLogged, history])
+		axios
+			.post("/users/google_login" ,{tokenId: response.tokenId})
+			.then((res) => {
+				setIsLoading(true);
+				dispatch(dispatchLogin2(res));
+				dispatch(clearErrors());
+				history.push("/");
+			})
+			.catch((err) => {
+				setIsLoading(false);
+				dispatch(
+					returnErrors(
+						err.response.data.msg,
+						err.response.status,
+						err.response.data.id
+					)
+				);
+			});
+	};
 	return (
 		<div className="body">
 			<Card className={classes.main_card} elevation={0}>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent>
-					  <form onSubmit={handleSubmit}>
-						<Typography
-							className={classes.text}
-							variant="h6"
-							align="center"
-							color="primary"
-						>
-							Se Connecter
-						</Typography>
-						<TextField
+						<form onSubmit={handleSubmit}>
+							<Typography
+								className={classes.text}
+								variant="h6"
+								align="center"
+								color="primary"
+							>
+								Se Connecter
+							</Typography>
+							<TextField
 								variant="outlined"
 								label="Email"
 								size="small"
@@ -211,10 +230,10 @@ export default function ClientLogin() {
 								name="email"
 								value={email}
 								onChange={handleChangeInput}
-								helperText={err}
-								error={err}
-						 />
-						<TextField
+								helperText={emailMsg.id === 0 ? emailMsg.msg : null}
+								error={emailMsg.id === 0 ? true : false}
+							/>
+							<TextField
 								type="password"
 								variant="outlined"
 								label="Mot de passe"
@@ -225,79 +244,82 @@ export default function ClientLogin() {
 								fullWidth
 								value={password}
 								onChange={handleChangeInput}
-								helperText={passwordErr}
-								error={passwordErr}
-						/>
-						<br />
-
-						<Button
-							className={classes.btn}
-							variant="contained"
-							color="primary"
-							type="submit"
-							classes={{ label: classes.btn_text }}
-							fullWidth
-							disableElevation
-						>
-							Connexion
-						</Button>
-						<br />
-						<div className="mdps_oblier">
-							<Link
-								component="button"
+								helperText={passwordMsg.id === 1 ? passwordMsg.msg : null}
+								error={passwordMsg.id === 1 ? true : false}
+							/>
+							<br />
+						  <div className={classes.wrapper}>
+							<Button
+								className={classes.btn}
+								variant="contained"
 								color="primary"
-								underline="hover"
-								variant="inherit"
-								classes={{ root: classes.mdps_oublier }}
-								onClick={() => history.push("/recover_password")}
+								type="submit"
+								disabled={isLoading}
+								classes={{ label: classes.btn_text }}
+								fullWidth
 							>
-								Mot de passe oublier?
-							</Link>
-						</div>
-						<div className={classes.div}>
-							<div className={classes.line}></div>
-							<Typography
-								className={classes.btm_text}
-								variant="subtitle2"
-								align="center"
-							>
-								Ou
-							</Typography>
-							<div className={classes.line}></div>
-						</div>
-						<Button
-							
-							fullWidth
-							
-						>   
-							<GoogleLogin
-                               clientId="664430788321-7nplkv1bhj864bcedgirrug2vdtf0e4g.apps.googleusercontent.com"
-                                buttonText="Continue with google"
-                                onSuccess={responseGoogle}
-                                cookiePolicy={'single_host_origin'}
-                            />
-						</Button>
-						<div className={classes.div}>
-							<Typography
-								className={classes.signup_txt}
-								variant="subtitle2"
-								align="center"
-							>
-								Vous n’avez pas un compte?
-							</Typography>
+								Connexion
+							</Button>
+							{isLoading && (
+									<CircularProgress
+										size={24}
+										className={classes.buttonProgress}
+									/>
+							)}
+						  </div>
+							<br />
+							<div className="mdps_oblier">
+								<Link
+									component="button"
+									color="primary"
+									underline="hover"
+									variant="inherit"
+									classes={{ root: classes.mdps_oublier }}
+									onClick={() => history.push("/recover_password")}
+								>
+									Mot de passe oublier?
+								</Link>
+							</div>
+							<div className={classes.div}>
+								<div className={classes.line}></div>
+								<Typography
+									className={classes.btm_text}
+									variant="subtitle2"
+									align="center"
+								>
+									Ou
+								</Typography>
+								<div className={classes.line}></div>
+							</div>
+							<Button fullWidth>
+								<GoogleLogin
+									clientId="664430788321-7nplkv1bhj864bcedgirrug2vdtf0e4g.apps.googleusercontent.com"
+									buttonText="Continue with google"
+									onSuccess={responseGoogle}
+									cookiePolicy={"single_host_origin"}
+								/>
+							</Button>
+							<div className={classes.div}>
+								<Typography
+									className={classes.signup_txt}
+									variant="subtitle2"
+									align="center"
+								>
+									Vous n’avez pas un compte?
+								</Typography>
 
-							<Link
-								component="button"
-								color="primary"
-								underline="hover"
-								variant="inherit"
-								classes={{ root: classes.signup_txt }}
-								onClick={() => history.push("/register")}
-							>
-								Inscrivez-vous
-							</Link>
-						</div>
-					  </form>
+								<Link
+									component="button"
+									color="primary"
+									underline="hover"
+									variant="inherit"
+									classes={{ root: classes.signup_txt }}
+									onClick={() => history.push("/register")}
+								>
+									Inscrivez-vous
+								</Link>
+							</div>
+						</form>
 					</CardContent>
 				</Card>
 				<div className={classes.img_div}>

@@ -1,20 +1,22 @@
-const jwt = require('jsonwebtoken')
-
+const jwt = require("jsonwebtoken");
 
 const auth = (req, res, next) => {
-    try {
-        const token = req.header("Authorization")
-        if(!token) return res.status(400).json({msg: "Invalid Authentication."})
+	const token = req.header("x-auth-token");
 
-        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-            if(err) return res.status(400).json({msg: "Invalid Authentication."})
+	//Check for token
+	if (!token) return res.status(400).json({ msg: "Authentication Invalid ." });
 
-            req.user = user
-            next()
-        })
-    } catch (err) {
-        return res.status(500).json({msg: err.message})
-    }
-}
+	try {
+		// Verify token
+		const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+		// Add user from payload
+		req.user = decoded;
+		next();
+	} catch (e) {
+		res.status(400).json({
+			msg: "Token n'est pas valid",
+		});
+	}
+};
 
-module.exports = auth
+module.exports = auth;

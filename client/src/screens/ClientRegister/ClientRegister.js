@@ -1,27 +1,27 @@
-import React , {useState} from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import {Link} from "@material-ui/core";
+import {CircularProgress, Link } from "@material-ui/core";
+import { returnErrors, clearErrors} from "../../redux/actions/errAction";
 import RegisterIcon from "../../Icons/RegisterIcon";
 import { useHistory } from "react-router";
-import axios from 'axios'
-import {isEmpty, isEmail, isLength} from '../../utils/validation/Validation'
-import {showSuccessMsg} from '../../utils/notification/Notification'
-import GoogleLogin from 'react-google-login';
+import axios from "axios";
+import { dispatchLogin2 } from "../../redux/actions/authAction";
+import { showSuccessMsg } from "../../utils/notification/Notification";
+import GoogleLogin from "react-google-login";
+import { useDispatch, useSelector} from "react-redux";
+import "./index.css";
 
-import "../index.css";
-
-
-
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => {
+  return{
 	main_card: {
 		margin: "0",
 		background: "#C4C4C4",
-		borderRadius: "40px",
+		borderRadius: 40,
 		width: "60em",
 		height: "40em",
 		display: "flex",
@@ -80,7 +80,18 @@ const useStyles = makeStyles({
 		fontSize: "11px",
 		marginLeft: "10.7em",
 	},
-
+    wrapper: {
+		margin: 0,
+		position: "relative",
+	},
+	buttonProgress: {
+		color: theme.palette.primary,
+		position: "absolute",
+		top: "50%",
+		left: "50%",
+		marginTop: -1,
+		marginLeft: -12,
+	},
 	divider: {
 		display: "flex",
 		flexDirection: "row",
@@ -130,90 +141,108 @@ const useStyles = makeStyles({
 		alignContent: "center",
 		alignItems: "center",
 	},
+  }
 });
 
 const initialState = {
-    name: '',
-	last_name:'',
-    email: '',
-    password: '',
-    nameerr: '',
-	last_nameerr: '',
-	emailerr: '',
-	passworderr: '',
-    success: ''
-}
-
+	name: "",
+	last_name: "",
+	email: "",
+	password: "",
+	cf_password:"",
+	success:"",
+};
 
 export default function ClientRegister() {
 	const classes = useStyles();
 	const history = useHistory();
-	
-    const [user, setUser] = useState(initialState)
-        
-    const {name, last_name , email, password, nameerr,last_nameerr,emailerr,passworderr,success} = user
 
-    const handleChangeInput = e => {
-        const {name, value} = e.target
-        setUser({...user, [name]:value, nameerr: '',last_nameerr:'' ,emailerr:'' ,passworderr:'', success: ''})
-    }
+	const [user, setUser] = useState(initialState);
+	const [isLoading, setIsLoading] = useState(false);
+	const dispatch = useDispatch();
 
-/* const handleClickShowPassword = () => {
+	const {
+		name,
+		last_name,
+		email,
+		password,
+		cf_password,
+		success,
+	} = user;
+
+	const handleChangeInput = (e) => {
+		const { name, value } = e.target;
+		setUser({ ...user, [name]: value });
+	};
+
+	/* const handleClickShowPassword = () => {
 		setValues({ ...values, showPassword: !values.showPassword });
 	};
 
 	const handleMouseDownPassword = (event) => {
 		event.preventDefault();
 	};*/
-    const handleSubmit = async e => {
-        e.preventDefault()
-        if(isEmpty(name) )
-		    return setUser({...user, nameerr: "Entrer votre Nom", success: ''})
-		if (isEmpty(last_name))
-		    return setUser({...user, last_nameerr: "Entrer votre Prénom ",success: ''})
-		if (isEmpty(email))
-            return setUser({...user, emailerr: "Entrer votre Email", success: ''})
-		if (isEmpty(password) )
-		    return setUser({...user, passworderr: "Entrer votre Password", success: ''})
-        if(!isEmail(email))
-            return setUser({...user, emailerr: "Invalid emails.", success: ''})
+    const nameMsg = useSelector((state)  => state.err);
+	const last_nameMsg = useSelector((state)  => state.err);
+	const emailMsg = useSelector((state)  => state.err);
+    const passwordMsg = useSelector((state)  => state.err);
+	const cf_passwordMsg = useSelector((state)  => state.err);
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 
-        if(isLength(password))
-            return setUser({...user, passworderr: "Password must be at least 6 characters.", success: ''})
-        
-        
+		setIsLoading(true);
 
-        try {
-            const res = await axios.post('/users/register', {
-                name, last_name ,  email, password
-            })
+		// Headers
+		const config = {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		};
 
-            setUser({...user,  nameerr: '',last_nameerr:'' ,emailerr:'' ,passworderr:'', success: res.data.msg})
-        } catch (err) {
-            
-            setUser({
-				...user,
-				nameerr: err.response.data.nameMsg,
-				last_nameerr: err.response.data.last_nameMsg,
-				emailerr: err.response.data.emailMsg,
-				passworderr: err.response.data.passwordMsg,
-				success: ''})
-        }
-    }
+		// Request body
+		const body = JSON.stringify({ name , last_name , email, password,cf_password  });
+
+		axios
+			.post("/users/register", body, config)
+			.then((res) => {
+				dispatch(clearErrors());
+				setIsLoading(false);
+				setUser({...user,   success: res.data.msg})
+	
+			})
+			.catch((err) => {
+				setIsLoading(false);
+				dispatch(
+					returnErrors(
+						err.response.data.msg,
+						err.response.status,
+						err.response.data.id
+					)
+				);
+			});
+	};
 
 	const responseGoogle = async (response) => {
-        try {
-            const res = await axios.post('/users/google_login', {tokenId: response.tokenId})
 
-            setUser({...user, error:'', success: res.data.msg})
-          
-            history.push('/login')
-        } catch (err) {
-            err.response.data.msg && 
-            setUser({...user, err: err.response.data.msg, success: ''})
-        }
-    }
-
+		axios
+			.post("/users/google_login" ,{tokenId: response.tokenId})
+			.then((res) => {
+				setIsLoading(true);
+				dispatch(dispatchLogin2(res));
+				dispatch(clearErrors());
+				history.push("/login");
+			})
+			.catch((err) => {
+				setIsLoading(false);
+				dispatch(
+					returnErrors(
+						err.response.data.msg,
+						err.response.status,
+						err.response.data.id
+					)
+				);
+			});
+	};
 
 	return (
 		<div className="body">
@@ -223,149 +252,165 @@ export default function ClientRegister() {
 				</div>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent>
-					 {success && showSuccessMsg(success)}
-                     <form onSubmit={handleSubmit}>
-						<Typography
-							className={classes.text}
-							variant="h6"
-							align="center"
-							color="primary"
-						>
-							Crée un compte
-						</Typography>
-						<div className={classes.info_div}>
-							{/*name Input */}
+						{success && showSuccessMsg(success)}
+						<form onSubmit={handleSubmit}>
+							<Typography
+								className={classes.text}
+								variant="h6"
+								align="center"
+								color="primary"
+							>
+								Crée un compte
+							</Typography>
+							<div className={classes.info_div}>
+								{/*name Input */}
+								<TextField
+									variant="outlined"
+									label="Nom"
+									size="small"
+									classes={{ root: classes.name_field }}
+									fullWidth
+									type="text"
+									id="name"
+									value={name}
+									name="name"
+									onChange={handleChangeInput}
+									helperText={nameMsg.id === 2 ? nameMsg.msg : null}
+								    error={nameMsg.id === 2 ? true : false}
+								/>
+								{/*Lastname Input */}
+								<TextField
+									variant="outlined"
+									label="Prénom"
+									size="small"
+									classes={{ root: classes.lastname_field }}
+									fullWidth
+									type="text"
+									id="last_name"
+									value={last_name}
+									name="last_name"
+									onChange={handleChangeInput}
+									helperText={last_nameMsg.id === 3 ? last_nameMsg.msg : null}
+								    error={last_nameMsg.id === 3 ? true : false}
+								/>
+							</div>
+							{/*Email Input */}
 							<TextField
 								variant="outlined"
-								label="Nom"
+								label="Email"
 								size="small"
-								classes={{ root: classes.name_field }}
-								fullWidth
-								type="text" 
-								 id="name"
-                                value={name} 
-								name="name"
-								 onChange={handleChangeInput}
-								 helperText={nameerr}
-								error={nameerr}
-							/>
-							{/*Lastname Input */}
-							<TextField
-								variant="outlined"
-								label="Prénom"
-								size="small"
-								classes={{ root: classes.lastname_field }}
+								classes={{ root: classes.text_field }}
 								fullWidth
 								type="text"
-								id="last_name"
-								value={last_name}
-								name="last_name"
-								 onChange={handleChangeInput}
-								 helperText={last_nameerr}
-								error={last_nameerr}
+								id="email"
+								value={email}
+								name="email"
+								onChange={handleChangeInput}
+								helperText={emailMsg.id === 0 ? emailMsg.msg : null}
+								error={emailMsg.id === 0 ? true : false}
 							/>
-						</div>
-						{/*Email Input */}
-						<TextField
-							variant="outlined"
-							label="Email"
-							size="small"
-							classes={{ root: classes.text_field }}
-							fullWidth
-							type="text"
-							 id="email"
-                            value={email} 
-							name="email" 
-							onChange={handleChangeInput}
-							helperText={emailerr}
-							error={emailerr}
-						/>
-						<br />
+							<br />
 
-						{/*Password Input */}
-						<TextField
-							variant="outlined"
-							label="mot de passe"
-							size="small"
-							classes={{ root: classes.text_field }}
-							fullWidth
-							type="password"
-							 id="password"
-                            value={password} 
-							name="password" 
-							onChange={handleChangeInput}
-							helperText={passworderr}
-							error={passworderr}
-						/>
-						<br />
-
-						{/*Create acount Button */}
-						<Button
-							className={classes.btn}
-							variant="contained"
-							type = "submit"
-							color="primary"
-							classes={{ label: classes.btn_text }}
-							fullWidth
-							disableElevation
-						>
-							Crée un compte
-						</Button>
-						<br />
-						<div className={classes.divider}>
-							<div className={classes.line}></div>
-							<Typography
-								className={classes.btm_text}
-								variant="subtitle2"
-								align="center"
-							>
-								Ou
-							</Typography>
-							<div className={classes.line}></div>
-						</div>
-
-						{/*Google Button */}
-						<Button
-							
-							fullWidth
-							
-						>   
-							<GoogleLogin
-                               clientId="664430788321-7nplkv1bhj864bcedgirrug2vdtf0e4g.apps.googleusercontent.com"
-                                buttonText="Continue with google"
-                                onSuccess={responseGoogle}
-                                cookiePolicy={'single_host_origin'}
-                            />
-						</Button>
-						<div className={classes.signin_div}>
-							<Typography
-								className={classes.signup_txt}
-								variant="subtitle2"
-								align="center"
-							>
-								Vous avez déjà un compte?
-							</Typography>
-
-							{/*Login Link */}
-							<Link
-								component="button"
+							{/*Password Input */}
+							<TextField
+								variant="outlined"
+								label="mot de passe"
+								size="small"
+								classes={{ root: classes.text_field }}
+								fullWidth
+								type="password"
+								id="password"
+								value={password}
+								name="password"
+								onChange={handleChangeInput}
+								helperText={passwordMsg.id === 1 ? passwordMsg.msg : null}
+								error={passwordMsg.id === 1 ? true : false}
+							/>
+							<br />
+                            {/*Password Input */}
+							<TextField
+								variant="outlined"
+								label="confirmer mot de passe"
+								size="small"
+								classes={{ root: classes.text_field }}
+								fullWidth
+								type="password"
+								id="cf_password"
+								value={cf_password}
+								name="cf_password"
+								onChange={handleChangeInput}
+								helperText={cf_passwordMsg.id === 4 ? cf_passwordMsg.msg : null}
+								error={cf_passwordMsg.id === 4 ? true : false}
+							/>
+							<br />
+							{/*Create account Button */}
+						  <div className={classes.wrapper}>
+							<Button
+								className={classes.btn}
+								variant="contained"
+								type="submit"
 								color="primary"
-								underline="hover"
-								variant="inherit"
-								classes={{ root: classes.signup_txt }}
-								onClick={() => history.push("/login")}
+								disabled={isLoading}
+								classes={{ label: classes.btn_text }}
+								fullWidth
+								
 							>
-								Connecter-vous
-							</Link>
-						</div>
+								Crée un compte
+							</Button>
+							{isLoading && (
+									<CircularProgress
+										size={24}
+										className={classes.buttonProgress}
+									/>
+							)}
+						  </div>
+							<br />
+							<div className={classes.divider}>
+								<div className={classes.line}></div>
+								<Typography
+									className={classes.btm_text}
+									variant="subtitle2"
+									align="center"
+								>
+									Ou
+								</Typography>
+								<div className={classes.line}></div>
+							</div>
 
-					 </form>
+							{/*Google Button */}
+							<Button fullWidth>
+								<GoogleLogin
+									clientId="664430788321-7nplkv1bhj864bcedgirrug2vdtf0e4g.apps.googleusercontent.com"
+									buttonText="Continue with google"
+									onSuccess={responseGoogle}
+									cookiePolicy={"single_host_origin"}
+								/>
+							</Button>
+							<div className={classes.signin_div}>
+								<Typography
+									className={classes.signup_txt}
+									variant="subtitle2"
+									align="center"
+								>
+									Vous avez déjà un compte?
+								</Typography>
+
+								{/*Login Link */}
+								<Link
+									component="button"
+									color="primary"
+									underline="hover"
+									variant="inherit"
+									classes={{ root: classes.signup_txt }}
+									onClick={() => history.push("/login")}
+								>
+									Connecter-vous
+								</Link>
+							</div>
+						</form>
 					</CardContent>
 				</Card>
 			</Card>
 		</div>
 	);
 }
-
-
-

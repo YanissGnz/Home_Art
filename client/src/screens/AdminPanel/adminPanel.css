@@ -1,0 +1,16 @@
+.panel_body {
+	display: flex;
+}
+.admin_appbar {
+	display: flex;
+	flex-direction: row;
+	align-content: center;
+	justify-content: center;
+}
+.admin_panel {
+	width: 100%;
+	height: 100%;
+}
+.dashbord_container {
+	margin-top: 2em;
+}
