@@ -4,7 +4,7 @@ import axios from "axios";
 import { dispatchLogin } from "../../redux/actions/authAction";
 import { returnErrors, clearErrors } from "../../redux/actions/errAction";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CircularProgress, Link } from "@material-ui/core";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -107,7 +107,10 @@ export default function AdminLogin() {
 	const dispatch = useDispatch();
 	const history = useHistory();
 
-	const { email, password, err, passwordErr } = user;
+	const { email, password } = user;
+
+	const emailMsg = useSelector((state) => state.err);
+	const passwordMsg = useSelector((state) => state.err);
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
@@ -129,6 +132,7 @@ export default function AdminLogin() {
 		// Request body
 		const body = JSON.stringify({ email, password });
 
+		dispatch(clearErrors());
 		axios
 			.post("/users/admin", body, config)
 			.then((res) => {
@@ -172,8 +176,8 @@ export default function AdminLogin() {
 								name="email"
 								value={email}
 								onChange={handleChangeInput}
-								helperText={err}
-								error={err}
+								helperText={emailMsg.id === 0 ? emailMsg.msg : null}
+								error={emailMsg.id === 0 ? true : false}
 							/>
 							<br />
 							<TextField
@@ -187,8 +191,8 @@ export default function AdminLogin() {
 								fullWidth
 								value={password}
 								onChange={handleChangeInput}
-								helperText={passwordErr}
-								error={passwordErr}
+								helperText={passwordMsg.id === 1 ? passwordMsg.msg : null}
+								error={passwordMsg.id === 1 ? true : false}
 							/>
 							<br />
 							<Link

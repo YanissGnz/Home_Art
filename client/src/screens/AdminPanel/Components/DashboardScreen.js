@@ -43,7 +43,7 @@ export default function DashboardScreen() {
 					</Grid>
 					<Grid item xs={12} sm={6} md={3}>
 						<Card className={classes.cart} elevation={5}>
-							<CardHeader title="Produit" className={classes} />
+							<CardHeader title="Produit" />
 							<CardContent>
 								<Typography variant="h4" color="primary">
 									0
@@ -53,7 +53,7 @@ export default function DashboardScreen() {
 					</Grid>
 					<Grid item xs={12} sm={6} md={3}>
 						<Card className={classes.cart} elevation={5}>
-							<CardHeader title="Revenu" className={classes} />
+							<CardHeader title="Revenu" />
 							<CardContent>
 								<Typography variant="h4" color="primary">
 									0 DZD

@@ -5,16 +5,20 @@ import {
 	Button,
 	Card,
 	CardMedia,
+	CircularProgress,
 	Container,
 	InputAdornment,
 	MenuItem,
 	TextField,
 	Toolbar,
 	Typography,
+	useTheme,
 } from "@material-ui/core";
 import { useStyles } from "../useStyles";
 
 import "../adminPanel.css";
+import { useDispatch, useSelector } from "react-redux";
+import { returnErrors } from "../../../redux/actions/errAction";
 
 function PriceFormat(props) {
 	const { inputRef, onChange, ...other } = props;
@@ -86,11 +90,22 @@ const initialState = {
 
 export default function ProductsScreen() {
 	const classes = useStyles();
+	const [product, setProduct] = React.useState(initialState);
 	const [categorie, setCategorie] = React.useState("");
 	const [fileName, setFileName] = React.useState("");
 	const [file, setFile] = React.useState("");
-	const [product, setProduct] = React.useState(initialState);
 	const [msg, setMsg] = React.useState("");
+	const [isLoading, setIsLoading] = React.useState(false);
+
+	const dispatch = useDispatch();
+	const token = useSelector((state) => state.auth.token);
+	const nameMsg = useSelector((state) => state.err);
+	const brandMsg = useSelector((state) => state.err);
+	const priceMsg = useSelector((state) => state.err);
+	const stockMsg = useSelector((state) => state.err);
+	const categorieMsg = useSelector((state) => state.err);
+	const descriptionMsg = useSelector((state) => state.err);
+	let imageMsg = useSelector((state) => state.err);
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
@@ -98,7 +113,7 @@ export default function ProductsScreen() {
 	};
 	const handleCategorieChange = (e) => {
 		setCategorie(e.target.value);
-		setProduct({ ...product, categorie: categorie });
+		setProduct({ ...product, categorie: e.target.value });
 	};
 	function handleImageChange(e) {
 		let url = URL.createObjectURL(e.target.files[0]);
@@ -109,6 +124,16 @@ export default function ProductsScreen() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		setIsLoading(true);
+
+		setMsg("");
+
+		//Header
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
 
 		const formData = new FormData();
 
@@ -121,10 +146,24 @@ export default function ProductsScreen() {
 		formData.append("receipt", fileName);
 
 		axios
-			.post("/products/add_product", formData)
-			.then((res) => setMsg(res.data.msg))
-			.catch((err) => setMsg(err.msg));
+			.post("/products/add_product", formData, config)
+			.then((res) => {
+				setIsLoading(false);
+				setMsg(res.data.msg);
+				imageMsg.msg = "";
+			})
+			.catch((err) => {
+				setIsLoading(false);
+				dispatch(
+					returnErrors(
+						err.response.data.msg,
+						err.response.status,
+						err.response.data.id
+					)
+				);
+			});
 	};
+
 	return (
 		<Container maxWidth="xl" className="dashbord_container">
 			<Toolbar />
@@ -142,26 +181,29 @@ export default function ProductsScreen() {
 					className={classes.productForm}
 					encType="multipart/form-data"
 				>
-					{msg && <Typography>{msg}</Typography>}
 					<div className={classes.productInputContainer_2}>
 						<TextField
-							variant="filled"
+							variant="outlined"
 							label="Nom de produit"
 							name="name"
 							onChange={handleChangeInput}
 							className={classes.productInput}
 							fullWidth
+							helperText={nameMsg.id === 0 ? nameMsg.msg : null}
+							error={nameMsg.id === 0 ? true : false}
 						/>
 						<TextField
-							variant="filled"
+							variant="outlined"
 							label="Marque"
 							name="brand"
 							onChange={handleChangeInput}
 							className={classes.productInput}
 							fullWidth
+							helperText={brandMsg.id === 1 ? brandMsg.msg : null}
+							error={brandMsg.id === 1 ? true : false}
 						/>
 						<TextField
-							variant="filled"
+							variant="outlined"
 							label="Prix	"
 							name="price"
 							onChange={handleChangeInput}
@@ -174,9 +216,11 @@ export default function ProductsScreen() {
 							}}
 							className={classes.productInput}
 							fullWidth
+							helperText={priceMsg.id === 2 ? priceMsg.msg : null}
+							error={priceMsg.id === 2 ? true : false}
 						/>
 						<TextField
-							variant="filled"
+							variant="outlined"
 							label="Nombre de stock"
 							name="stock"
 							onChange={handleChangeInput}
@@ -185,15 +229,19 @@ export default function ProductsScreen() {
 							}}
 							className={classes.productInput}
 							fullWidth
+							helperText={stockMsg.id === 3 ? stockMsg.msg : null}
+							error={stockMsg.id === 3 ? true : false}
 						/>
 						<TextField
 							select
 							label="Categories"
 							value={categorie}
 							onChange={handleCategorieChange}
-							className={classes.lastProductInput}
-							variant="filled"
+							variant="outlined"
 							fullWidth
+							className={classes.lastProductInput}
+							helperText={categorieMsg.id === 4 ? categorieMsg.msg : null}
+							error={categorieMsg.id === 4 ? true : false}
 						>
 							{categories.map((option) => (
 								<MenuItem key={option.value} value={option.value}>
@@ -203,29 +251,47 @@ export default function ProductsScreen() {
 						</TextField>
 					</div>
 					<TextField
-						variant="filled"
-						label="Descreption"
+						variant="outlined"
+						label="Description"
 						name="description"
 						onChange={handleChangeInput}
 						fullWidth
 						multiline
 						rowsMax={6}
 						className={classes.descriptionInput}
+						helperText={descriptionMsg.id === 5 ? descriptionMsg.msg : null}
+						error={descriptionMsg.id === 5 ? true : false}
 					/>
-					<TextField
-						id="outlined-full-width"
-						label="Ajouter une image"
-						name="upload-photo"
-						accept="image/*"
-						type="file"
-						fullWidth
-						InputLabelProps={{
-							shrink: true,
-						}}
-						variant="filled"
-						onChange={handleImageChange}
-						className={classes.descriptionInput}
-					/>
+
+					<Container className={classes.imageInputContainer}>
+						<input
+							accept="image/*"
+							className={classes.imageInput}
+							id="contained-button-file"
+							type="file"
+							onChange={handleImageChange}
+						/>
+						<label htmlFor="contained-button-file">
+							<Button
+								variant="outlined"
+								size="large"
+								color="primary"
+								component="span"
+								className={classes.imageButton}
+							>
+								Ajouter une image
+							</Button>
+						</label>
+						{imageMsg.id === 6 && (
+							<Typography
+								className={classes.imageMsgDiv}
+								color="error"
+								variant="caption"
+							>
+								{imageMsg.msg}
+							</Typography>
+						)}
+					</Container>
 					{file.length > 0 && (
 						<Card className={classes.imageCard} variant="outlined">
 							<CardMedia
@@ -236,18 +302,27 @@ export default function ProductsScreen() {
 							/>
 						</Card>
 					)}
-					<Button
-						variant="contained"
-						color="primary"
-						className={classes.addProductBtn}
-						type="submit"
-						size="large"
-					>
-						Ajouter produit
-					</Button>
+					<div className={classes.wrapper}>
+						<Button
+							variant="contained"
+							color="primary"
+							className={classes.addProductBtn}
+							type="submit"
+							size="large"
+							disabled={isLoading}
+						>
+							Ajouter produit
+						</Button>
+						{isLoading && (
+							<CircularProgress size={24} className={classes.buttonProgress} />
+						)}
+						{msg && (
+							<Typography className={classes.successMsg}>{msg}</Typography>
+						)}
+					</div>
 				</form>
 			</Container>
-			<Container maxWidth="xl" className={classes.productInputContainer}>
+			<Container maxWidth="xl">
 				<Typography variant="h6" className={classes.dashboardText}>
 					List des produit
 				</Typography>

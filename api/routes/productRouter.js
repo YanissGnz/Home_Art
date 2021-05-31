@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const ProductCtrl = require("../controllers/ProductCtrl");
 const multer = require("multer");
+const auth = require("../middleware/auth");
 const { post } = require("./userRouter");
 
 //multer Configuration
@@ -10,7 +11,8 @@ const storage = multer.diskStorage({
 	},
 	filename: (req, file, cb) => {
 		const fileName = `${Date.now()}_${file.originalname.replace(/\s+/g, "-")}`;
-		cb(null, fileName);
+		file.originalname = fileName;
+		cb(null, file.originalname);
 	},
 });
 const upload = multer({ storage }).single("receipt");

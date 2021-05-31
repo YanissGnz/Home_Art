@@ -4,6 +4,10 @@ const drawerWidth = 250;
 
 export const useStyles = makeStyles((theme) => {
 	return {
+		loader: {
+			marginTop: "22%",
+			marginLeft: "49%",
+		},
 		appBar: {
 			zIndex: theme.zIndex.drawer + 1,
 			transition: theme.transitions.create(["width", "margin"], {
@@ -120,7 +124,8 @@ export const useStyles = makeStyles((theme) => {
 			marginBottom: 20,
 		},
 		productInputContainer: {
-			paddingLeft: "0em",
+			width: "66%",
+			padding: "0em",
 			display: "flex",
 			flexDirection: "column",
 		},
@@ -134,19 +139,44 @@ export const useStyles = makeStyles((theme) => {
 			padding: "0em",
 			display: "flex",
 			flexDirection: "row",
-			alignItems: "center",
 			justifyContent: "flex-start",
-		},
-		productInput: {
 			marginBottom: "2em",
+		},
+
+		productInput: {
 			marginRight: "1em",
+			backgroundColor: theme.palette.common.white,
 		},
 		lastProductInput: {
-			marginBottom: "2em",
+			backgroundColor: theme.palette.common.white,
 		},
 		descriptionInput: {
 			marginBottom: "2em",
 			marginRight: "1em",
+			backgroundColor: theme.palette.common.white,
+		},
+		imageInputContainer: {
+			width: "15em",
+			display: "flex",
+			flexWrap: "wrap",
+			alignItems: "center",
+			justifyContent: "center",
+			marginTop: "0",
+			marginRight: "0",
+			marginLeft: "0",
+			marginBottom: "2em",
+			padding: "0",
+			alignSelf: "center",
+			position: "relative",
+		},
+		imageInput: {
+			display: "none",
+		},
+		imageLabel: {
+			alignSelf: "center",
+		},
+		imageButton: {
+			textTransform: "capitalize",
 		},
 		imageCard: {
 			maxWidth: 350,
@@ -154,12 +184,30 @@ export const useStyles = makeStyles((theme) => {
 			alignSelf: "center",
 			marginBottom: "2em",
 		},
+		wrapper: {
+			margin: 0,
+			position: "relative",
+			alignSelf: "center",
+			marginBottom: "1em",
+		},
 		addProductBtn: {
 			textTransform: "capitalize",
 			color: theme.palette.common.white,
 			width: "20em",
-			marginBottom: "1em",
-			alignSelf: "center",
+		},
+		buttonProgress: {
+			color: theme.palette.primary,
+			position: "absolute",
+			top: "50%",
+			left: "50%",
+			marginTop: -12,
+			marginLeft: -13,
+		},
+		successMsg: {
+			color: theme.palette.primary,
+			position: "absolute",
+			left: "20%",
+			marginBottom: 10,
 		},
 	};
 });

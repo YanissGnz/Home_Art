@@ -10,6 +10,7 @@ import {
 import {
 	AppBar,
 	Button,
+	CircularProgress,
 	CssBaseline,
 	Divider,
 	Drawer,
@@ -108,108 +109,120 @@ export default function AdminPanel(props) {
 		history.push("/admin");
 	};
 
+	const isLoading = useSelector((state) => state.auth.isLoading);
+
 	return (
-		<div className="panel_body">
-			<CssBaseline />
-			<ElevationScroll {...props}>
-				<AppBar
-					color="white"
-					className={clsx(classes.appBar, {
-						[classes.appBarShift]: open,
-					})}
-				>
-					<Toolbar>
-						<IconButton
-							color="inherit"
-							aria-label="open drawer"
-							onClick={handleDrawerOpen}
-							edge="start"
-							className={clsx(classes.menuButton, {
-								[classes.hide]: open,
+		<div>
+			{isLoading && (
+				<CircularProgress size={80} thickness={5} className={classes.loader} />
+			)}
+			{!isLoading && (
+				<div className="panel_body">
+					<CssBaseline />
+					<ElevationScroll {...props}>
+						<AppBar
+							color="white"
+							className={clsx(classes.appBar, {
+								[classes.appBarShift]: open,
 							})}
 						>
-							<MenuIcon />
-						</IconButton>
-						<div className={classes.appBarLogo}>
-							<Logo />
-							<Typography variant="caption">Home Art</Typography>
-						</div>
-						<div className={classes.searchDiv}>
-							<Paper
-								component="form"
-								className={classes.searchPaper}
-								elevation={0}
-								variant="outlined"
-							>
-								<InputBase className={classes.input} placeholder="Rechercher" />
+							<Toolbar>
 								<IconButton
-									type="submit"
-									className={classes.search_Button}
-									aria-label="search"
-									onClick={handleSearch}
+									color="inherit"
+									aria-label="open drawer"
+									onClick={handleDrawerOpen}
+									edge="start"
+									className={clsx(classes.menuButton, {
+										[classes.hide]: open,
+									})}
 								>
-									<SearchIcon />
+									<MenuIcon />
 								</IconButton>
-							</Paper>
-						</div>
-						<Button
-							disableRipple
-							className={classes.logout_button}
-							onClick={handleLogout}
-						>
-							Se déconnecter
-						</Button>
-					</Toolbar>
-				</AppBar>
-			</ElevationScroll>
+								<div className={classes.appBarLogo}>
+									<Logo />
+									<Typography variant="caption">Home Art</Typography>
+								</div>
+								<div className={classes.searchDiv}>
+									<Paper
+										component="form"
+										className={classes.searchPaper}
+										elevation={0}
+										variant="outlined"
+									>
+										<InputBase
+											className={classes.input}
+											placeholder="Rechercher"
+										/>
+										<IconButton
+											type="submit"
+											className={classes.search_Button}
+											aria-label="search"
+											onClick={handleSearch}
+										>
+											<SearchIcon />
+										</IconButton>
+									</Paper>
+								</div>
+								<Button
+									disableRipple
+									className={classes.logout_button}
+									onClick={handleLogout}
+								>
+									Se déconnecter
+								</Button>
+							</Toolbar>
+						</AppBar>
+					</ElevationScroll>
 
-			<Drawer
-				variant="permanent"
-				className={clsx(classes.drawer, {
-					[classes.drawerOpen]: open,
-					[classes.drawerClose]: !open,
-				})}
-				classes={{
-					paper: clsx({
-						[classes.drawerOpen]: open,
-						[classes.drawerClose]: !open,
-					}),
-				}}
-			>
-				<div className={classes.toolbar}>
-					<IconButton onClick={handleDrawerClose}>
-						{theme.direction === "rtl" ? (
-							<ChevronRightIcon />
-						) : (
-							<ChevronLeftIcon />
-						)}
-					</IconButton>
+					<Drawer
+						variant="permanent"
+						className={clsx(classes.drawer, {
+							[classes.drawerOpen]: open,
+							[classes.drawerClose]: !open,
+						})}
+						classes={{
+							paper: clsx({
+								[classes.drawerOpen]: open,
+								[classes.drawerClose]: !open,
+							}),
+						}}
+					>
+						<div className={classes.toolbar}>
+							<IconButton onClick={handleDrawerClose}>
+								{theme.direction === "rtl" ? (
+									<ChevronRightIcon />
+								) : (
+									<ChevronLeftIcon />
+								)}
+							</IconButton>
+						</div>
+						<Divider />
+						<List>
+							<ListItem
+								button
+								onClick={() => setScreen(true)}
+								className={screen ? classes.active : null}
+							>
+								<ListItemIcon>
+									<Dashboard />
+								</ListItemIcon>
+								<ListItemText primary="Tableau de bord" />
+							</ListItem>
+							<ListItem
+								button
+								onClick={() => setScreen(false)}
+								className={!screen ? classes.active : null}
+							>
+								<ListItemIcon>
+									<Catalog />
+								</ListItemIcon>
+								<ListItemText primary="Produit" />
+							</ListItem>
+						</List>
+					</Drawer>
+					{screen ? <DashboardScreen /> : <ProductsScreen />}
 				</div>
-				<Divider />
-				<List>
-					<ListItem
-						button
-						onClick={() => setScreen(true)}
-						className={screen ? classes.active : null}
-					>
-						<ListItemIcon>
-							<Dashboard />
-						</ListItemIcon>
-						<ListItemText primary="Tableau de bord" />
-					</ListItem>
-					<ListItem
-						button
-						onClick={() => setScreen(false)}
-						className={!screen ? classes.active : null}
-					>
-						<ListItemIcon>
-							<Catalog />
-						</ListItemIcon>
-						<ListItemText primary="Produit" />
-					</ListItem>
-				</List>
-			</Drawer>
-			{screen ? <DashboardScreen /> : <ProductsScreen />}
+			)}
 		</div>
 	);
 }
