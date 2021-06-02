@@ -43,6 +43,11 @@ import DashboardScreen from "./Components/DashboardScreen";
 import ProductsScreen from "./Components/ProductsScreen";
 import axios from "axios";
 import { returnErrors } from "../../redux/actions/errAction";
+import {
+	productLoading,
+	productsLoaded,
+	productErrors,
+} from "../../redux/actions/productsAction";
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -86,13 +91,32 @@ export default function AdminPanel(props) {
 				})
 				.catch((err) => {
 					dispatch(dispatchAdminError());
-					returnErrors(err.response.data.msg, err.response.status);
+					dispatch(returnErrors(err.response.data.msg, err.response.status));
 				});
 			const isAuthenticated = localStorage.getItem("isAuthenticated");
 			if (isAuthenticated === "false") history.push("/admin");
 		};
 		loadAdmin();
 	}, [dispatch, history, token]);
+
+	React.useEffect(() => {
+		const loadProduct = async () => {
+			dispatch(productLoading());
+
+			await axios
+				.get("/products/get_products")
+				.then((res) => {
+					dispatch(productsLoaded(res));
+				})
+				.catch((err) => {
+					dispatch(productErrors());
+					console.log(err);
+					//dispatch(returnErrors(err.response.data.msg, err.response.status));
+				});
+		};
+		const isAuthenticated = localStorage.getItem("isAuthenticated");
+		if (isAuthenticated === "false") loadProduct();
+	}, [dispatch]);
 
 	const handleDrawerOpen = () => {
 		setOpen(true);

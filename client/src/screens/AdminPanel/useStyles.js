@@ -123,18 +123,24 @@ export const useStyles = makeStyles((theme) => {
 		dashboardText: {
 			marginBottom: 20,
 		},
-		productInputContainer: {
-			width: "66%",
-			padding: "0em",
-			display: "flex",
-			flexDirection: "column",
+
+		addProductFab: {
+			color: theme.palette.common.white,
+			textTransform: "capitalize",
+			position: "fixed",
+			bottom: theme.spacing(4),
+			right: theme.spacing(4),
 		},
+		fabIcon: {
+			marginRight: theme.spacing(1),
+		},
+
 		productForm: {
 			paddingLeft: "0em",
 			display: "flex",
 			flexDirection: "column",
 		},
-		productInputContainer_2: {
+		productInputContainer: {
 			width: "100%",
 			padding: "0em",
 			display: "flex",
@@ -208,6 +214,46 @@ export const useStyles = makeStyles((theme) => {
 			position: "absolute",
 			left: "20%",
 			marginBottom: 10,
+		},
+		productCardContent: {
+			padding: 0,
+			paddingBottom: 0,
+		},
+		productCardDescription: {
+			marginTop: 10,
+			marginLeft: 10,
+		},
+		expand: {
+			transform: "rotate(0deg)",
+			marginLeft: "auto",
+			transition: theme.transitions.create("transform", {
+				duration: theme.transitions.duration.shortest,
+			}),
+		},
+		expandOpen: {
+			transform: "rotate(180deg)",
+		},
+
+		productCardActionDiv: {
+			display: "flex",
+			flexDirection: "row",
+			justifyContent: "center",
+			alignItems: "center",
+			paddingLeft: 10,
+			paddingRight: 10,
+		},
+		MenuIcon: {
+			marginRight: theme.spacing(1),
+		},
+		padding: {
+			paddingLeft: 10,
+			paddingRight: 10,
+		},
+		productDescription: {
+			paddingTop: 0,
+			paddingBottom: 0,
+			paddingLeft: 10,
+			paddingRight: 10,
 		},
 	};
 });

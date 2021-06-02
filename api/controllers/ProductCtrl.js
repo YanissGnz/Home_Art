@@ -43,7 +43,7 @@ const productCtrl = {
 					stock: req.body.stock,
 					categorie: req.body.categorie,
 					description: req.body.description,
-					receipt: req.file.originalname,
+					productImage: req.file.originalname,
 				});
 
 				newProduct
@@ -58,6 +58,17 @@ const productCtrl = {
 		} catch (err) {
 			console.log(err.message);
 			return res.status(400).json({ msg: err.message });
+		}
+	},
+	getProducts: async (req, res) => {
+		try {
+			const Products = await Product.find().sort({ categorie: 1 });
+
+			res.status(200).json({
+				Products,
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
 		}
 	},
 };

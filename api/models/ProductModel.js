@@ -31,7 +31,7 @@ const productSchema = new mongoose.Schema({
 		required: [true, "Entrer un description"],
 		trim: true,
 	},
-	receipt: {
+	productImage: {
 		type: String,
 		required: [true, "Ajouter une image"],
 	},

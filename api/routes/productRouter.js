@@ -7,7 +7,7 @@ const { post } = require("./userRouter");
 //multer Configuration
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
-		cb(null, "./public");
+		cb(null, "./client/public/uploads");
 	},
 	filename: (req, file, cb) => {
 		const fileName = `${Date.now()}_${file.originalname.replace(/\s+/g, "-")}`;
@@ -15,8 +15,9 @@ const storage = multer.diskStorage({
 		cb(null, file.originalname);
 	},
 });
-const upload = multer({ storage }).single("receipt");
+const upload = multer({ storage }).single("productImage");
 
 router.post("/add_product", upload, ProductCtrl.addProduct);
+router.get("/get_products", ProductCtrl.getProducts);
 
 module.exports = router;

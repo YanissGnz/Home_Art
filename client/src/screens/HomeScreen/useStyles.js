@@ -28,5 +28,15 @@ export const useStyles = makeStyles((theme) => {
 				backgroundColor: theme.palette.common.white,
 			},
 		},
+		logout_button: {
+			marginRight: 20,
+			padding: 10,
+			fontWeight: "550",
+			fontSize: "16px",
+			textTransform: "capitalize",
+			"&:hover": {
+				backgroundColor: theme.palette.common.white,
+			},
+		},
 	};
 });

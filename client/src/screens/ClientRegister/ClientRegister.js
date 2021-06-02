@@ -5,129 +5,143 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import { Link } from "@material-ui/core";
+import { CircularProgress, Link } from "@material-ui/core";
+import { returnErrors, clearErrors } from "../../redux/actions/errAction";
 import RegisterIcon from "../../Icons/RegisterIcon";
 import { useHistory } from "react-router";
 import axios from "axios";
-import { isEmpty, isEmail, isLength } from "../../utils/validation/Validation";
+import { dispatchLogin2 } from "../../redux/actions/authAction";
 import { showSuccessMsg } from "../../utils/notification/Notification";
 import GoogleLogin from "react-google-login";
-
+import { useDispatch, useSelector } from "react-redux";
 import "./index.css";
 
-const useStyles = makeStyles({
-	main_card: {
-		margin: "0",
-		background: "#C4C4C4",
-		borderRadius: 40,
-		width: "60em",
-		height: "40em",
-		display: "flex",
-		flexDirection: "row",
-	},
-	right_card: {
-		display: "flex",
-		position: "static",
-		background: "white",
-		paddingLeft: "2em",
-		paddingRight: "2em",
-		width: "40%",
-		height: "100%",
-		alignItems: "center",
-		justifyContent: "center",
-		flexDirection: "column",
-	},
-	text: {
-		fontWeight: "600",
-		fontSize: "17px",
-		marginTop: "5em",
-	},
-	info_div: {
-		width: "100%",
-		marginTop: "1em",
-	},
-	name_field: {
-		width: "47%",
-		marginRight: "1.1em",
-		fontFamily: "emPoppins",
-	},
-	lastname_field: {
-		width: "47%",
-		fontFamily: "Poppins",
-	},
-	text_field: {
-		marginTop: "1em",
-		fontFamily: "Poppins",
-	},
-	btn: {
-		marginTop: "1.8em",
-	},
-	btn_text: {
-		fontFamily: "Poppins",
-		fontWeight: "500",
-		fontSize: "15px",
-		textTransform: "capitalize",
-		color: "white",
-	},
-	mdps_oublier: {
-		position: "relative",
-		left: "4.5em",
-		marginTop: "0.2em",
-		fontFamily: "Poppins",
-		fontWeight: "500",
-		fontSize: "11px",
-		marginLeft: "10.7em",
-	},
-
-	divider: {
-		display: "flex",
-		flexDirection: "row",
-		alignItems: "center",
-		alignContent: "center",
-		marginTop: "1em",
-	},
-	line: {
-		width: "8em",
-		height: "0.08em",
-		background: "black",
-	},
-	btm_text: {
-		fontFamily: "Poppins",
-		fontWeight: "450",
-		fontSize: "14px",
-		marginInline: "0.8em",
-	},
-	google_btn: {
-		fontFamily: "Poppins",
-		fontWeight: "500",
-		fontSize: "13px",
-		textTransform: "capitalize",
-		marginTop: "1em",
-	},
-	signin_div: {
-		width: "100%",
-		display: "flex",
-		flexDirection: "row",
-		alignItems: "center",
-		alignContent: "center",
-		justifyContent: "center",
-		marginTop: "1em",
-	},
-	signup_txt: {
-		fontFamily: "Poppins",
-		fontWeight: "600",
-		fontSize: "11px",
-		marginRight: "0.5em",
-	},
-	img_div: {
-		position: "static",
-		height: "100%",
-		width: "60%",
-		display: "flex",
-		justifyContent: "center",
-		alignContent: "center",
-		alignItems: "center",
-	},
+const useStyles = makeStyles((theme) => {
+	return {
+		main_card: {
+			margin: "0",
+			background: "#C4C4C4",
+			borderRadius: 40,
+			width: "60em",
+			height: "40em",
+			display: "flex",
+			flexDirection: "row",
+		},
+		right_card: {
+			display: "flex",
+			position: "static",
+			background: "white",
+			paddingLeft: "2em",
+			paddingRight: "2em",
+			width: "40%",
+			height: "100%",
+			alignItems: "center",
+			justifyContent: "center",
+			flexDirection: "column",
+		},
+		text: {
+			fontWeight: "600",
+			fontSize: "17px",
+			marginTop: "5em",
+		},
+		info_div: {
+			width: "100%",
+			marginTop: "1em",
+		},
+		name_field: {
+			width: "47%",
+			marginRight: "1.1em",
+			fontFamily: "emPoppins",
+		},
+		lastname_field: {
+			width: "47%",
+			fontFamily: "Poppins",
+		},
+		text_field: {
+			marginTop: "1em",
+			fontFamily: "Poppins",
+		},
+		btn: {
+			marginTop: "1.8em",
+		},
+		btn_text: {
+			fontFamily: "Poppins",
+			fontWeight: "500",
+			fontSize: "15px",
+			textTransform: "capitalize",
+			color: "white",
+		},
+		mdps_oublier: {
+			position: "relative",
+			left: "4.5em",
+			marginTop: "0.2em",
+			fontFamily: "Poppins",
+			fontWeight: "500",
+			fontSize: "11px",
+			marginLeft: "10.7em",
+		},
+		wrapper: {
+			margin: 0,
+			position: "relative",
+		},
+		buttonProgress: {
+			color: theme.palette.primary,
+			position: "absolute",
+			top: "50%",
+			left: "50%",
+			marginTop: -1,
+			marginLeft: -12,
+		},
+		divider: {
+			display: "flex",
+			flexDirection: "row",
+			alignItems: "center",
+			alignContent: "center",
+			marginTop: "1em",
+		},
+		line: {
+			width: "8em",
+			height: "0.08em",
+			background: "black",
+		},
+		btm_text: {
+			fontFamily: "Poppins",
+			fontWeight: "450",
+			fontSize: "14px",
+			marginInline: "0.8em",
+		},
+		google_btn: {
+			fontFamily: "Poppins",
+			fontWeight: "500",
+			fontSize: "13px",
+			textTransform: "capitalize",
+			marginTop: "1em",
+		},
+		signin_div: {
+			width: "100%",
+			display: "flex",
+			flexDirection: "row",
+			alignItems: "center",
+			alignContent: "center",
+			justifyContent: "center",
+			marginTop: "1em",
+		},
+		signup_txt: {
+			fontFamily: "Poppins",
+			fontWeight: "600",
+			fontSize: "11px",
+			marginRight: "0.5em",
+		},
+		img_div: {
+			position: "static",
+			height: "100%",
+			width: "60%",
+			display: "flex",
+			justifyContent: "center",
+			alignContent: "center",
+			alignItems: "center",
+		},
+	};
 });
 
 const initialState = {
@@ -135,10 +149,7 @@ const initialState = {
 	last_name: "",
 	email: "",
 	password: "",
-	nameerr: "",
-	last_nameerr: "",
-	emailerr: "",
-	passworderr: "",
+	cf_password: "",
 	success: "",
 };
 
@@ -147,30 +158,14 @@ export default function ClientRegister() {
 	const history = useHistory();
 
 	const [user, setUser] = useState(initialState);
+	const [isLoading, setIsLoading] = useState(false);
+	const dispatch = useDispatch();
 
-	const {
-		name,
-		last_name,
-		email,
-		password,
-		nameerr,
-		last_nameerr,
-		emailerr,
-		passworderr,
-		success,
-	} = user;
+	const { name, last_name, email, password, cf_password, success } = user;
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
-		setUser({
-			...user,
-			[name]: value,
-			nameerr: "",
-			last_nameerr: "",
-			emailerr: "",
-			passworderr: "",
-			success: "",
-		});
+		setUser({ ...user, [name]: value });
 	};
 
 	/* const handleClickShowPassword = () => {
@@ -180,75 +175,70 @@ export default function ClientRegister() {
 	const handleMouseDownPassword = (event) => {
 		event.preventDefault();
 	};*/
+	const nameMsg = useSelector((state) => state.err);
+	const last_nameMsg = useSelector((state) => state.err);
+	const emailMsg = useSelector((state) => state.err);
+	const passwordMsg = useSelector((state) => state.err);
+	const cf_passwordMsg = useSelector((state) => state.err);
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		if (isEmpty(name))
-			return setUser({ ...user, nameerr: "Entrer votre Nom", success: "" });
-		if (isEmpty(last_name))
-			return setUser({
-				...user,
-				last_nameerr: "Entrer votre Prénom ",
-				success: "",
-			});
-		if (isEmpty(email))
-			return setUser({ ...user, emailerr: "Entrer votre Email", success: "" });
-		if (isEmpty(password))
-			return setUser({
-				...user,
-				passworderr: "Entrer votre Password",
-				success: "",
-			});
-		if (!isEmail(email))
-			return setUser({ ...user, emailerr: "Invalid emails.", success: "" });
 
-		if (isLength(password))
-			return setUser({
-				...user,
-				passworderr: "Password must be at least 6 characters.",
-				success: "",
-			});
+		setIsLoading(true);
 
-		try {
-			const res = await axios.post("/users/register", {
-				name,
-				last_name,
-				email,
-				password,
-			});
+		// Headers
+		const config = {
+			headers: {
+				"Content-Type": "application/json",
+			},
+		};
 
-			setUser({
-				...user,
-				nameerr: "",
-				last_nameerr: "",
-				emailerr: "",
-				passworderr: "",
-				success: res.data.msg,
+		// Request body
+		const body = JSON.stringify({
+			name,
+			last_name,
+			email,
+			password,
+			cf_password,
+		});
+
+		axios
+			.post("/users/register", body, config)
+			.then((res) => {
+				dispatch(clearErrors());
+				setIsLoading(false);
+				setUser({ ...user, success: res.data.msg });
+			})
+			.catch((err) => {
+				setIsLoading(false);
+				dispatch(
+					returnErrors(
+						err.response.data.msg,
+						err.response.status,
+						err.response.data.id
+					)
+				);
 			});
-		} catch (err) {
-			setUser({
-				...user,
-				nameerr: err.response.data.nameMsg,
-				last_nameerr: err.response.data.last_nameMsg,
-				emailerr: err.response.data.emailMsg,
-				passworderr: err.response.data.passwordMsg,
-				success: "",
-			});
-		}
 	};
 
 	const responseGoogle = async (response) => {
-		try {
-			const res = await axios.post("/users/google_login", {
-				tokenId: response.tokenId,
+		axios
+			.post("/users/google_login", { tokenId: response.tokenId })
+			.then((res) => {
+				setIsLoading(true);
+				dispatch(dispatchLogin2(res));
+				dispatch(clearErrors());
+				history.push("/login");
+			})
+			.catch((err) => {
+				setIsLoading(false);
+				dispatch(
+					returnErrors(
+						err.response.data.msg,
+						err.response.status,
+						err.response.data.id
+					)
+				);
 			});
-
-			setUser({ ...user, error: "", success: res.data.msg });
-
-			history.push("/login");
-		} catch (err) {
-			err.response.data.msg &&
-				setUser({ ...user, err: err.response.data.msg, success: "" });
-		}
 	};
 
 	return (
@@ -282,8 +272,8 @@ export default function ClientRegister() {
 									value={name}
 									name="name"
 									onChange={handleChangeInput}
-									helperText={nameerr}
-									error={nameerr}
+									helperText={nameMsg.id === 2 ? nameMsg.msg : null}
+									error={nameMsg.id === 2 ? true : false}
 								/>
 								{/*Lastname Input */}
 								<TextField
@@ -297,8 +287,8 @@ export default function ClientRegister() {
 									value={last_name}
 									name="last_name"
 									onChange={handleChangeInput}
-									helperText={last_nameerr}
-									error={last_nameerr}
+									helperText={last_nameMsg.id === 3 ? last_nameMsg.msg : null}
+									error={last_nameMsg.id === 3 ? true : false}
 								/>
 							</div>
 							{/*Email Input */}
@@ -313,8 +303,8 @@ export default function ClientRegister() {
 								value={email}
 								name="email"
 								onChange={handleChangeInput}
-								helperText={emailerr}
-								error={emailerr}
+								helperText={emailMsg.id === 0 ? emailMsg.msg : null}
+								error={emailMsg.id === 0 ? true : false}
 							/>
 							<br />
 
@@ -330,23 +320,46 @@ export default function ClientRegister() {
 								value={password}
 								name="password"
 								onChange={handleChangeInput}
-								helperText={passworderr}
-								error={passworderr}
+								helperText={passwordMsg.id === 1 ? passwordMsg.msg : null}
+								error={passwordMsg.id === 1 ? true : false}
 							/>
 							<br />
 
-							{/*Create account Button */}
-							<Button
-								className={classes.btn}
-								variant="contained"
-								type="submit"
-								color="primary"
-								classes={{ label: classes.btn_text }}
+							<TextField
+								variant="outlined"
+								label="confirmer mot de passe"
+								size="small"
+								classes={{ root: classes.text_field }}
 								fullWidth
-								disableElevation
-							>
-								Crée un compte
-							</Button>
+								type="password"
+								id="cf_password"
+								value={cf_password}
+								name="cf_password"
+								onChange={handleChangeInput}
+								helperText={cf_passwordMsg.id === 4 ? cf_passwordMsg.msg : null}
+								error={cf_passwordMsg.id === 4 ? true : false}
+							/>
+							<br />
+							{/*Create account Button */}
+							<div className={classes.wrapper}>
+								<Button
+									className={classes.btn}
+									variant="contained"
+									type="submit"
+									color="primary"
+									disabled={isLoading}
+									classes={{ label: classes.btn_text }}
+									fullWidth
+								>
+									Crée un compte
+								</Button>
+								{isLoading && (
+									<CircularProgress
+										size={24}
+										className={classes.buttonProgress}
+									/>
+								)}
+							</div>
 							<br />
 							<div className={classes.divider}>
 								<div className={classes.line}></div>

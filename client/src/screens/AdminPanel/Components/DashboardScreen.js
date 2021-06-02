@@ -8,10 +8,13 @@ import {
 	Typography,
 } from "@material-ui/core";
 import React from "react";
+import { useSelector } from "react-redux";
 import { useStyles } from "../useStyles";
 
 export default function DashboardScreen() {
 	const classes = useStyles();
+	const productCount = useSelector((state) => state.products.products);
+	console.log(typeof productCount);
 
 	return (
 		<div className="admin_panel">
@@ -46,7 +49,7 @@ export default function DashboardScreen() {
 							<CardHeader title="Produit" />
 							<CardContent>
 								<Typography variant="h4" color="primary">
-									0
+									{productCount.length}
 								</Typography>
 							</CardContent>
 						</Card>

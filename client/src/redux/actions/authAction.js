@@ -8,7 +8,12 @@ export const dispatchLogin = (res) => {
 		payload: res.data,
 	};
 };
-
+export const dispatchLogin2 = (res) => {
+	return {
+		type: ACTIONS.LOGIN2,
+		payload: res.data,
+	};
+};
 //Logout Action
 
 export const dispatchLogout = () => {
@@ -22,21 +27,47 @@ export const dispatchAdminLoading = () => {
 		type: ACTIONS.ADMIN_LOADING,
 	};
 };
+export const dispatchUserLoading = () => {
+	return {
+		type: ACTIONS.USER_LOADING,
+	};
+};
 export const dispatchAdminLoaded = (res) => {
 	return {
 		type: ACTIONS.ADMIN_LOADED,
 		payload: res.data,
 	};
 };
-
+export const dispatchUserLoaded = (res) => {
+	return {
+		type: ACTIONS.USER_LOADED,
+		payload: res.data,
+	};
+};
 export const dispatchAdminError = (res) => {
 	return {
 		type: ACTIONS.ADMIN_ERROR,
 	};
 };
-
+export const dispatchUserError = (res) => {
+	return {
+		type: ACTIONS.USER_ERROR,
+	};
+};
+export const dispatchRecoverPassword = (res) => {
+	return {
+		type: ACTIONS.RECOVER_PASSWORD,
+		payload: res.data,
+	};
+};
 export const fetchUser = async (token) => {
 	const res = await axios.get("/users/admin_info", {
+		headers: { Authorization: token },
+	});
+	return res;
+};
+export const fetchUser2 = async (token) => {
+	const res = await axios.get("/users/User_info", {
 		headers: { Authorization: token },
 	});
 	return res;

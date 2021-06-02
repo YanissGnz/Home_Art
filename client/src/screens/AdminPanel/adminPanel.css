@@ -16,3 +16,26 @@
 	height: 100%;
 	margin-top: 2em;
 }
+
+.my-masonry-grid {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	margin-left: -30px;
+	width: auto;
+}
+.my-masonry-grid_column {
+	padding-left: 35px;
+	background-clip: padding-box;
+}
+
+/* Style your items */
+.my-masonry-grid_column > div {
+	margin-bottom: 30px;
+}
+
+.product_image {
+	width: 100%;
+	max-height: 400px;
+	object-fit: cover;
+}
