@@ -1,12 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import axios from "axios";
+
 import {
-	showErrMsg,
-	showSuccessMsg,
-} from "../../utils/notification/Notification";
+	Button,
+	Card,
+	CardActions,
+	CardContent,
+	makeStyles,
+	Typography,
+} from "@material-ui/core";
+
+const useStyles = makeStyles({
+	root: {
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		height: "100%",
+	},
+	card: {
+		height: 200,
+		width: 500,
+		borderRadius: 15,
+		display: "flex",
+		alignItems: "center",
+		flexDirection: "column",
+	},
+	cardContent: {
+		marginBottom: 50,
+	},
+
+	button: {
+		textTransform: "capitalize",
+		fontSize: 18,
+		fontWeight: 600,
+	},
+});
 
 function ActivationEmail() {
+	const classes = useStyles();
+	const history = useHistory();
 	const { activation_token } = useParams();
 	const [err, setErr] = useState("");
 	const [success, setSuccess] = useState("");
@@ -28,9 +61,25 @@ function ActivationEmail() {
 	}, [activation_token]);
 
 	return (
-		<div className="active_page">
-			{err && showErrMsg(err)}
-			{success && showSuccessMsg(success)}
+		<div className={classes.root}>
+			<Card className={classes.card} elevation={10}>
+				<CardContent className={classes.card}>
+					<Typography variant="h5" className={classes.cardContent}>
+						{err || success}
+					</Typography>
+				</CardContent>
+				<CardActions>
+					<Button
+						color="primary"
+						size="large"
+						variant="text"
+						className={classes.button}
+						onClick={() => history.push("/login")}
+					>
+						Connecter-vous
+					</Button>
+				</CardActions>
+			</Card>
 		</div>
 	);
 }

@@ -10,7 +10,7 @@ router.get("/load_admin", auth, userCtrl.loadAdmin);
 
 //Client Routes
 router.post("/login", userCtrl2.login);
-router.post("/load_user", auth, userCtrl2.loadUser);
+router.get("/load_User", auth, userCtrl2.loadUser);
 router.post("/Recover_Password", userCtrl2.forgotPassword);
 router.post("/Reset_Password", auth, userCtrl2.resetPassword);
 router.post("/register", userCtrl2.register);

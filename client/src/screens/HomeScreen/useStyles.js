@@ -2,6 +2,10 @@ import { makeStyles } from "@material-ui/core";
 
 export const useStyles = makeStyles((theme) => {
 	return {
+		loader: {
+			marginTop: "22%",
+			marginLeft: "49%",
+		},
 		paper: {
 			padding: "2px 4px",
 			display: "flex",

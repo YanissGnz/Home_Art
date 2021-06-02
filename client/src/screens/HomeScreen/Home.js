@@ -10,10 +10,13 @@ import {
 import {
 	AppBar,
 	Button,
+	CircularProgress,
 	Container,
 	CssBaseline,
 	IconButton,
 	InputBase,
+	Menu,
+	MenuItem,
 	Paper,
 	Toolbar,
 	Typography,
@@ -28,6 +31,12 @@ import Logo from "../../Icons/Logo";
 import SearchIcon from "@material-ui/icons/Search";
 import Cart from "../../Icons/Cart";
 import Menus from "./Menu";
+import { AccountCircle } from "@material-ui/icons";
+import {
+	productErrors,
+	productLoading,
+	productsLoaded,
+} from "../../redux/actions/productsAction";
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -48,10 +57,26 @@ export default function Home(props) {
 
 	const history = useHistory();
 	const dispatch = useDispatch();
+	const [anchorEl, setAnchorEl] = React.useState(null);
+	const open = Boolean(anchorEl);
 
 	// Get token from localstorage
 	const token = useSelector((state) => state.auth.token);
+	const auth = useSelector((state) => state.auth);
+	const isLoading = useSelector((state) => state.auth.isLoading);
 
+	const handleMenu = (event) => {
+		setAnchorEl(event.currentTarget);
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+
+	const handleLogout = (event) => {
+		dispatch(dispatchLogout());
+		history.push("/login");
+	};
 	React.useEffect(() => {
 		const loadUser = async () => {
 			dispatch(dispatchUserLoading());
@@ -74,61 +99,109 @@ export default function Home(props) {
 				});
 		};
 		loadUser();
-	}, [dispatch, history, token]);
+	}, [dispatch, token]);
 
-	const handleLogout = (event) => {
-		dispatch(dispatchLogout());
-		history.push("/login");
-	};
+	React.useEffect(() => {
+		const loadProduct = async () => {
+			dispatch(productLoading());
+
+			await axios
+				.get("/products/get_products")
+				.then((res) => {
+					dispatch(productsLoaded(res));
+				})
+				.catch((err) => {
+					dispatch(productErrors());
+					console.log(err);
+					//dispatch(returnErrors(err.response.data.msg, err.response.status));
+				});
+		};
+		loadProduct();
+	}, [dispatch]);
+
 	return (
-		<div className="home_body">
-			<CssBaseline />
-			<ElevationScroll {...props}>
-				<AppBar color="white" position="sticky">
-					<Toolbar className="appbar">
-						<div className="Logo">
-							<Logo />
-							<Typography variant="subtitle2">Home Art</Typography>
-						</div>
+		<div>
+			{isLoading && (
+				<CircularProgress size={80} thickness={5} className={classes.loader} />
+			)}
 
-						<Paper
-							component="form"
-							className={classes.paper}
-							elevation={0}
-							variant="outlined"
-						>
-							<InputBase className={classes.input} placeholder="Rechercher" />
-							<IconButton
-								type="submit"
-								className={classes.search_Button}
-								aria-label="search"
-								onClick={handleSearch}
-							>
-								<SearchIcon />
-							</IconButton>
-						</Paper>
-						<Menus />
-						<Button
-							disableRipple
-							startIcon={<Cart />}
-							className={classes.cart_button}
-						>
-							Panier
-						</Button>
-						<Button
-							aria-controls="customized-menu"
-							aria-haspopup="true"
-							color="primary"
-							className={classes.logout_button}
-							onClick={handleLogout}
-						>
-							Se déconnecter
-						</Button>
-					</Toolbar>
-				</AppBar>
-			</ElevationScroll>
+			{!isLoading && (
+				<div className="home_body">
+					<CssBaseline />
+					<ElevationScroll {...props}>
+						<AppBar color="white" position="sticky">
+							<Toolbar className="appbar">
+								<div className="Logo">
+									<Logo />
+									<Typography variant="subtitle2">Home Art</Typography>
+								</div>
 
-			<Container maxWidth="xl" className="main"></Container>
+								<Paper
+									component="form"
+									className={classes.paper}
+									variant="outlined"
+								>
+									<InputBase
+										className={classes.input}
+										placeholder="Rechercher"
+									/>
+									<IconButton
+										type="submit"
+										className={classes.search_Button}
+										aria-label="search"
+										onClick={handleSearch}
+									>
+										<SearchIcon />
+									</IconButton>
+								</Paper>
+
+								{auth.isAuthenticated === "false" && <Menus />}
+								<Button
+									disableRipple
+									startIcon={<Cart />}
+									className={classes.cart_button}
+								>
+									Panier
+								</Button>
+
+								{auth.isAuthenticated === "true" && !auth.isAdmin && (
+									<div>
+										<IconButton
+											aria-label="account of current user"
+											aria-controls="menu-appbar"
+											aria-haspopup="true"
+											onClick={handleMenu}
+											color="inherit"
+										>
+											<AccountCircle />
+										</IconButton>
+										<Menu
+											id="menu-appbar"
+											anchorEl={anchorEl}
+											anchorOrigin={{
+												vertical: "top",
+												horizontal: "right",
+											}}
+											keepMounted
+											transformOrigin={{
+												vertical: "top",
+												horizontal: "right",
+											}}
+											open={open}
+											onClose={handleClose}
+										>
+											<MenuItem>Profile</MenuItem>
+											<MenuItem onClick={handleLogout}>Se déconnecter</MenuItem>
+										</Menu>
+									</div>
+								)}
+							</Toolbar>
+						</AppBar>
+					</ElevationScroll>
+
+					<Container maxWidth="xl" className="main"></Container>
+				</div>
+			)}
 		</div>
 	);
 }

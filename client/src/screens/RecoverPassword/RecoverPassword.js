@@ -3,13 +3,17 @@ import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
-import { CircularProgress } from "@material-ui/core";
+import {
+	CircularProgress,
+	Dialog,
+	DialogActions,
+	DialogContent,
+} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import ForgetPassword from "../../Icons/ForgetPassword";
 import { returnErrors, clearErrors } from "../../redux/actions/errAction";
 import axios from "axios";
-import { showSuccessMsg } from "../../utils/notification/Notification";
 import { useDispatch, useSelector } from "react-redux";
 import "./index.css";
 import { dispatchRecoverPassword } from "../../redux/actions/authAction";
@@ -92,12 +96,16 @@ export default function RecoverPassword() {
 	const [isLoading, setIsLoading] = useState(false);
 	const dispatch = useDispatch();
 	const [data, setData] = useState(initialState);
-
+	const [open, setOpen] = useState(false);
 	const { email, success } = data;
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
 		setData({ ...data, [name]: value });
+	};
+
+	const handleClose = () => {
+		setOpen(false);
 	};
 
 	const emailMsg = useSelector((state) => state.err);
@@ -124,6 +132,7 @@ export default function RecoverPassword() {
 				dispatch(clearErrors());
 				setIsLoading(false);
 				setData({ ...data, success: res.data.msg });
+				setOpen(true);
 			})
 			.catch((err) => {
 				setIsLoading(false);
@@ -139,17 +148,22 @@ export default function RecoverPassword() {
 
 	return (
 		<div className="body">
-			<Card className={classes.main_card} elevation={0}>
+			<Card className={classes.main_card} elevation={10}>
 				<div className={classes.img_div}>
 					<ForgetPassword />
 				</div>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent className={classes.card_content}>
-						{success && showSuccessMsg(success)}
-						<br />
-						<br />
-						<br />
-						<br />
+						<Dialog open={open} onClose={handleClose}>
+							<DialogContent>
+								<Typography>{success}</Typography>
+							</DialogContent>
+							<DialogActions>
+								<Button autoFocus onClick={handleClose} color="primary">
+									ok
+								</Button>
+							</DialogActions>
+						</Dialog>
 						<form onSubmit={handleSubmit}>
 							<Typography
 								className={classes.text}

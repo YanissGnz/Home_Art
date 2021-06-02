@@ -83,6 +83,7 @@ const authReducer = (state = initialState, action) => {
 				...state,
 				user: null,
 				token: null,
+				isLoading: false,
 				isAuthenticated: localStorage.getItem("isAuthenticated"),
 				isAdmin: false,
 			};

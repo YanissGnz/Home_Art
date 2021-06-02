@@ -5,13 +5,18 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
-import { CircularProgress, Link } from "@material-ui/core";
+import {
+	CircularProgress,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	Link,
+} from "@material-ui/core";
 import { returnErrors, clearErrors } from "../../redux/actions/errAction";
 import RegisterIcon from "../../Icons/RegisterIcon";
 import { useHistory } from "react-router";
 import axios from "axios";
 import { dispatchLogin2 } from "../../redux/actions/authAction";
-import { showSuccessMsg } from "../../utils/notification/Notification";
 import GoogleLogin from "react-google-login";
 import { useDispatch, useSelector } from "react-redux";
 import "./index.css";
@@ -96,12 +101,12 @@ const useStyles = makeStyles((theme) => {
 			display: "flex",
 			flexDirection: "row",
 			alignItems: "center",
-			alignContent: "center",
+			justifyContent: "center",
 			marginTop: "1em",
 		},
 		line: {
 			width: "8em",
-			height: "0.08em",
+			height: "0.05em",
 			background: "black",
 		},
 		btm_text: {
@@ -159,6 +164,8 @@ export default function ClientRegister() {
 
 	const [user, setUser] = useState(initialState);
 	const [isLoading, setIsLoading] = useState(false);
+	const [open, setOpen] = useState(false);
+
 	const dispatch = useDispatch();
 
 	const { name, last_name, email, password, cf_password, success } = user;
@@ -168,18 +175,16 @@ export default function ClientRegister() {
 		setUser({ ...user, [name]: value });
 	};
 
-	/* const handleClickShowPassword = () => {
-		setValues({ ...values, showPassword: !values.showPassword });
+	const handleClose = () => {
+		setOpen(false);
 	};
 
-	const handleMouseDownPassword = (event) => {
-		event.preventDefault();
-	};*/
 	const nameMsg = useSelector((state) => state.err);
 	const last_nameMsg = useSelector((state) => state.err);
 	const emailMsg = useSelector((state) => state.err);
 	const passwordMsg = useSelector((state) => state.err);
 	const cf_passwordMsg = useSelector((state) => state.err);
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
@@ -207,6 +212,7 @@ export default function ClientRegister() {
 				dispatch(clearErrors());
 				setIsLoading(false);
 				setUser({ ...user, success: res.data.msg });
+				setOpen(true);
 			})
 			.catch((err) => {
 				setIsLoading(false);
@@ -249,7 +255,16 @@ export default function ClientRegister() {
 				</div>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent>
-						{success && showSuccessMsg(success)}
+						<Dialog open={open} onClose={handleClose}>
+							<DialogContent>
+								<Typography>{success}</Typography>
+							</DialogContent>
+							<DialogActions>
+								<Button autoFocus onClick={handleClose} color="primary">
+									ok
+								</Button>
+							</DialogActions>
+						</Dialog>
 						<form onSubmit={handleSubmit}>
 							<Typography
 								className={classes.text}
@@ -311,7 +326,7 @@ export default function ClientRegister() {
 							{/*Password Input */}
 							<TextField
 								variant="outlined"
-								label="mot de passe"
+								label="Mot de passe"
 								size="small"
 								classes={{ root: classes.text_field }}
 								fullWidth
@@ -327,7 +342,7 @@ export default function ClientRegister() {
 
 							<TextField
 								variant="outlined"
-								label="confirmer mot de passe"
+								label="Confirmer mot de passe"
 								size="small"
 								classes={{ root: classes.text_field }}
 								fullWidth
