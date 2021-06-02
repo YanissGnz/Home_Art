@@ -1,4 +1,4 @@
-import React , {useState}  from "react";
+import React , {useState} from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -8,13 +8,14 @@ import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import ForgetPassword from "../../Icons/ForgetPassword";
 import { returnErrors, clearErrors} from "../../redux/actions/errAction";
+import "./index.css";
 import axios from 'axios'
 import { showSuccessMsg} from '../../utils/notification/Notification'
 import { useDispatch, useSelector} from "react-redux";
-import "./index.css";
-import { dispatchRecoverPassword } from "../../redux/actions/authAction";
+
+
 const useStyles = makeStyles((theme) => {
-  return{
+ return{
 	main_card: {
 		margin: "0",
 		background: "#C4C4C4",
@@ -50,7 +51,17 @@ const useStyles = makeStyles((theme) => {
 		marginTop: "1em",
 		fontFamily: "Poppins",
 	},
-	wrapper: {
+	btn: {
+		marginTop: "1.5em",
+	},
+	btn_text: {
+		fontFamily: "Poppins",
+		fontWeight: "500",
+		fontSize: "15px",
+		textTransform: "capitalize",
+		color: "white",
+	},
+    wrapper: {
 		margin: 0,
 		position: "relative",
 	},
@@ -61,16 +72,6 @@ const useStyles = makeStyles((theme) => {
 		left: "50%",
 		marginTop: -1,
 		marginLeft: -12,
-	},
-	btn: {
-		marginTop: "1.5em",
-	},
-	btn_text: {
-		fontFamily: "Poppins",
-		fontWeight: "500",
-		fontSize: "15px",
-		textTransform: "capitalize",
-		color: "white",
 	},
 	img_div: {
 		position: "static",
@@ -83,25 +84,28 @@ const useStyles = makeStyles((theme) => {
 	},
   }
 });
-const initialState = {
-    email: "",
-    success:"",
-}
-export default function RecoverPassword() {
-	const classes = useStyles();
-    const [isLoading, setIsLoading] = useState(false);
-	const dispatch = useDispatch();
-    const [data, setData] = useState(initialState)
 
-    const {email, success} = data
+const initialState = {
+    password: "",
+    cf_password: "",
+    success: ""
+}
+export default function ResetPassword() {
+	const classes = useStyles();
+
+	const [isLoading, setIsLoading] = useState(false);
+    const dispatch = useDispatch();
+    const [data, setData] = useState(initialState)
+    const {password, cf_password ,success} = data
 
     const handleChangeInput = e => {
         const {name, value} = e.target
         setData({...data, [name]:value})
     }
-    
-	const emailMsg = useSelector((state)  => state.err);
-
+     
+    const passwordMsg = useSelector((state)  => state.err);
+	const cf_passwordMsg = useSelector((state)  => state.err);
+    const token = useSelector((state) => state.auth.token);
     const handleSubmit = async (e) => {
 		e.preventDefault();
 
@@ -110,22 +114,24 @@ export default function RecoverPassword() {
 		// Headers
 		const config = {
 			headers: {
+				"x-auth-token": token,
 				"Content-Type": "application/json",
 			},
 		};
-        
+        console.log(password);
 		// Request body
-		const body = JSON.stringify({  email  });
-   
+		const body = JSON.stringify({  password , cf_password  });
+        
+        
         axios
-		  .post('/users/Recover_Password', body, config)
-		  .then((res) => {
-			dispatch(dispatchRecoverPassword(res));
-			dispatch(clearErrors());
+          .post('/users/Reset_Password', body, config)
+          .then((res) => {
+            dispatch(clearErrors());
 			setIsLoading(false);
             setData({...data,  success: res.data.msg})
 		  })
-		  .catch((err) => {
+
+          .catch((err) => {
 			setIsLoading(false);
             dispatch(
 				returnErrors(
@@ -135,9 +141,8 @@ export default function RecoverPassword() {
 				)
 			);
 		  });
+        
     }
-    
-
 	return (
 		<div className="body">
 			<Card className={classes.main_card} elevation={0}>
@@ -146,56 +151,71 @@ export default function RecoverPassword() {
 				</div>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent className={classes.card_content}>
-					  {success && showSuccessMsg(success)}
+					 <form onSubmit={handleSubmit}> 
+                      {success && showSuccessMsg(success)}
 					  <br />
 					  <br />
 					  <br />
 					  <br />
-					  <form onSubmit={handleSubmit}>
 						<Typography
 							className={classes.text}
 							variant="h6"
 							align="center"
 							color="primary"
 						>
-							Réinitialiser votre mot de passe.
+							Reset your password
 						</Typography>
 
-						{/*Email Input */}
+						{/*Password Input */}
 						<TextField
 							variant="outlined"
-							label="Email"
+                            label="Nouveau mot de passe"
+                            size="small"
+                            classes={{ root: classes.text_field }}
+                            fullWidth
+                            type="password"
+                            id="password"
+                            value={password}
+                            name="password"
+                            onChange={handleChangeInput}
+                            helperText={passwordMsg.id === 1 ? passwordMsg.msg : null}
+                            error={passwordMsg.id === 1 ? true : false}
+						/>
+						<br />
+                        <TextField
+							variant="outlined"
+							label="confirmer mot de passe"
 							size="small"
 							classes={{ root: classes.text_field }}
 							fullWidth
-							type="text"
-							id="email"
-							value={email}
-							name="email"
+							type="password"
+							id="cf_password"
+							value={cf_password}
+							name="cf_password"
 							onChange={handleChangeInput}
-							helperText={emailMsg.id === 0 ? emailMsg.msg : null}
-							error={emailMsg.id === 0 ? true : false}
+							helperText={cf_passwordMsg.id === 4 ? cf_passwordMsg.msg : null}
+							error={cf_passwordMsg.id === 4 ? true : false}
 						/>
 						<br />
-					  <div className={classes.wrapper}>
+                      <div className={classes.wrapper}>
 						<Button
 							className={classes.btn}
 							variant="contained"
-							type="submit"
 							color="primary"
+							type="submit"
 							disabled={isLoading}
 							classes={{ label: classes.btn_text }}
 							fullWidth
 						>
 							Réinitialiser
 						</Button>
-						{isLoading && (
+                        {isLoading && (
 									<CircularProgress
 										size={24}
 										className={classes.buttonProgress}
 									/>
 						)}
-					  </div>
+                      </div>
 					 </form>
 					</CardContent>
 				</Card>

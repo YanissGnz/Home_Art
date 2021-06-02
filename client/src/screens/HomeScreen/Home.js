@@ -5,6 +5,7 @@ import {
 	dispatchUserError,
 	dispatchUserLoaded,
 	dispatchUserLoading,
+	dispatchLogout,
 } from "../../redux/actions/authAction";
 import {
 	AppBar,
@@ -47,7 +48,7 @@ export default function Home(props) {
 
 	const history = useHistory();
 	const dispatch = useDispatch();
-	
+
 
 	// Get token from localstorage
 	const token = useSelector((state) => state.auth.token);
@@ -72,11 +73,15 @@ export default function Home(props) {
 					dispatch(dispatchUserError());
 					returnErrors(err.response.data.msg, err.response.status);
 				});
-			const isAuthenticated = localStorage.getItem("isAuthenticated");
-			if (isAuthenticated === "false") history.push("/login");
+		
 		};
 		loadUser();
 	}, [dispatch, history, token]);
+
+	const handleLogout = (event) => {
+		dispatch(dispatchLogout());
+		history.push("/login");
+	};
 	return (
 		<div className="home_body">
 			<CssBaseline />
@@ -111,6 +116,16 @@ export default function Home(props) {
 							className={classes.cart_button}
 						>
 							Panier
+						</Button>
+						<Button
+						    aria-controls="customized-menu"
+							aria-haspopup="true"
+							color="primary"
+							
+							className={classes.logout_button}
+							onClick={handleLogout}
+						>
+							Se déconnecter
 						</Button>
 					</Toolbar>
 				</AppBar>

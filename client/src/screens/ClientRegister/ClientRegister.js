@@ -327,7 +327,7 @@ export default function ClientRegister() {
 								error={passwordMsg.id === 1 ? true : false}
 							/>
 							<br />
-                            {/*Password Input */}
+
 							<TextField
 								variant="outlined"
 								label="confirmer mot de passe"

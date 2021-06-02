@@ -60,6 +60,14 @@ const authReducer = (state = initialState, action) => {
 				isAuthenticated: localStorage.getItem("isAuthenticated"),
 				isAdmin: false,
 			};
+		case ACTIONS.RECOVER_PASSWORD:
+			localStorage.setItem("token", action.payload.access_token);
+			localStorage.setItem("isAuthenticated", false);
+			return {
+				...state,
+				token: localStorage.getItem("token"),
+				isAuthenticated: localStorage.getItem("isAuthenticated"),
+			};
 		case ACTIONS.ADMIN_ERROR:
 			localStorage.setItem("isAuthenticated", false);
 			return {

@@ -54,7 +54,12 @@ export const dispatchUserError = (res) => {
 		type: ACTIONS.USER_ERROR,
 	};
 };
-
+export const dispatchRecoverPassword = (res) => {
+	return {
+		type: ACTIONS.RECOVER_PASSWORD,
+		payload: res.data,
+	};
+};
 export const fetchUser = async (token) => {
 	const res = await axios.get("/users/admin_info", {
 		headers: { Authorization: token },

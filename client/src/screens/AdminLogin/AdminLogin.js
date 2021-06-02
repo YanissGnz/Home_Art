@@ -41,6 +41,9 @@ const useStyles = makeStyles((theme) => {
 			alignItems: "center",
 			flexDirection: "row",
 		},
+		card_content: {
+			width: "100%",
+		},
 		text: {
 			fontFamily: "Poppins",
 			fontWeight: "600",

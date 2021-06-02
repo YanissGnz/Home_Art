@@ -32,6 +32,9 @@ const userCtrl2 = {
 			if (password == "") {
 				return res.status(400).json({ msg: "Enter votre mot de passe.", id:1 });
 			}
+			if (cf_password == "") {
+				return res.status(400).json({ msg: "Confirmer votre mot de passe.", id:4 });
+			}
             if(!validateEmail(email))
                 return res.status(400).json({msg: "Invalid email.",id:0})
 
@@ -134,6 +137,50 @@ const userCtrl2 = {
 			res.status(400).json({ msg: e.message });
 		}
 	},
+	forgotPassword: async (req, res) => {
+        try {
+            const {email} = req.body
+			if(!validateEmail(email))
+			     return res.status(400).json({msg: "Invalid Emails",id:0})
+            const user = await Users2.findOne({email})
+                if(!user) return res.status(400).json({msg: "This email does not exist.",id:0})
+
+            const access_token = createAccessToken({id: user._id})
+            const url = `${CLIENT_URL}/users/reset/${access_token}`
+
+            sendEmail(email, url, "Reset your password")
+            res.json({msg: "Re-send the password, please check your email.",access_token})
+			
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
+	resetPassword: async (req, res) => {
+        try {
+            const {password, cf_password} = req.body
+			if (password == "") {
+				return res.status(400).json({ msg: "Enter un nouveau mot de passe.", id:1 });
+			}
+			if (cf_password == "") {
+				return res.status(400).json({ msg: "Confirmer votre nouveau  mot de passe.", id:4 });
+			}
+			if(password.length < 6)
+                  return res.status(400).json({msg: "Password must be at least 6 characters.",id:1})
+            
+            if(!isMatch(password, cf_password))
+		          return res.status(400).json({msg: "Password did not match.",id:4})
+
+            const passwordHash = await bcrypt.hash(password, 12)
+
+            await Users2.findOneAndUpdate({_id: req.user.id}, {
+                password: passwordHash
+            })
+
+            res.json({msg: "Password successfully changed!"})
+        } catch (err) {
+            return res.status(500).json({msg: err.message})
+        }
+    },
 
 	getUserInfo: async (req, res) => {
 		try {
