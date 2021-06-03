@@ -110,8 +110,6 @@ export default function AdminPanel(props) {
 				})
 				.catch((err) => {
 					dispatch(productErrors());
-					console.log(err);
-					//dispatch(returnErrors(err.response.data.msg, err.response.status));
 				});
 		};
 		const isAuthenticated = localStorage.getItem("isAuthenticated");

@@ -35,6 +35,9 @@ const productSchema = new mongoose.Schema({
 		type: String,
 		required: [true, "Ajouter une image"],
 	},
+	archived: {
+		type: Boolean,
+	},
 });
 
 module.exports = mongoose.model("Product", productSchema);

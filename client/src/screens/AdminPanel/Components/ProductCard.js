@@ -11,7 +11,8 @@ import {
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import ArchiveOutlinedIcon from "@material-ui/icons/ArchiveOutlined";
+import VisibilityOffOutlinedIcon from "@material-ui/icons/VisibilityOffOutlined";
+import VisibilityOutlinedIcon from "@material-ui/icons/VisibilityOutlined";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
 
@@ -19,7 +20,13 @@ import clsx from "clsx";
 import "../adminPanel.css";
 import { useStyles } from "../useStyles";
 
-export default function ProductCard({ product }) {
+export default function ProductCard({
+	product,
+	handleClickEditOpen,
+	handleDelete,
+	handleArchive,
+	handleReveal,
+}) {
 	const classes = useStyles();
 	const [expanded, setExpanded] = React.useState(false);
 	const [anchorEl, setAnchorEl] = React.useState(null);
@@ -37,7 +44,12 @@ export default function ProductCard({ product }) {
 	};
 
 	return (
-		<Card elevation={2}>
+		<Card
+			elevation={3}
+			className={
+				product.archived ? classes.archivedproductCard : classes.productCard
+			}
+		>
 			<CardHeader
 				action={
 					<div>
@@ -51,18 +63,39 @@ export default function ProductCard({ product }) {
 							open={Boolean(anchorEl)}
 							onClose={handleMenuClose}
 						>
-							<MenuItem onClick={handleMenuClose}>
+							<MenuItem
+								onClick={() => {
+									handleMenuClose();
+									handleDelete(product._id, product.productImage);
+								}}
+							>
 								<DeleteOutlined fontSize="small" className={classes.MenuIcon} />
 								Supprimer
 							</MenuItem>
-							<MenuItem onClick={handleMenuClose}>
-								<ArchiveOutlinedIcon
-									fontSize="small"
-									className={classes.MenuIcon}
-								/>
-								Archiver
-							</MenuItem>
-							<MenuItem onClick={handleMenuClose}>
+							{product.archived && (
+								<MenuItem onClick={() => handleReveal(product._id)}>
+									<VisibilityOutlinedIcon
+										fontSize="small"
+										className={classes.MenuIcon}
+									/>
+									Faire apparaître
+								</MenuItem>
+							)}
+							{!product.archived && (
+								<MenuItem onClick={() => handleArchive(product._id)}>
+									<VisibilityOffOutlinedIcon
+										fontSize="small"
+										className={classes.MenuIcon}
+									/>
+									Se cacher
+								</MenuItem>
+							)}
+							<MenuItem
+								onClick={() => {
+									handleMenuClose();
+									handleClickEditOpen(product);
+								}}
+							>
 								<EditOutlinedIcon
 									fontSize="small"
 									className={classes.MenuIcon}
@@ -86,7 +119,7 @@ export default function ProductCard({ product }) {
 					Prix: {product.price} Da
 				</Typography>
 				<Typography variant="body1" className={classes.padding}>
-					Stock: {product.stock} unité
+					Stock: {product.stock} unité(s)
 				</Typography>
 				<div className={classes.productCardActionDiv}>
 					<Typography variant="body1">Description</Typography>

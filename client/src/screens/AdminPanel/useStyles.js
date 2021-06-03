@@ -183,6 +183,7 @@ export const useStyles = makeStyles((theme) => {
 		},
 		imageButton: {
 			textTransform: "capitalize",
+			alignItems: "center",
 		},
 		imageCard: {
 			maxWidth: 350,
@@ -233,7 +234,13 @@ export const useStyles = makeStyles((theme) => {
 		expandOpen: {
 			transform: "rotate(180deg)",
 		},
-
+		productCard: {
+			borderRadius: 10,
+		},
+		archivedproductCard: {
+			border: "solid 4px #F58634",
+			borderRadius: 10,
+		},
 		productCardActionDiv: {
 			display: "flex",
 			flexDirection: "row",
