@@ -32,11 +32,15 @@ const productCtrl = {
 					.status(400)
 					.json({ msg: "Enter une description sur produit.", id: 5 });
 			}
-			if (req.file == null) {
+			if (req.files.length == 0) {
 				return res
 					.status(400)
-					.json({ msg: "Choisir une image pour le produit", id: 6 });
+					.json({ msg: "Choisir des images pour le produit", id: 6 });
 			} else {
+				const productImages = [];
+				for (var i = 0; i < req.files.length; i++) {
+					productImages.push(req.files[i].originalname);
+				}
 				const newProduct = new Product({
 					name: req.body.name,
 					brand: req.body.brand,
@@ -44,7 +48,7 @@ const productCtrl = {
 					stock: req.body.stock,
 					categorie: req.body.categorie,
 					description: req.body.description,
-					productImage: req.file.originalname,
+					productImages: productImages,
 					archived: false,
 				});
 
@@ -110,16 +114,28 @@ const productCtrl = {
 			if (!check) {
 				return res.status(400).json({ msg: "Produit n'exist pas.", id: 5 });
 			}
-			if (req.file == null) {
+			if (req.files.length == 0) {
 				const editedProduct = await Product.updateOne(
 					{ _id: product_id },
 					{ name, brand, price, stock, categorie, description }
 				);
 			} else {
-				const productImage = req.file.originalname;
+				const productImages = [];
+
+				for (var i = 0; i < req.files.length; i++) {
+					productImages.push(req.files[i].originalname);
+				}
 				const editedProduct = await Product.updateOne(
 					{ _id: product_id },
-					{ name, brand, price, stock, categorie, description, productImage }
+					{
+						name,
+						brand,
+						price,
+						stock,
+						categorie,
+						description,
+						productImages,
+					}
 				);
 			}
 			return res.status(200).json({
@@ -173,7 +189,7 @@ const productCtrl = {
 				return res.status(400).json({ msg: "Produit n'exist pas." });
 			}
 			await Product.deleteOne({ _id: product_id });
-			res.json({ msg: "le produit a été supprimé" });
+			res.json({ msg: "Le produit a été supprimé" });
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
 		}

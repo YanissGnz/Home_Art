@@ -31,8 +31,8 @@ const productSchema = new mongoose.Schema({
 		required: [true, "Entrer un description"],
 		trim: true,
 	},
-	productImage: {
-		type: String,
+	productImages: {
+		type: Array,
 		required: [true, "Ajouter une image"],
 	},
 	archived: {

@@ -69,7 +69,7 @@ export default function AdminPanel(props) {
 	const theme = useTheme();
 	const [open, setOpen] = React.useState(false);
 	const [screen, setScreen] = React.useState(true);
-
+	const isLoading = useSelector((state) => state.auth.isLoading);
 	// Get token from localstorage
 	const token = useSelector((state) => state.auth.token);
 
@@ -131,12 +131,12 @@ export default function AdminPanel(props) {
 		history.push("/admin");
 	};
 
-	const isLoading = useSelector((state) => state.auth.isLoading);
-
 	return (
 		<div>
 			{isLoading && (
-				<CircularProgress size={80} thickness={5} className={classes.loader} />
+				<div className="loader_div">
+					<img className="loader" src="/loader.gif" alt="loader" />
+				</div>
 			)}
 			{!isLoading && (
 				<div className="panel_body">
@@ -238,7 +238,7 @@ export default function AdminPanel(props) {
 								<ListItemIcon>
 									<Catalog />
 								</ListItemIcon>
-								<ListItemText primary="Produit" />
+								<ListItemText primary="Produits" />
 							</ListItem>
 						</List>
 					</Drawer>

@@ -155,7 +155,7 @@ export default function AdminLogin() {
 
 	return (
 		<div className="body">
-			<Card className={classes.main_card} elevation={0}>
+			<Card className={classes.main_card} elevation={10}>
 				<Card className={classes.right_card} elevation={0}>
 					<CardContent className={classes.card_content}>
 						<form onSubmit={handleSubmit}>

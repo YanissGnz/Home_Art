@@ -1,5 +1,7 @@
 import { makeStyles } from "@material-ui/core";
 
+const drawerWidth = 400;
+
 export const useStyles = makeStyles((theme) => {
 	return {
 		loader: {
@@ -41,6 +43,15 @@ export const useStyles = makeStyles((theme) => {
 			"&:hover": {
 				backgroundColor: theme.palette.common.white,
 			},
+		},
+		drawer: {
+			width: drawerWidth,
+		},
+		drawerPaper: {
+			width: drawerWidth,
+		},
+		inline: {
+			display: "inline",
 		},
 	};
 });

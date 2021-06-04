@@ -19,5 +19,8 @@
 }
 .main {
 	margin-top: 1em;
-	background-color: #f1f1f1;
+}
+
+.card_image {
+	max-width: 100%;
 }

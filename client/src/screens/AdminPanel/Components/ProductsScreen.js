@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import React from "react";
+import { Slide } from "react-slideshow-image";
 import axios from "axios";
 import NumberFormat from "react-number-format";
 import {
 	Backdrop,
 	Button,
 	Card,
-	CardMedia,
 	CircularProgress,
 	Container,
 	Dialog,
@@ -107,16 +107,18 @@ const initialState = {
 	description: "",
 };
 
+const slideProperties = {
+	canSwipe: false,
+};
+
 export default function ProductsScreen() {
 	const classes = useStyles();
-	const [products, setProducts] = React.useState(
-		useSelector((state) => state.products.products)
-	);
 
 	const [product, setProduct] = React.useState(initialState);
 	const [categorie, setCategorie] = React.useState("");
+	var images = [];
+	const [imageSlide, setImageSlide] = React.useState("");
 	const [productImage, setProductImage] = React.useState("");
-	const [file, setFile] = React.useState("");
 	const [msg, setMsg] = React.useState("");
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [addOpen, setAddOpen] = React.useState(false);
@@ -125,6 +127,9 @@ export default function ProductsScreen() {
 	const [alertOpen, setAlertOpen] = React.useState(false);
 	const [backdropOpen, setBackdropOpen] = React.useState(false);
 
+	const [products, setProducts] = React.useState(
+		useSelector((state) => state.products.products)
+	);
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
 	const nameMsg = useSelector((state) => state.err);
@@ -135,6 +140,7 @@ export default function ProductsScreen() {
 	const descriptionMsg = useSelector((state) => state.err);
 	let imageMsg = useSelector((state) => state.err);
 
+	/*For The Masonary Container*/
 	const breakpoints = {
 		default: 4,
 		1600: 3,
@@ -149,15 +155,17 @@ export default function ProductsScreen() {
 	const handleAddClose = () => {
 		setAddOpen(false);
 		setProductImage("");
-		setFile("");
+		images = [];
+		setImageSlide("");
+		dispatch(clearErrors());
 		setMsg("");
 	};
-	/*______________________ */
+	/*______________________*/
 
 	/*          For Edit Product Dialog          */
 	const handleClickEditOpen = (editedProduct) => {
 		setProductImage("");
-		setFile("");
+		images = [];
 		setEditOpen(true);
 		setProduct({
 			name: editedProduct.name,
@@ -171,6 +179,11 @@ export default function ProductsScreen() {
 	};
 	const handleEditClose = () => {
 		setEditOpen(false);
+		setProductImage("");
+		images = [];
+		setImageSlide("");
+		dispatch(clearErrors());
+		setMsg("");
 	};
 	/*__________________________________________ */
 
@@ -197,14 +210,17 @@ export default function ProductsScreen() {
 		setCategorie(e.target.value);
 		setProduct({ ...product, categorie: e.target.value });
 	};
-	function handleImageChange(e) {
-		let url = URL.createObjectURL(e.target.files[0]);
-		setFile(url);
-		setProductImage(e.target.files[0]);
-		console.log(productImage);
-	}
+	const handleImageChange = (e) => {
+		for (var i = 0; i < e.target.files.length; i++) {
+			images.push(URL.createObjectURL(e.target.files[i]));
+		}
 
-	const handleSubmit = async (e) => {
+		setImageSlide(images.reverse());
+		console.log(imageSlide);
+		setProductImage(e.target.files);
+	};
+
+	const handleAddProduct = async (e) => {
 		e.preventDefault();
 		setIsLoading(true);
 
@@ -221,13 +237,16 @@ export default function ProductsScreen() {
 		//Body
 		const formData = new FormData();
 
+		console.log(productImage);
 		formData.append("name", product.name);
 		formData.append("brand", product.brand);
 		formData.append("price", product.price);
 		formData.append("stock", product.stock);
 		formData.append("categorie", product.categorie);
 		formData.append("description", product.description);
-		formData.append("productImage", productImage);
+		for (const key of Object.keys(productImage)) {
+			formData.append("productImage", productImage[key]);
+		}
 
 		axios
 			.post("/products/add_product", formData, config)
@@ -272,7 +291,10 @@ export default function ProductsScreen() {
 		formData.append("stock", product.stock);
 		formData.append("categorie", categorie);
 		formData.append("description", product.description);
-		formData.append("productImage", productImage);
+		for (const key of Object.keys(productImage)) {
+			formData.append("productImage", productImage[key]);
+		}
+
 		axios
 			.put(`/products/edit_product/${editedProdcutId}`, formData, config)
 			.then((res) => {
@@ -399,6 +421,7 @@ export default function ProductsScreen() {
 			<Typography variant="h5" className={classes.dashboardText}>
 				Produit
 			</Typography>
+
 			{/*_____________________Add Dialog_____________________*/}
 			<Dialog
 				open={addOpen}
@@ -409,7 +432,7 @@ export default function ProductsScreen() {
 				<DialogTitle id="form-dialog-title">Ajouter un produit</DialogTitle>
 				<DialogContent>
 					<form
-						onSubmit={handleSubmit}
+						onSubmit={handleAddProduct}
 						className={classes.productForm}
 						encType="multipart/form-data"
 					>
@@ -501,6 +524,7 @@ export default function ProductsScreen() {
 								className={classes.imageInput}
 								id="contained-button-file"
 								type="file"
+								multiple
 								onChange={handleImageChange}
 							/>
 							<label htmlFor="contained-button-file">
@@ -511,9 +535,12 @@ export default function ProductsScreen() {
 									component="span"
 									className={classes.imageButton}
 								>
-									Ajouter une image
+									Ajouter des images
 								</Button>
 							</label>
+							<Typography className={classes.imageMsgDiv} variant="body2">
+								(6 images maximum)
+							</Typography>
 							{imageMsg.id === 6 && (
 								<Typography
 									className={classes.imageMsgDiv}
@@ -524,15 +551,36 @@ export default function ProductsScreen() {
 								</Typography>
 							)}
 						</Container>
-						{file.length > 0 && (
-							<Card className={classes.imageCard} variant="outlined">
-								<img
-									alt="Image Produit"
-									src={file}
-									className={classes.addProductImage}
-								/>
-							</Card>
+
+						{imageSlide.length > 0 && (
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "row",
+									alignContent: "center",
+									justifyContent: "center",
+									width: "100%",
+									margin: "5px",
+									flexWrap: "wrap",
+								}}
+							>
+								{imageSlide.map((each, index) => (
+									<Card
+										style={{ margin: "5px" }}
+										className={classes.imageCard}
+										variant="outlined"
+									>
+										<img
+											key={index}
+											src={each}
+											alt="product"
+											className={classes.addProductImage}
+										/>
+									</Card>
+								))}
+							</div>
 						)}
+
 						<div className={classes.wrapper}>
 							<Button
 								variant="contained"
@@ -662,6 +710,7 @@ export default function ProductsScreen() {
 								className={classes.imageInput}
 								id="contained-button-file"
 								type="file"
+								multiple
 								onChange={handleImageChange}
 							/>
 							<label htmlFor="contained-button-file">
@@ -688,15 +737,33 @@ export default function ProductsScreen() {
 								</Typography>
 							)}
 						</Container>
-						{file.length > 0 && (
-							<Card className={classes.imageCard} variant="outlined">
-								<CardMedia
-									component="img"
-									alt="Image Produit"
-									image={file}
-									title="Image Produit"
-								/>
-							</Card>
+						{imageSlide.length > 0 && (
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "row",
+									alignContent: "center",
+									justifyContent: "center",
+									width: "100%",
+									margin: "5px",
+									flexWrap: "wrap",
+								}}
+							>
+								{imageSlide.map((each, index) => (
+									<Card
+										style={{ margin: "5px" }}
+										className={classes.imageCard}
+										variant="outlined"
+									>
+										<img
+											key={index}
+											src={each}
+											alt="product"
+											className={classes.addProductImage}
+										/>
+									</Card>
+								))}
+							</div>
 						)}
 						<div className={classes.wrapper}>
 							<Button
@@ -736,7 +803,9 @@ export default function ProductsScreen() {
 				autoHideDuration={2500}
 				onClose={handleAlertClose}
 			>
-				<Alert severity="success">{msg}</Alert>
+				<Alert severity="success">
+					<Typography>{msg}</Typography>
+				</Alert>
 			</Snackbar>
 
 			{/*__________________Product Container__________________*/}

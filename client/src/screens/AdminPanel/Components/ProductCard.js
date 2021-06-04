@@ -1,4 +1,6 @@
 import React from "react";
+import { Slide } from "react-slideshow-image";
+import "react-slideshow-image/dist/styles.css";
 import {
 	Card,
 	CardContent,
@@ -42,6 +44,15 @@ export default function ProductCard({
 	const handleMenuClose = () => {
 		setAnchorEl(null);
 	};
+
+	const slideProperties = {
+		canSwipe: false,
+	};
+
+	const images = [];
+	product.productImages.forEach((image, index) =>
+		images.push(`/uploads/${product.productImages[index]}`)
+	);
 
 	return (
 		<Card
@@ -120,11 +131,18 @@ export default function ProductCard({
 			/>
 
 			<CardContent className={classes.productCardContent}>
-				<img
-					src={`/uploads/${product.productImage}`}
-					alt="Product"
-					className="product_image"
-				/>
+				<Slide autoplay={false} {...slideProperties}>
+					{images.map((each, index) => (
+						<img
+							key={index}
+							style={{ width: "100%" }}
+							src={each}
+							alt="product"
+							className="product_image"
+						/>
+					))}
+				</Slide>
+
 				<Typography variant="body1" className={classes.padding}>
 					Prix: {product.price} Da
 				</Typography>

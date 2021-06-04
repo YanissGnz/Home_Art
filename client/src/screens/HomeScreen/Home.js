@@ -1,4 +1,5 @@
 import React from "react";
+import clsx from "clsx";
 import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -10,9 +11,14 @@ import {
 import {
 	AppBar,
 	Button,
+	Card,
+	CardActions,
+	CardContent,
+	CardMedia,
 	CircularProgress,
 	Container,
 	CssBaseline,
+	Drawer,
 	IconButton,
 	InputBase,
 	Menu,
@@ -58,6 +64,9 @@ export default function Home(props) {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const [anchorEl, setAnchorEl] = React.useState(null);
+	const [state, setState] = React.useState({
+		right: false,
+	});
 	const open = Boolean(anchorEl);
 
 	// Get token from localstorage
@@ -77,6 +86,18 @@ export default function Home(props) {
 		dispatch(dispatchLogout());
 		history.push("/login");
 	};
+
+	const toggleCart = (anchor, open) => (event) => {
+		if (
+			event.type === "keydown" &&
+			(event.key === "Tab" || event.key === "Shift")
+		) {
+			return;
+		}
+
+		setState({ right: open });
+	};
+
 	React.useEffect(() => {
 		const loadUser = async () => {
 			dispatch(dispatchUserLoading());
@@ -95,7 +116,7 @@ export default function Home(props) {
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
-					returnErrors(err.response.data.msg, err.response.status);
+					dispatch(returnErrors(err.response.data.msg, err.response.status));
 				});
 		};
 		loadUser();
@@ -160,6 +181,7 @@ export default function Home(props) {
 									disableRipple
 									startIcon={<Cart />}
 									className={classes.cart_button}
+									onClick={toggleCart("right", true)}
 								>
 									Panier
 								</Button>
@@ -173,7 +195,7 @@ export default function Home(props) {
 											onClick={handleMenu}
 											color="inherit"
 										>
-											<AccountCircle />
+											<AccountCircle size={50} />
 										</IconButton>
 										<Menu
 											id="menu-appbar"
@@ -198,6 +220,42 @@ export default function Home(props) {
 							</Toolbar>
 						</AppBar>
 					</ElevationScroll>
+					<Drawer
+						anchor={"right"}
+						open={state["right"]}
+						onClose={toggleCart("right", false)}
+						className={classes.drawer}
+						classes={{
+							paper: classes.drawerPaper,
+						}}
+					>
+						<Card className={classes.root} variant="outlined">
+							<CardContent>
+								<div>
+									<img
+										src="/uploads/Red.jpg"
+										alt="product"
+										className="card_image"
+									/>
+									<Typography gutterBottom variant="h5" component="h2">
+										Product
+									</Typography>
+									<br />
+									<Typography gutterBottom variant="h5" component="h2">
+										20000 da
+									</Typography>
+								</div>
+							</CardContent>
+							<CardActions>
+								<Button size="small" color="primary">
+									Share
+								</Button>
+								<Button size="small" color="primary">
+									Learn More
+								</Button>
+							</CardActions>
+						</Card>
+					</Drawer>
 
 					<Container maxWidth="xl" className="main"></Container>
 				</div>
