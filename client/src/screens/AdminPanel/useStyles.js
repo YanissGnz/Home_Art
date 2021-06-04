@@ -262,5 +262,8 @@ export const useStyles = makeStyles((theme) => {
 			paddingLeft: 10,
 			paddingRight: 10,
 		},
+		snackbar: {
+			backgroundColor: "#f5f5f5",
+		},
 	};
 });

@@ -105,8 +105,8 @@ const useStyles = makeStyles((theme) => {
 			marginTop: "1em",
 		},
 		line: {
-			width: "8em",
-			height: "0.05em",
+			width: 120,
+			height: 0.5,
 			background: "black",
 		},
 		btm_text: {

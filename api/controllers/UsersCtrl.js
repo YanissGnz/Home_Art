@@ -43,9 +43,7 @@ const userCtrl2 = {
 
 			const user = await Users2.findOne({ email });
 			if (user)
-				return res
-					.status(400)
-					.json({ msg: "This email already exists.", id: 0 });
+				return res.status(400).json({ msg: "Ce email exists déja.", id: 0 });
 
 			if (password.length < 6)
 				return res

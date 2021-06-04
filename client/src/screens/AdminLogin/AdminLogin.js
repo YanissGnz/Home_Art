@@ -54,7 +54,7 @@ const useStyles = makeStyles((theme) => {
 			fontFamily: "Poppins",
 		},
 		btn: {
-			marginTop: "1.5em",
+			marginTop: "0.5em",
 		},
 		btn_text: {
 			width: "100%",
@@ -65,9 +65,7 @@ const useStyles = makeStyles((theme) => {
 			color: "white",
 		},
 		mdps_oublier: {
-			position: "relative",
-			left: "62%",
-			marginTop: "0.2em",
+			marginTop: "0.8em",
 			fontFamily: "Poppins",
 			fontWeight: "500",
 			fontSize: "11px",
@@ -81,7 +79,7 @@ const useStyles = makeStyles((theme) => {
 			position: "absolute",
 			top: "50%",
 			left: "50%",
-			marginTop: -1,
+			marginTop: -8,
 			marginLeft: -12,
 		},
 		img_div: {
@@ -198,16 +196,6 @@ export default function AdminLogin() {
 								error={passwordMsg.id === 1 ? true : false}
 							/>
 							<br />
-							<Link
-								component="button"
-								color="primary"
-								underline="hover"
-								variant="inherit"
-								classes={{ root: classes.mdps_oublier }}
-								onClick={() => history.push("/recover_password")}
-							>
-								Mot de passe oublier?
-							</Link>
 							<br />
 							<div className={classes.wrapper}>
 								<Button
@@ -227,6 +215,18 @@ export default function AdminLogin() {
 										className={classes.buttonProgress}
 									/>
 								)}
+							</div>
+							<div className="mdps_oblier">
+								<Link
+									component="button"
+									color="primary"
+									underline="hover"
+									variant="inherit"
+									classes={{ root: classes.mdps_oublier }}
+									onClick={() => history.push("/recover_password")}
+								>
+									Mot de passe oublier?
+								</Link>
 							</div>
 						</form>
 					</CardContent>

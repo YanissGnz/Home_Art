@@ -14,10 +14,13 @@ import {
 	Fab,
 	InputAdornment,
 	MenuItem,
+	Snackbar,
 	TextField,
 	Toolbar,
 	Typography,
 } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
+
 import { useStyles } from "../useStyles";
 import AddIcon from "@material-ui/icons/Add";
 
@@ -28,7 +31,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearErrors, returnErrors } from "../../../redux/actions/errAction";
 import ProductCard from "./ProductCard";
 
-const fs = require("fs");
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function PriceFormat(props) {
 	const { inputRef, onChange, ...other } = props;
@@ -108,7 +113,7 @@ export default function ProductsScreen() {
 
 	const [product, setProduct] = React.useState(initialState);
 	const [categorie, setCategorie] = React.useState("");
-	const [fileName, setFileName] = React.useState("");
+	const [productImage, setProductImage] = React.useState("");
 	const [file, setFile] = React.useState("");
 	const [msg, setMsg] = React.useState("");
 	const [isLoading, setIsLoading] = React.useState(false);
@@ -117,6 +122,7 @@ export default function ProductsScreen() {
 	const [editedProdcutId, setEditedProductId] = React.useState("");
 	const [deleteSuccess, setDeleteSuccess] = React.useState(false);
 	const [archiveSuccess, setArchiveSuccess] = React.useState(false);
+	const [alertOpen, setAlertOpen] = React.useState(false);
 
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
@@ -142,14 +148,15 @@ export default function ProductsScreen() {
 
 	const handleAddClose = () => {
 		setAddOpen(false);
-		setFileName("");
+		setProductImage("");
 		setFile("");
+		setMsg("");
 	};
 	/*______________________ */
 
-	/*For Add Product Dialog */
+	/*For Edit Product Dialog */
 	const handleClickEditOpen = (editedProduct) => {
-		setFileName("");
+		setProductImage("");
 		setFile("");
 		setEditOpen(true);
 		setProduct({
@@ -192,7 +199,8 @@ export default function ProductsScreen() {
 	function handleImageChange(e) {
 		let url = URL.createObjectURL(e.target.files[0]);
 		setFile(url);
-		setFileName(e.target.files[0]);
+		setProductImage(e.target.files[0]);
+		console.log(productImage);
 	}
 
 	const handleSubmit = async (e) => {
@@ -218,7 +226,7 @@ export default function ProductsScreen() {
 		formData.append("stock", product.stock);
 		formData.append("categorie", product.categorie);
 		formData.append("description", product.description);
-		formData.append("productImage", fileName);
+		formData.append("productImage", productImage);
 
 		axios
 			.post("/products/add_product", formData, config)
@@ -227,6 +235,7 @@ export default function ProductsScreen() {
 				dispatch(clearErrors());
 				setMsg(res.data.msg);
 				imageMsg.msg = "";
+				handleAlertOpen();
 			})
 			.catch((err) => {
 				setIsLoading(false);
@@ -263,7 +272,7 @@ export default function ProductsScreen() {
 		formData.append("stock", product.stock);
 		formData.append("categorie", categorie);
 		formData.append("description", product.description);
-		formData.append("productImage", fileName);
+		formData.append("productImage", productImage);
 		axios
 			.put(`/products/edit_product/${editedProdcutId}`, formData, config)
 			.then((res) => {
@@ -271,6 +280,7 @@ export default function ProductsScreen() {
 				dispatch(clearErrors());
 				setMsg(res.data.msg);
 				imageMsg.msg = "";
+				handleAlertOpen();
 			})
 			.catch((err) => {
 				setIsLoading(false);
@@ -295,12 +305,12 @@ export default function ProductsScreen() {
 		await axios
 			.delete(`/products/delete_product/${deletedProductId}`, config)
 			.then((res) => {
-				setDeleteSuccess(true);
 				setMsg(res.data.msg);
 				const newProducts = products.filter(
 					(product) => product._id !== deletedProductId
 				);
 				setProducts(newProducts);
+				handleAlertOpen();
 			})
 			.catch((err) => {
 				setDeleteSuccess(true);
@@ -326,11 +336,10 @@ export default function ProductsScreen() {
 		axios
 			.put(`/products/archive_product/${archiveProductId}`, null, config)
 			.then((res) => {
-				setArchiveSuccess(true);
 				setMsg(res.data.msg);
+				handleAlertOpen();
 			})
 			.catch((err) => {
-				setArchiveSuccess(true);
 				setMsg(err.response.data.msg);
 				dispatch(
 					returnErrors(
@@ -354,9 +363,9 @@ export default function ProductsScreen() {
 			.then((res) => {
 				setArchiveSuccess(true);
 				setMsg(res.data.msg);
+				handleAlertOpen();
 			})
 			.catch((err) => {
-				setArchiveSuccess(true);
 				setMsg(err.response.data.msg);
 				dispatch(
 					returnErrors(
@@ -367,6 +376,15 @@ export default function ProductsScreen() {
 				);
 			});
 	};
+
+	const handleAlertOpen = () => {
+		setAlertOpen(true);
+	};
+
+	const handleAlertClose = () => {
+		setAlertOpen(false);
+	};
+
 	return (
 		<Container maxWidth="xl" className="dashbord_container">
 			<Fab
@@ -535,9 +553,6 @@ export default function ProductsScreen() {
 									className={classes.buttonProgress}
 								/>
 							)}
-							{msg && (
-								<Typography className={classes.successMsg}>{msg}</Typography>
-							)}
 						</div>
 					</form>
 				</DialogContent>
@@ -703,9 +718,6 @@ export default function ProductsScreen() {
 									className={classes.buttonProgress}
 								/>
 							)}
-							{msg && (
-								<Typography className={classes.successMsg}>{msg}</Typography>
-							)}
 						</div>
 					</form>
 				</DialogContent>
@@ -716,43 +728,13 @@ export default function ProductsScreen() {
 				</DialogActions>
 			</Dialog>
 
-			<Dialog
-				open={deleteSuccess}
-				onClose={handleDeleteClose}
-				aria-labelledby="alert-dialog-title"
-				aria-describedby="alert-dialog-description"
+			<Snackbar
+				open={alertOpen}
+				autoHideDuration={3000}
+				onClose={handleAlertClose}
 			>
-				<DialogTitle id="alert-dialog-title">
-					{"Suppression produit "}
-				</DialogTitle>
-				<DialogContent>
-					<Typography>{msg}</Typography>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={handleDeleteClose} color="primary" autoFocus>
-						ok
-					</Button>
-				</DialogActions>
-			</Dialog>
-
-			<Dialog
-				open={archiveSuccess}
-				onClose={handleArchiveClose}
-				aria-labelledby="alert-dialog-title"
-				aria-describedby="alert-dialog-description"
-			>
-				<DialogTitle id="alert-dialog-title">
-					{"Archivage produit "}
-				</DialogTitle>
-				<DialogContent>
-					<Typography>{msg}</Typography>
-				</DialogContent>
-				<DialogActions>
-					<Button onClick={handleArchiveClose} color="primary" autoFocus>
-						ok
-					</Button>
-				</DialogActions>
-			</Dialog>
+				<Alert severity="success">{msg}</Alert>
+			</Snackbar>
 
 			<Container maxWidth="xl">
 				<Typography variant="h6" className={classes.dashboardText}>

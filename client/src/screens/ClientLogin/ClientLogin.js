@@ -81,8 +81,8 @@ const useStyles = makeStyles((theme) => {
 			marginLeft: -12,
 		},
 		line: {
-			width: "9em",
-			height: "0.01em",
+			width: 120,
+			height: 1,
 			background: "black",
 		},
 		btm_text: {
@@ -277,7 +277,7 @@ export default function ClientLogin() {
 								</Link>
 							</div>
 							<div className={classes.div}>
-								<div className={classes.line}></div>
+								<div className={classes.line} />
 								<Typography
 									className={classes.btm_text}
 									variant="subtitle2"
@@ -285,7 +285,7 @@ export default function ClientLogin() {
 								>
 									Ou
 								</Typography>
-								<div className={classes.line}></div>
+								<div className={classes.line} />
 							</div>
 							<Button fullWidth>
 								<GoogleLogin
