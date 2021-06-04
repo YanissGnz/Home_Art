@@ -1,7 +1,9 @@
+/* eslint-disable jsx-a11y/img-redundant-alt */
 import React from "react";
 import axios from "axios";
 import NumberFormat from "react-number-format";
 import {
+	Backdrop,
 	Button,
 	Card,
 	CardMedia,
@@ -83,7 +85,7 @@ const categories = [
 		value: "Meuble",
 	},
 	{
-		value: "Visselle",
+		value: "Vaisselle",
 	},
 	{
 		value: "Décoration",
@@ -120,9 +122,8 @@ export default function ProductsScreen() {
 	const [addOpen, setAddOpen] = React.useState(false);
 	const [editOpen, setEditOpen] = React.useState(false);
 	const [editedProdcutId, setEditedProductId] = React.useState("");
-	const [deleteSuccess, setDeleteSuccess] = React.useState(false);
-	const [archiveSuccess, setArchiveSuccess] = React.useState(false);
 	const [alertOpen, setAlertOpen] = React.useState(false);
+	const [backdropOpen, setBackdropOpen] = React.useState(false);
 
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
@@ -142,10 +143,9 @@ export default function ProductsScreen() {
 	};
 
 	/*For Add Product Dialog */
-	const handleClickAddOpen = () => {
+	const handleAddOpen = () => {
 		setAddOpen(true);
 	};
-
 	const handleAddClose = () => {
 		setAddOpen(false);
 		setProductImage("");
@@ -154,7 +154,7 @@ export default function ProductsScreen() {
 	};
 	/*______________________ */
 
-	/*For Edit Product Dialog */
+	/*          For Edit Product Dialog          */
 	const handleClickEditOpen = (editedProduct) => {
 		setProductImage("");
 		setFile("");
@@ -169,24 +169,25 @@ export default function ProductsScreen() {
 		setCategorie(editedProduct.categorie);
 		setEditedProductId(editedProduct._id);
 	};
-
 	const handleEditClose = () => {
 		setEditOpen(false);
 	};
-	/*______________________ */
+	/*__________________________________________ */
 
-	/*For Delete Product Dialog */
-	const handleDeleteClose = () => {
-		setDeleteSuccess(false);
-		setMsg("");
+	const handleAlertOpen = () => {
+		setAlertOpen(true);
 	};
-	/*______________________ */
-	/*For Delete Product Dialog */
-	const handleArchiveClose = () => {
-		setArchiveSuccess(false);
-		setMsg("");
+	const handleAlertClose = () => {
+		setAlertOpen(false);
 	};
-	/*______________________ */
+
+	const handleBackdropOpen = () => {
+		setBackdropOpen(true);
+	};
+
+	const handleBackdropClose = () => {
+		setBackdropOpen(false);
+	};
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
@@ -248,7 +249,6 @@ export default function ProductsScreen() {
 				);
 			});
 	};
-
 	const handleEdit = async (e) => {
 		e.preventDefault();
 		setIsLoading(true);
@@ -293,8 +293,8 @@ export default function ProductsScreen() {
 				);
 			});
 	};
-
 	const handleDelete = async (deletedProductId, deletedProductImage) => {
+		handleBackdropOpen();
 		//Header
 		const config = {
 			headers: {
@@ -311,9 +311,9 @@ export default function ProductsScreen() {
 				);
 				setProducts(newProducts);
 				handleAlertOpen();
+				handleBackdropClose();
 			})
 			.catch((err) => {
-				setDeleteSuccess(true);
 				setMsg(err.response.data.msg);
 				dispatch(
 					returnErrors(
@@ -322,10 +322,11 @@ export default function ProductsScreen() {
 						err.response.data.id
 					)
 				);
+				handleBackdropClose();
 			});
 	};
-
 	const handleArchive = (archiveProductId) => {
+		handleBackdropOpen();
 		//Header
 		const config = {
 			headers: {
@@ -338,6 +339,7 @@ export default function ProductsScreen() {
 			.then((res) => {
 				setMsg(res.data.msg);
 				handleAlertOpen();
+				handleBackdropClose();
 			})
 			.catch((err) => {
 				setMsg(err.response.data.msg);
@@ -348,9 +350,11 @@ export default function ProductsScreen() {
 						err.response.data.id
 					)
 				);
+				handleBackdropClose();
 			});
 	};
 	const handleReveal = (revealedProductId) => {
+		handleBackdropOpen();
 		//Header
 		const config = {
 			headers: {
@@ -361,9 +365,9 @@ export default function ProductsScreen() {
 		axios
 			.put(`/products/reveal_product/${revealedProductId}`, null, config)
 			.then((res) => {
-				setArchiveSuccess(true);
 				setMsg(res.data.msg);
 				handleAlertOpen();
+				handleBackdropClose();
 			})
 			.catch((err) => {
 				setMsg(err.response.data.msg);
@@ -374,29 +378,23 @@ export default function ProductsScreen() {
 						err.response.data.id
 					)
 				);
+				handleBackdropClose();
 			});
-	};
-
-	const handleAlertOpen = () => {
-		setAlertOpen(true);
-	};
-
-	const handleAlertClose = () => {
-		setAlertOpen(false);
 	};
 
 	return (
 		<Container maxWidth="xl" className="dashbord_container">
+			<Toolbar />
+			{/*_________________Add Product Button_________________*/}
 			<Fab
 				color="primary"
 				variant="extended"
-				onClick={handleClickAddOpen}
+				onClick={handleAddOpen}
 				className={classes.addProductFab}
 			>
 				<AddIcon className={classes.fabIcon} />
 				Ajouter un produit
 			</Fab>
-			<Toolbar />
 
 			<Typography variant="h5" className={classes.dashboardText}>
 				Produit
@@ -528,11 +526,10 @@ export default function ProductsScreen() {
 						</Container>
 						{file.length > 0 && (
 							<Card className={classes.imageCard} variant="outlined">
-								<CardMedia
-									component="img"
+								<img
 									alt="Image Produit"
-									image={file}
-									title="Image Produit"
+									src={file}
+									className={classes.addProductImage}
 								/>
 							</Card>
 						)}
@@ -728,14 +725,21 @@ export default function ProductsScreen() {
 				</DialogActions>
 			</Dialog>
 
+			{/*_________________Backdrop (LOADING...)________________*/}
+			<Backdrop className={classes.backdrop} open={backdropOpen}>
+				<CircularProgress size={60} thickness={5} color="primary" />
+			</Backdrop>
+
+			{/*____________________Alert Snackbar___________________*/}
 			<Snackbar
 				open={alertOpen}
-				autoHideDuration={3000}
+				autoHideDuration={2500}
 				onClose={handleAlertClose}
 			>
 				<Alert severity="success">{msg}</Alert>
 			</Snackbar>
 
+			{/*__________________Product Container__________________*/}
 			<Container maxWidth="xl">
 				<Typography variant="h6" className={classes.dashboardText}>
 					List des produit

@@ -73,7 +73,12 @@ export default function ProductCard({
 								Supprimer
 							</MenuItem>
 							{product.archived && (
-								<MenuItem onClick={() => handleReveal(product._id)}>
+								<MenuItem
+									onClick={() => {
+										handleMenuClose();
+										handleReveal(product._id);
+									}}
+								>
 									<VisibilityOutlinedIcon
 										fontSize="small"
 										className={classes.MenuIcon}
@@ -82,7 +87,12 @@ export default function ProductCard({
 								</MenuItem>
 							)}
 							{!product.archived && (
-								<MenuItem onClick={() => handleArchive(product._id)}>
+								<MenuItem
+									onClick={() => {
+										handleMenuClose();
+										handleArchive(product._id);
+									}}
+								>
 									<VisibilityOffOutlinedIcon
 										fontSize="small"
 										className={classes.MenuIcon}
@@ -134,11 +144,17 @@ export default function ProductCard({
 						<ExpandMoreIcon />
 					</IconButton>
 				</div>
-				<Collapse in={expanded} timeout="auto" unmountOnExit>
+				<Collapse
+					in={expanded}
+					timeout="auto"
+					unmountOnExit
+					className={classes.productDescriptionWrapper}
+				>
 					<Typography
-						paragraph
 						variant="body2"
+						variantMapping="span"
 						className={classes.productDescription}
+						display="inline"
 					>
 						{product.description}
 					</Typography>

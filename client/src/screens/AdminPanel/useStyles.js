@@ -186,10 +186,15 @@ export const useStyles = makeStyles((theme) => {
 			alignItems: "center",
 		},
 		imageCard: {
-			maxWidth: 350,
-			maxHeight: 350,
+			maxWidth: 300,
+			maxHeight: 300,
 			alignSelf: "center",
 			marginBottom: "2em",
+		},
+		addProductImage: {
+			maxWidth: "inherit",
+			maxHeight: "inherit",
+			objectFit: "fill",
 		},
 		wrapper: {
 			margin: 0,
@@ -256,14 +261,22 @@ export const useStyles = makeStyles((theme) => {
 			paddingLeft: 10,
 			paddingRight: 10,
 		},
+		productDescriptionWrapper: {
+			marginLeft: 10,
+			marginRight: 10,
+		},
 		productDescription: {
 			paddingTop: 0,
 			paddingBottom: 0,
-			paddingLeft: 10,
-			paddingRight: 10,
+
+			whiteSpace: "pre-wrap",
 		},
 		snackbar: {
 			backgroundColor: "#f5f5f5",
+		},
+		backdrop: {
+			zIndex: theme.zIndex.drawer + 1,
+			color: "#fff",
 		},
 	};
 });
