@@ -1,16 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
+const cookieParser = require("cookie-parser");
 const app = express();
 require("dotenv").config();
 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser());
 const adminRoutes = require("./api/routes/userRouter");
 const productRoutes = require("./api/routes/productRouter");
-
+const CartRoutes = require("./api/routes/cart");
 //BodyParser Middleware
 app.use(express.json());
 
@@ -34,6 +35,8 @@ app.use(express.static("public"));
 // For accepting post form data
 app.use("/users", adminRoutes);
 app.use("/products", productRoutes);
+
+app.use("/cart", CartRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port: ${PORT}`));
