@@ -1,5 +1,15 @@
 const express = require("express");
-const {
+const auth = require("../middleware/auth");
+const {addToCart} = require("../controllers/cart");
+const router = express.Router();
+
+router.post(
+  "/user/cart/addtocart",
+  auth,
+  addToCart
+);
+
+/*const {
   addItemToCart,
   addToCart,
   getCartItems,
@@ -21,5 +31,5 @@ router.post(
   auth,
   removeCartItems
 );
-
+*/
 module.exports = router;
