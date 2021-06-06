@@ -24,3 +24,20 @@
 .card_image {
 	max-width: 100%;
 }
+
+.my-masonry-grid-2 {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	margin-left: -30px;
+	width: auto;
+}
+.my-masonry-grid_column-2 {
+	padding-left: 35px;
+	background-clip: padding-box;
+}
+
+/* Style your items */
+.my-masonry-grid_column-2 > div {
+	margin-bottom: 30px;
+}

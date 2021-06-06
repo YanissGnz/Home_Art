@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/img-redundant-alt */
 import React from "react";
-import { Slide } from "react-slideshow-image";
 import axios from "axios";
 import NumberFormat from "react-number-format";
 import {
@@ -91,7 +90,7 @@ const categories = [
 		value: "Décoration",
 	},
 	{
-		value: "Litterie",
+		value: "Literie",
 	},
 	{
 		value: "Autre",
@@ -105,10 +104,6 @@ const initialState = {
 	stock: 0,
 	categorie: "",
 	description: "",
-};
-
-const slideProperties = {
-	canSwipe: false,
 };
 
 export default function ProductsScreen() {

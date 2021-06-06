@@ -131,20 +131,36 @@ export default function ProductCard({
 			/>
 
 			<CardContent className={classes.productCardContent}>
-				<Slide autoplay={false} {...slideProperties}>
-					{images.map((each, index) => (
-						<img
-							key={index}
-							style={{ width: "100%" }}
-							src={each}
-							alt="product"
-							className="product_image"
-						/>
-					))}
-				</Slide>
+				{images.length > 1 ? (
+					<Slide autoplay={false} {...slideProperties}>
+						{images.map((each, index) => (
+							<img
+								key={index}
+								style={{ width: "100%", height: "100%" }}
+								src={each}
+								alt="product"
+								className="product_image"
+							/>
+						))}
+					</Slide>
+				) : (
+					<img
+						key={0}
+						style={{ width: "100%", height: "100%" }}
+						src={images[0]}
+						alt="product"
+						className="product_image"
+					/>
+				)}
 
 				<Typography variant="body1" className={classes.padding}>
-					Prix: {product.price} Da
+					Prix:{" "}
+					{[
+						product.price.slice(0, product.price.length - 3),
+						" ",
+						product.price.slice(product.price.length - 3),
+					]}{" "}
+					Da Da
 				</Typography>
 				<Typography variant="body1" className={classes.padding}>
 					Stock: {product.stock} unité(s)

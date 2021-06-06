@@ -7,6 +7,7 @@
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
+    "antd": "^4.16.1",
     "axios": "^0.21.1",
     "home_art": "file:..",
     "js-cookie": "^2.2.1",
