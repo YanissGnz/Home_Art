@@ -39,17 +39,17 @@ const sendEmail = (to, url, txt) => {
 	const mailOptions = {
 		from: SENDER_EMAIL_ADDRESS,
 		to: to,
-		subject: "Validation Compte",
+		subject: "Validation email addres",
 		html: `
             <div style="max-width: 700px; margin:auto; border: 10px solid #ddd; padding: 50px 20px; font-size: 110%;">
-            <h2 style="text-align: center; text-transform: uppercase;color: teal;">Bienvenue sur Home Art .</h2>
-            <p>Félicitations! Vous êtes presque prêt à commencer à utiliser Home Art.
-                 Cliquez simplement sur le bouton ci-dessous pour valider votre adresse e-mail.
+            <h2 style="text-align: center; text-transform: uppercase;color: teal;">Welcome to Home Art .</h2>
+            <p>Congratulations! You're almost set to start using Home Art.
+                Just click the button below to validate your email address.
             </p>
             
             <a href=${url} style="background: #f58634; text-decoration: none; color: white; padding: 10px 20px; margin: 10px 0; display: inline-block;">${txt}</a>
         
-            <p>Si le bouton ne fonctionne pas pour une raison quelconque, vous pouvez également cliquer sur le lien ci-dessous:</p>
+            <p>If the button doesn't work for any reason, you can also click on the link below:</p>
         
             <div>${url}</div>
             </div>

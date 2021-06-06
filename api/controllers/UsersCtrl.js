@@ -43,7 +43,9 @@ const userCtrl2 = {
 
 			const user = await Users2.findOne({ email });
 			if (user)
-				return res.status(400).json({ msg: "Ce email exists déja.", id: 0 });
+				return res
+					.status(400)
+					.json({ msg: "This email already exists.", id: 0 });
 
 			if (password.length < 6)
 				return res
@@ -67,10 +69,10 @@ const userCtrl2 = {
 
 			const url = `${CLIENT_URL}/users/activate/${access_token}`;
 
-			sendEmail(email, url, "Verifier votre Email!");
+			sendEmail(email, url, "Verify your email address");
 
 			res.json({
-				msg: "Inscription Succès! Veuillez activer votre e-mail pour commencer, vérifier votre email.",
+				msg: "Register Success! Please activate your email to start.",
 			});
 		} catch (err) {
 			return res.status(500).json({ msg: err.message });
@@ -87,7 +89,8 @@ const userCtrl2 = {
 			const { name, email, password } = user;
 
 			const check = await Users2.findOne({ email });
-			if (check) return res.status(400).json({ msg: "Ce email n'existe pas." });
+			if (check)
+				return res.status(400).json({ msg: "This email already exists." });
 
 			const newUser = new Users2({
 				name,
@@ -97,7 +100,7 @@ const userCtrl2 = {
 
 			await newUser.save();
 
-			res.json({ msg: "Le compte a été activer!" });
+			res.json({ msg: "Account has been activated!" });
 		} catch (err) {
 			return res.status(500).json({ msg: err.message });
 		}
@@ -139,12 +142,12 @@ const userCtrl2 = {
 	},
 	loadUser: async (req, res) => {
 		try {
-			const user = await Users2.findById(req.user.id).select("-password");
-
-			if (!user)
-				return res.status(400).json({ msg: "Utilisateur n'existe pas." });
+			const user = await Users2.findById(req.user.id)
+				.select("-password")
+				.select("-register_date");
+			if (!user) return res.status(400).json({ msg: "User does not exist." });
 			if (user.role !== 0) {
-				return res.status(400).json({ msg: "Vous ètes pas un utilisateur" });
+				return res.status(400).json({ msg: "Vous etes pas un utilisateur" });
 			}
 			res.status(200).json({
 				user,
@@ -157,17 +160,19 @@ const userCtrl2 = {
 		try {
 			const { email } = req.body;
 			if (!validateEmail(email))
-				return res.status(400).json({ msg: "Email invalid", id: 0 });
+				return res.status(400).json({ msg: "Invalid Emails", id: 0 });
 			const user = await Users2.findOne({ email });
 			if (!user)
-				return res.status(400).json({ msg: "Ce email n'existe pas.", id: 0 });
+				return res
+					.status(400)
+					.json({ msg: "This email does not exist.", id: 0 });
 
 			const access_token = createAccessToken({ id: user._id });
 			const url = `${CLIENT_URL}/users/reset/${access_token}`;
 
 			sendEmail(email, url, "Reset your password");
 			res.json({
-				msg: "Lien de recuperation mot de passe a été envoie a votre email.",
+				msg: "Re-send the password, please check your email.",
 				access_token,
 			});
 		} catch (err) {
@@ -193,9 +198,7 @@ const userCtrl2 = {
 					.json({ msg: "Password must be at least 6 characters.", id: 1 });
 
 			if (!isMatch(password, cf_password))
-				return res
-					.status(400)
-					.json({ msg: "Le mot de passe ne correspond pas.", id: 4 });
+				return res.status(400).json({ msg: "Password did not match.", id: 4 });
 
 			const passwordHash = await bcrypt.hash(password, 12);
 
@@ -206,7 +209,7 @@ const userCtrl2 = {
 				}
 			);
 
-			res.json({ msg: "Mot de pass a été changer!" });
+			res.json({ msg: "Password successfully changed!" });
 		} catch (err) {
 			return res.status(500).json({ msg: err.message });
 		}
@@ -247,7 +250,7 @@ const userCtrl2 = {
 			if (user) {
 				const isMatch = await bcrypt.compare(password, user.password);
 				if (!isMatch)
-					return res.status(400).json({ msg: "Mot de pass incorrect." });
+					return res.status(400).json({ msg: "Password is incorrect." });
 
 				const access_token = createAccessToken({ id: user._id });
 
