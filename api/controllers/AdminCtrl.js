@@ -1,4 +1,5 @@
-const Users = require("../models/AdminModel");
+const Admins = require("../models/AdminModel");
+const Users = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -19,7 +20,7 @@ const userCtrl = {
 					.status(400)
 					.json({ msg: "Enter votre mot de passe.", id: 1 });
 			}
-			const user = await Users.findOne({ email });
+			const user = await Admins.findOne({ email });
 			if (!user)
 				return res.status(400).json({ msg: "Ce email n'exist pas.", id: 0 });
 
@@ -48,7 +49,7 @@ const userCtrl = {
 	 */
 	loadAdmin: async (req, res) => {
 		try {
-			const user = await Users.findById(req.user.id)
+			const user = await Admins.findById(req.user.id)
 				.select("-password")
 				.select("-register_date");
 			if (!user) return res.status(400).json({ msg: "User does not exist." });
@@ -62,13 +63,27 @@ const userCtrl = {
 			res.status(400).json({ msg: e.message });
 		}
 	},
-	getUsersAllInfo: async (req, res) => {
+	getUsers: async (req, res) => {
 		try {
 			const users = await Users.find().select("-password");
-
-			res.json(users);
+			res.status(200).json({
+				users,
+			});
 		} catch (err) {
 			return res.status(500).json({ msg: err.message });
+		}
+	},
+	deleteUser: async (req, res) => {
+		const user_Id = req.params.user_Id;
+		try {
+			const check = await Users.findOne({ _id: user_Id });
+			if (!check) {
+				return res.status(400).json({ msg: "Utilisateur n'exist pas." });
+			}
+			await Users.deleteOne({ _id: user_Id });
+			res.json({ msg: "L'utilisateur a été supprimé" });
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
 		}
 	},
 };

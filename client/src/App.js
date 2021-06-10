@@ -14,6 +14,7 @@ import Home from "./screens/HomeScreen/Home";
 import AdminPanel from "./screens/AdminPanel/AdminPanel";
 
 import "./App.css";
+import ProductDetails from "./screens/ProductDetails/ProductDetails";
 
 const theme = createMuiTheme({
 	palette: {
@@ -33,6 +34,11 @@ export default function App() {
 				<Router>
 					<Switch>
 						<Route exact path="/" component={Home} />
+						<Route
+							exact
+							path="/product/:productId"
+							component={ProductDetails}
+						/>
 						<Route exact path="/Admin_panel" component={AdminPanel} />
 						<Route exact path="/admin" component={AdminLogin} />
 						<Route exact path="/login" component={ClientLogin} />

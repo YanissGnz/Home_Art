@@ -1,0 +1,321 @@
+import { Divider, Typography } from "@material-ui/core";
+import React from "react";
+import GoogleIcon from "../Icons/GoogleIcon";
+import LogoWhite from "../Icons/LogoWhite";
+
+export default function Fotter() {
+	return (
+		<div
+			style={{
+				backgroundColor: "rgb(34 34 34)",
+				marginTop: 50,
+				display: "flex",
+				flexDirection: "column",
+				width: "100%",
+				padding: 50,
+			}}
+		>
+			<div
+				style={{
+					display: "flex",
+					width: "100%",
+				}}
+			>
+				<div
+					style={{
+						width: "25%",
+					}}
+				>
+					<Typography variant="h5" style={{ color: "white", fontWeight: 500 }}>
+						Categories
+					</Typography>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Electroménager
+						</Typography>
+					</a>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Meuble
+						</Typography>
+					</a>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Vaisselle
+						</Typography>
+					</a>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Décoration
+						</Typography>
+					</a>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Literie
+						</Typography>
+					</a>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Autre
+						</Typography>
+					</a>
+				</div>
+				<div
+					style={{
+						width: "25%",
+					}}
+				>
+					<Typography variant="h5" style={{ color: "white", fontWeight: 500 }}>
+						A propos
+					</Typography>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Qui somme nous?
+						</Typography>
+					</a>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Confidentialité et notification sur les cookies
+						</Typography>
+					</a>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Conditions Générales d'Utilisation
+						</Typography>
+					</a>
+				</div>
+				<div
+					style={{
+						width: "25%",
+					}}
+				>
+					<Typography variant="h5" style={{ color: "white", fontWeight: 500 }}>
+						Service Client
+					</Typography>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Centre d'assistance
+						</Typography>
+					</a>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Modes de paiement
+						</Typography>
+					</a>
+					<a
+						href="/"
+						style={{
+							textDecoration: "none",
+						}}
+					>
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Retour & Remboursement
+						</Typography>
+					</a>
+				</div>
+
+				<div
+					style={{
+						width: "25%",
+					}}
+				>
+					<Typography variant="h5" style={{ color: "white", fontWeight: 500 }}>
+						Réseaux Sociaux
+					</Typography>
+					<div style={{ marginTop: 40, display: "flex", width: "5	0%" }}>
+						<a href="/" style={{ marginRight: 20 }}>
+							<GoogleIcon />
+						</a>
+						<a href="/" style={{ marginRight: 20 }}>
+							<GoogleIcon />
+						</a>
+						<a href="/" style={{ marginRight: 20 }}>
+							<GoogleIcon />
+						</a>
+						<a href="/" style={{ marginRight: 20 }}>
+							<GoogleIcon />
+						</a>
+					</div>
+				</div>
+			</div>
+			<Divider
+				style={{
+					marginTop: 10,
+					background: "white",
+				}}
+			/>
+			<div
+				style={{
+					marginTop: 10,
+					display: "flex",
+					width: "100%",
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<LogoWhite />
+				<Typography
+					variant="body1"
+					style={{
+						color: "white",
+						marginLeft: 10,
+					}}
+				>
+					Copyright © 2010-2021 Home Art Company S.L. Tous les droits sont
+					réservés.
+				</Typography>
+			</div>
+		</div>
+	);
+}

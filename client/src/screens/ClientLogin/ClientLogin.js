@@ -17,6 +17,7 @@ import { dispatchLogin2 } from "../../redux/actions/authAction";
 import { useDispatch, useSelector } from "react-redux";
 
 import "./index.css";
+import GoogleIcon from "../../Icons/GoogleIcon";
 
 const useStyles = makeStyles((theme) => {
 	return {
@@ -287,14 +288,23 @@ export default function ClientLogin() {
 								</Typography>
 								<div className={classes.line} />
 							</div>
-							<Button fullWidth>
-								<GoogleLogin
-									clientId="664430788321-7nplkv1bhj864bcedgirrug2vdtf0e4g.apps.googleusercontent.com"
-									buttonText="Continue with google"
-									onSuccess={responseGoogle}
-									cookiePolicy={"single_host_origin"}
-								/>
-							</Button>
+							<GoogleLogin
+								clientId="664430788321-7nplkv1bhj864bcedgirrug2vdtf0e4g.apps.googleusercontent.com"
+								onSuccess={responseGoogle}
+								render={(renderProps) => (
+									<Button
+										onClick={renderProps.onClick}
+										disabled={renderProps.disabled}
+										startIcon={<GoogleIcon />}
+										variant="outlined"
+										fullWidth
+										style={{ marginTop: 20, textTransform: "capitalize" }}
+									>
+										Continue avec Google
+									</Button>
+								)}
+								cookiePolicy={"single_host_origin"}
+							/>
 							<div className={classes.div}>
 								<Typography
 									className={classes.signup_txt}

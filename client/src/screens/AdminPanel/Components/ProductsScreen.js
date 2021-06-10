@@ -812,6 +812,7 @@ export default function ProductsScreen() {
 					breakpointCols={breakpoints}
 					className="my-masonry-grid"
 					columnClassName="my-masonry-grid_column"
+					style={{ width: "100%" }}
 				>
 					{products.map((product) => (
 						<ProductCard

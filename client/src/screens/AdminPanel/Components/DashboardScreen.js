@@ -11,9 +11,10 @@ import { useSelector } from "react-redux";
 import { useStyles } from "../useStyles";
 import Masonry from "react-masonry-css";
 
-export default function DashboardScreen() {
+export default function DashboardScreen({ usersCount }) {
 	const classes = useStyles();
 	const productCount = useSelector((state) => state.products.products);
+
 	const breakpoints = {
 		default: 4,
 		1100: 2,
@@ -43,7 +44,7 @@ export default function DashboardScreen() {
 						<CardHeader title="Client" />
 						<CardContent>
 							<Typography variant="h4" color="primary">
-								0
+								{usersCount.length}
 							</Typography>
 						</CardContent>
 					</Card>

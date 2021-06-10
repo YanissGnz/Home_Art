@@ -29,6 +29,8 @@
 	height: 100%;
 	margin-top: 2em;
 	background-color: #f1f1f1;
+	max-width: 96%;
+	min-width: 87%;
 }
 
 .my-masonry-grid {

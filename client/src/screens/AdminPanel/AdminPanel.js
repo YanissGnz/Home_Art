@@ -48,6 +48,9 @@ import {
 	productsLoaded,
 	productErrors,
 } from "../../redux/actions/productsAction";
+import Users from "../../Icons/Users";
+import UsersScreen from "./Components/UsersScreen";
+import { dispatchGetAllUsers } from "../../redux/actions/usersAction";
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -68,10 +71,11 @@ export default function AdminPanel(props) {
 	const dispatch = useDispatch();
 	const theme = useTheme();
 	const [open, setOpen] = React.useState(false);
-	const [screen, setScreen] = React.useState(true);
+	const [screen, setScreen] = React.useState(0);
 	const isLoading = useSelector((state) => state.auth.isLoading);
 	// Get token from localstorage
 	const token = useSelector((state) => state.auth.token);
+	const [usersCount, setUsersCount] = React.useState([]);
 
 	React.useEffect(() => {
 		const loadAdmin = async () => {
@@ -97,6 +101,30 @@ export default function AdminPanel(props) {
 			if (isAuthenticated === "false") history.push("/admin");
 		};
 		loadAdmin();
+	}, [dispatch, history, token]);
+
+	React.useEffect(() => {
+		const loadUsers = async () => {
+			dispatch(dispatchAdminLoading());
+
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
+
+			await axios
+				.get("/users/get_users", config)
+				.then((res) => {
+					dispatch(dispatchGetAllUsers(res.data.users));
+					setUsersCount(res.data.users);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		};
+		loadUsers();
 	}, [dispatch, history, token]);
 
 	React.useEffect(() => {
@@ -222,8 +250,9 @@ export default function AdminPanel(props) {
 						<List>
 							<ListItem
 								button
-								onClick={() => setScreen(true)}
-								className={screen ? classes.active : null}
+								onClick={() => setScreen(0)}
+								className={screen === 0 && classes.active}
+								style={{ marginBottom: 5 }}
 							>
 								<ListItemIcon>
 									<Dashboard />
@@ -232,17 +261,31 @@ export default function AdminPanel(props) {
 							</ListItem>
 							<ListItem
 								button
-								onClick={() => setScreen(false)}
-								className={!screen ? classes.active : null}
+								onClick={() => setScreen(1)}
+								className={screen === 1 && classes.active}
+								style={{ marginBottom: 5 }}
 							>
 								<ListItemIcon>
 									<Catalog />
 								</ListItemIcon>
 								<ListItemText primary="Produits" />
 							</ListItem>
+							<ListItem
+								button
+								onClick={() => setScreen(2)}
+								className={screen === 2 && classes.active}
+								style={{ marginBottom: 5 }}
+							>
+								<ListItemIcon>
+									<Users />
+								</ListItemIcon>
+								<ListItemText primary="Utilisateur" />
+							</ListItem>
 						</List>
 					</Drawer>
-					{screen ? <DashboardScreen /> : <ProductsScreen />}
+					{screen === 0 && <DashboardScreen usersCount={usersCount} />}
+					{screen === 1 && <ProductsScreen />}
+					{screen === 2 && <UsersScreen />}
 				</div>
 			)}
 		</div>

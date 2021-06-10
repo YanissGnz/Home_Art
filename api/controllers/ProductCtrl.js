@@ -77,6 +77,21 @@ const productCtrl = {
 			res.status(400).json({ msg: e.message });
 		}
 	},
+	getProductById: async (req, res) => {
+		let type = req.query.type;
+		let product_id = req.query.id;
+		console.log(product_id);
+		try {
+			const product = await Product.find({ _id: { $in: product_id } });
+
+			res.status(200).json({
+				product,
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
+	getSimilaireProducts: async (req, res) => {},
 	editProduct: async (req, res) => {
 		const product_id = req.params.product_id;
 		const { name, brand, price, stock, categorie, description } = req.body;
