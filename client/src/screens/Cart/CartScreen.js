@@ -29,6 +29,7 @@ export default function CartScreen() {
 		<div style={{ background: "#f1f1f1" }}>
 			<MyAppBar />
 			{cart.length < 0 ? (
+				//Hadi ki ykon l panier faregh
 				<Container
 					maxWidth="xl"
 					style={{
@@ -92,6 +93,7 @@ export default function CartScreen() {
 					</Container>
 				</Container>
 			) : (
+				//Hadi ki ykon l panier m3amer
 				<Container
 					maxWidth="xl"
 					style={{
