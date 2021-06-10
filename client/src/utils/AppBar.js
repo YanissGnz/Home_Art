@@ -93,6 +93,7 @@ export default function MyAppBar(props) {
 						disableRipple
 						startIcon={<Cart />}
 						className={classes.cart_button}
+						onClick={() => history.push("/cart")}
 					>
 						Panier
 					</Button>

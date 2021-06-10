@@ -312,7 +312,11 @@ export default function ProductDetails(props) {
 												style={{ width: "100%", height: "100%" }}
 											>
 												<img
-													style={{ width: "100%", maxHeight: "200px" }}
+													style={{
+														width: "100%",
+														maxHeight: "200px",
+														objectFit: "contain",
+													}}
 													src={`/uploads/${element.productImages[0]}`}
 													alt="Product"
 												/>
