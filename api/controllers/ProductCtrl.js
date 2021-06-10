@@ -80,7 +80,6 @@ const productCtrl = {
 	getProductById: async (req, res) => {
 		let type = req.query.type;
 		let product_id = req.query.id;
-		console.log(product_id);
 		try {
 			const product = await Product.find({ _id: { $in: product_id } });
 
@@ -91,7 +90,22 @@ const productCtrl = {
 			res.status(400).json({ msg: e.message });
 		}
 	},
-	getSimilaireProducts: async (req, res) => {},
+	getSimilaireProducts: async (req, res) => {
+		let type = req.query.type;
+		let categorie = req.query.categorie;
+		try {
+			const products = await Product.find({ categorie: categorie })
+				.skip(0)
+				.limit(5);
+
+			res.status(200).json({
+				products,
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
+
 	editProduct: async (req, res) => {
 		const product_id = req.params.product_id;
 		const { name, brand, price, stock, categorie, description } = req.body;

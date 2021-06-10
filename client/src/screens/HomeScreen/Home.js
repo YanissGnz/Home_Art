@@ -142,9 +142,9 @@ export default function Home(props) {
 							))}
 						</Container>
 					</Container>
+					<Fotter />
 				</div>
 			)}
-			<Fotter />
 		</div>
 	);
 }

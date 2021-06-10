@@ -32,14 +32,16 @@ import MyAppBar from "../../utils/AppBar";
 import CommentIcon from "../../Icons/CommentsIcon";
 import Fotter from "../../utils/Fotter";
 import AddToCart from "../../Icons/AddToCartIcon";
+import { useHistory } from "react-router";
 
 export default function ProductDetails(props) {
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
+	const history = useHistory();
 
 	const product_Id = props.match.params.productId;
 	const [product, setProduct] = React.useState({});
-	const [similaireProduct, setSimilaireProduct] = React.useState([]);
+	const [similaireProducts, setSimilaireProducts] = React.useState([]);
 	const [productImages, setProductImages] = React.useState([]);
 	const [ratingValue, setRatingValue] = React.useState(4.5);
 	const [isLoading, setIsLoading] = React.useState(false);
@@ -92,10 +94,10 @@ export default function ProductDetails(props) {
 
 			await axios
 				.get(
-					`/products/get_product_by_id?categorie=${product.categorie}&type=single`
+					`/products/get_similaire_products?categorie=${product.categorie}&type=single`
 				)
 				.then((res) => {
-					setSimilaireProduct(res.data.products);
+					setSimilaireProducts(res.data.products);
 					setIsLoading(false);
 				})
 				.catch((err) => {
@@ -108,7 +110,7 @@ export default function ProductDetails(props) {
 	}, [dispatch, product]);
 
 	const images = [];
-	console.log(productImages);
+	console.log(similaireProducts);
 	productImages.forEach((image, index) =>
 		images.push({
 			original: `/uploads/${productImages[index]}`,
@@ -223,7 +225,7 @@ export default function ProductDetails(props) {
 						</div>
 						<Divider style={{ marginBottom: 10 }} />
 						<Typography style={{ marginBottom: 10 }} variant="h6">
-							{isLoading ? <Skeleton width="50%" /> : product.price + "Da"}
+							{isLoading ? <Skeleton width="50%" /> : product.price + " Da"}
 						</Typography>
 						<Button
 							color="primary"
@@ -295,39 +297,54 @@ export default function ProductDetails(props) {
 							width: "100%",
 						}}
 					>
-						{/* <Card style={{ width: "22%", height: 300, marginRight: 30 }}>
-							<CardActionArea disableRipple>
-								<img
-									style={{ width: "100%", maxHeight: "200px" }}
-									//src={`/uploads/${product.productImages[0]}`}
-									alt="Product"
-								/>
+						{similaireProducts.map(
+							(element) =>
+								product._id !== element._id && (
+									<a
+										href={`/product/${element._id}`}
+										style={{ width: "22%", textDecoration: "none" }}
+									>
+										<Card
+											style={{ width: "100%", height: 300, marginRight: 30 }}
+										>
+											<CardActionArea
+												disableRipple
+												style={{ width: "100%", height: "100%" }}
+											>
+												<img
+													style={{ width: "100%", maxHeight: "200px" }}
+													src={`/uploads/${element.productImages[0]}`}
+													alt="Product"
+												/>
 
-								<CardContent>
-									<Typography
-										gutterBottom
-										style={{ fontSize: 18, fontWeight: 500 }}
-										variant="h6"
-										component="h2"
-										noWrap={true}
-									>
-										{product.name}
-									</Typography>
-									<Typography
-										style={{ fontSize: 18, fontWeight: 600 }}
-										gutterBottom
-										color="primary"
-									>
-										{[
-											product.price.slice(0, product.price.length - 3),
-											" ",
-											product.price.slice(product.price.length - 3),
-										]}{" "}
-										Da
-									</Typography>
-								</CardContent>
-							</CardActionArea>
-						</Card> */}
+												<CardContent>
+													<Typography
+														gutterBottom
+														style={{ fontSize: 18, fontWeight: 500 }}
+														variant="h6"
+														component="h2"
+														noWrap={true}
+													>
+														{element.name}
+													</Typography>
+													<Typography
+														style={{ fontSize: 18, fontWeight: 600 }}
+														gutterBottom
+														color="primary"
+													>
+														{[
+															element.price.slice(0, element.price.length - 3),
+															" ",
+															element.price.slice(element.price.length - 3),
+														]}{" "}
+														Da
+													</Typography>
+												</CardContent>
+											</CardActionArea>
+										</Card>
+									</a>
+								)
+						)}
 					</div>
 				</Container>
 				<Container

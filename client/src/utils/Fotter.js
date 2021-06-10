@@ -1,6 +1,8 @@
 import { Divider, Typography } from "@material-ui/core";
 import React from "react";
+import FacebookIcon from "../Icons/FacebookIcon";
 import GoogleIcon from "../Icons/GoogleIcon";
+import InstagramLogo from "../Icons/InstagramLogo";
 import LogoWhite from "../Icons/LogoWhite";
 
 export default function Fotter() {
@@ -275,13 +277,10 @@ export default function Fotter() {
 					</Typography>
 					<div style={{ marginTop: 40, display: "flex", width: "5	0%" }}>
 						<a href="/" style={{ marginRight: 20 }}>
-							<GoogleIcon />
+							<FacebookIcon />
 						</a>
 						<a href="/" style={{ marginRight: 20 }}>
-							<GoogleIcon />
-						</a>
-						<a href="/" style={{ marginRight: 20 }}>
-							<GoogleIcon />
+							<InstagramLogo />
 						</a>
 						<a href="/" style={{ marginRight: 20 }}>
 							<GoogleIcon />
@@ -300,16 +299,14 @@ export default function Fotter() {
 					marginTop: 10,
 					display: "flex",
 					width: "100%",
-					alignItems: "center",
 					justifyContent: "center",
 				}}
 			>
-				<LogoWhite />
 				<Typography
 					variant="body1"
 					style={{
 						color: "white",
-						marginLeft: 10,
+						marginTop: 10,
 					}}
 				>
 					Copyright © 2010-2021 Home Art Company S.L. Tous les droits sont
