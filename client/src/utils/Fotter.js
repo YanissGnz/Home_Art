@@ -3,7 +3,6 @@ import React from "react";
 import FacebookIcon from "../Icons/FacebookIcon";
 import GoogleIcon from "../Icons/GoogleIcon";
 import InstagramLogo from "../Icons/InstagramLogo";
-import LogoWhite from "../Icons/LogoWhite";
 
 export default function Fotter() {
 	return (

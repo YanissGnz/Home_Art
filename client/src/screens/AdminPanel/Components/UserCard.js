@@ -66,7 +66,7 @@ export default function UserCard({ user, handleDeleteUser }) {
 						variant="body1"
 						component="p"
 					>
-						{user.createdAt}
+						{user.createdAt.slice(0, 10)}
 					</Typography>
 					<Typography
 						style={{ position: "absolute", left: "70%" }}

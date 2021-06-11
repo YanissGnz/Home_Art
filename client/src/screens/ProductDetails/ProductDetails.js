@@ -32,12 +32,10 @@ import MyAppBar from "../../utils/AppBar";
 import CommentIcon from "../../Icons/CommentsIcon";
 import Fotter from "../../utils/Fotter";
 import AddToCart from "../../Icons/AddToCartIcon";
-import { useHistory } from "react-router";
 
 export default function ProductDetails(props) {
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
-	const history = useHistory();
 
 	const product_Id = props.match.params.productId;
 	const [product, setProduct] = React.useState({});

@@ -55,3 +55,7 @@
 	max-height: 400px;
 	object-fit: contain;
 }
+
+.recent_client_div:hover {
+	background-color: rgb(246 246 246);
+}

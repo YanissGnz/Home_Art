@@ -10,7 +10,6 @@ import {
 import {
 	AppBar,
 	Button,
-	CircularProgress,
 	CssBaseline,
 	Divider,
 	Drawer,
@@ -190,7 +189,7 @@ export default function AdminPanel(props) {
 								</IconButton>
 								<div className={classes.appBarLogo}>
 									<Logo />
-									<Typography variant="caption">Home Art</Typography>
+									<Typography variant="subtitle2">Home Art</Typography>
 								</div>
 								<div className={classes.searchDiv}>
 									<Paper

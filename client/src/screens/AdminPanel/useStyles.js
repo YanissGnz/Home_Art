@@ -69,19 +69,18 @@ export const useStyles = makeStyles((theme) => {
 			flexDirection: "column",
 			alignItems: "center",
 			justifyContent: "center",
-			marginRight: "30%",
 		},
 		searchDiv: {
-			flex: 0.98,
+			flex: 1,
 		},
 		searchPaper: {
-			width: "30em",
 			padding: "2px 4px",
 			display: "flex",
 			alignItems: "center",
 			height: 40,
 			marginRight: "3em",
 			marginLeft: "3em",
+			flexGrow: 1,
 		},
 		input: {
 			width: "20em",
