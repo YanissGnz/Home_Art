@@ -82,7 +82,7 @@ export default function Home(props) {
 				});
 		};
 		loadProduct();
-	});
+	}, [dispatch]);
 
 	return (
 		<div>

@@ -276,6 +276,36 @@ const userCtrl2 = {
 			return res.status(400).json({ msg: err.message });
 		}
 	},
+	addToFavorite: async (req, res) => {
+		try {
+			const user_Id = req.user.id;
+			const product_id = req.params.product_Id;
+			var user = await Users2.findOne({ _id: user_Id });
+			var favoriteProducts = user.favoriteProducts;
+			if (favoriteProducts.indexOf(product_id) === -1) {
+				favoriteProducts.push(product_id);
+			}
+			user = await Users2.updateOne({ _id: user_Id }, { favoriteProducts });
+			return res.status(200).json({ msg: "Le Produit a été ajouter" });
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
+	removeFromFavorite: async (req, res) => {
+		try {
+			const user_Id = req.user.id;
+			const product_id = req.params.product_Id;
+			var user = await Users2.findOne({ _id: user_Id });
+			var favoriteProducts = user.favoriteProducts;
+			if (favoriteProducts.indexOf(product_id) !== -1) {
+				favoriteProducts.splice(favoriteProducts.indexOf(product_id), 1);
+			}
+			user = await Users2.updateOne({ _id: user_Id }, { favoriteProducts });
+			return res.status(200).json({ msg: "Le Produit a été supprimer" });
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
 };
 
 function validateEmail(email) {

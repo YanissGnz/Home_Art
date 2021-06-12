@@ -13,9 +13,11 @@ import {
 	CardActionArea,
 	CardContent,
 	Button,
+	Tooltip,
+	Snackbar,
 } from "@material-ui/core";
-
-import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import Zoom from "@material-ui/core/Zoom";
+import MuiAlert from "@material-ui/lab/Alert";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
@@ -24,7 +26,6 @@ import {
 	dispatchUserLoaded,
 	dispatchUserLoading,
 } from "../../redux/actions/authAction";
-import { returnErrors } from "../../redux/actions/errAction";
 
 import "./index.css";
 import { Rating, Skeleton } from "@material-ui/lab";
@@ -32,17 +33,82 @@ import MyAppBar from "../../utils/AppBar";
 import CommentIcon from "../../Icons/CommentsIcon";
 import Fotter from "../../utils/Fotter";
 import AddToCart from "../../Icons/AddToCartIcon";
+import HeartIcon from "../../Icons/HeartIcon";
+import ActiveHeartIcon from "../../Icons/ActiveHeartIcon";
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function ProductDetails(props) {
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
+	const user = useSelector((state) => state.auth.user);
+	// const [favoriteProducts, setFavoriteProducts] = React.useState([]);
 
 	const product_Id = props.match.params.productId;
 	const [product, setProduct] = React.useState({});
 	const [similaireProducts, setSimilaireProducts] = React.useState([]);
+
 	const [productImages, setProductImages] = React.useState([]);
 	const [ratingValue, setRatingValue] = React.useState(4.5);
 	const [isLoading, setIsLoading] = React.useState(false);
+	const [favorite, setFavorite] = React.useState(
+		user ? user.favoriteProducts.indexOf(product_Id) !== -1 : false
+	);
+	const [msg, setMsg] = React.useState("");
+	const [alertOpen, setAlertOpen] = React.useState(false);
+	const [alertType, setAlertType] = React.useState("");
+
+	const handleAlertOpen = () => {
+		setAlertOpen(true);
+	};
+	const handleAlertClose = () => {
+		setAlertOpen(false);
+	};
+
+	const handleFavorites = async () => {
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		if (user === null) {
+			setAlertOpen(true);
+			setMsg("Vous devez ètre connecter!");
+			setAlertType("error");
+		} else if (favorite) {
+			await axios
+				.post(`/users/remove_from_favorite/${product_Id}`, null, config)
+				.then((res) => {
+					// favoriteProducts.push(product_Id);
+					setFavorite(false);
+					setMsg(res.data.msg);
+					setAlertType("success");
+					handleAlertOpen();
+				})
+				.catch((err) => {
+					console.log(err.message);
+					setFavorite(true);
+				});
+		} else {
+			await axios
+				.post(`/users/add_to_favorite/${product_Id}`, null, config)
+				.then((res) => {
+					// favoriteProducts.push(product_Id);
+					setFavorite(true);
+					setMsg(res.data.msg);
+					setAlertType("success");
+					handleAlertOpen();
+				})
+				.catch((err) => {
+					console.log(err.message);
+					setFavorite(false);
+				});
+		}
+	};
 
 	React.useEffect(() => {
 		const loadUser = async () => {
@@ -59,10 +125,13 @@ export default function ProductDetails(props) {
 				.get("/users/load_User", config)
 				.then((res) => {
 					dispatch(dispatchUserLoaded(res));
+					setFavorite(
+						res.data.user.favoriteProducts.indexOf(product_Id) !== -1
+					);
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
-					dispatch(returnErrors(err.response.data.msg, err.response.status));
+					//dispatch(returnErrors(err.response.data.msg, err.response.status));
 				});
 		};
 		loadUser();
@@ -85,7 +154,7 @@ export default function ProductDetails(props) {
 				});
 		};
 		loadProduct();
-	}, [dispatch, product_Id]);
+	}, []);
 	React.useEffect(() => {
 		const loadSimilaireProducts = async () => {
 			setIsLoading(true);
@@ -126,6 +195,15 @@ export default function ProductDetails(props) {
 			<CssBaseline />
 			<MyAppBar />
 			<Container maxWidth="lg" style={{ marginTop: 50 }}>
+				<Snackbar
+					open={alertOpen}
+					autoHideDuration={2500}
+					onClose={handleAlertClose}
+				>
+					<Alert severity={alertType}>
+						<Typography>{msg}</Typography>
+					</Alert>
+				</Snackbar>
 				<Breadcrumbs
 					separator={<NavigateNextIcon fontSize="small" />}
 					aria-label="breadcrumb"
@@ -178,12 +256,25 @@ export default function ProductDetails(props) {
 							flexDirection: "column",
 						}}
 					>
-						<IconButton
-							style={{ position: "absolute", right: 0, top: 10 }}
-							size="medium"
+						<Tooltip
+							title={
+								favorite
+									? "Supprimer du produit favoris"
+									: "Ajouter au produit favoris"
+							}
+							aria-label="add"
+							placement="left"
+							TransitionComponent={Zoom}
+							style={{ fontSize: 16 }}
 						>
-							<FavoriteBorderIcon fontSize="inherit" />
-						</IconButton>
+							<IconButton
+								style={{ position: "absolute", right: 0, top: 10 }}
+								size="medium"
+								onClick={handleFavorites}
+							>
+								{favorite ? <ActiveHeartIcon /> : <HeartIcon />}
+							</IconButton>
+						</Tooltip>
 
 						<Typography
 							style={{ marginTop: 50, marginBottom: 15, fontWeight: 500 }}

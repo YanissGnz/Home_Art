@@ -97,7 +97,11 @@ const authReducer = (state = initialState, action) => {
 				isAuthenticated: false,
 				isAdmin: false,
 			};
-
+		case ACTIONS.ADD_TO_FAVORITE:
+			return {
+				...state,
+				user: action.payload,
+			};
 		default:
 			return state;
 	}

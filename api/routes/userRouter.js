@@ -18,5 +18,11 @@ router.post("/Reset_Password", auth, userCtrl2.resetPassword);
 router.post("/register", userCtrl2.register);
 router.post("/activation", userCtrl2.activateEmail);
 router.post("/google_login", userCtrl2.googleLogin);
+router.post("/add_to_favorite/:product_Id", auth, userCtrl2.addToFavorite);
+router.post(
+	"/remove_from_favorite/:product_Id",
+	auth,
+	userCtrl2.removeFromFavorite
+);
 
 module.exports = router;

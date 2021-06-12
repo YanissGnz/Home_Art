@@ -82,3 +82,10 @@ export const dispatchGetUser = (res) => {
 		},
 	};
 };
+
+export const addToFavorites = (user) => {
+	return {
+		type: ACTIONS.ADD_TO_FAVORITE,
+		payload: user,
+	};
+};
