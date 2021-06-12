@@ -27,6 +27,7 @@ import {
 } from "../../redux/actions/productsAction";
 import MyAppBar from "../../utils/AppBar";
 import Fotter from "../../utils/Fotter";
+import Masonry from "react-masonry-css";
 
 export default function Home(props) {
 	const classes = useStyles();
@@ -38,6 +39,14 @@ export default function Home(props) {
 	const token = useSelector((state) => state.auth.token);
 	const isLoading = useSelector((state) => state.auth.isLoading);
 	const [products, setProducts] = React.useState([]);
+
+	/*For The Masonary Container*/
+	const breakpoints = {
+		default: 4,
+		1600: 3,
+		1100: 2,
+		700: 1,
+	};
 
 	React.useEffect(() => {
 		const loadUser = async () => {
@@ -82,6 +91,7 @@ export default function Home(props) {
 				});
 		};
 		loadProduct();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch]);
 
 	return (
@@ -97,50 +107,53 @@ export default function Home(props) {
 
 					{/*                          Main Home Screen (Product Page)                          */}
 					<Container maxWidth="xl" className="main">
-						<Container
-							maxWidth="xl"
-							style={{ height: 500, display: "flex", flexDirection: "row" }}
+						<Masonry
+							breakpointCols={breakpoints}
+							className="my-masonry-grid"
+							columnClassName="my-masonry-grid_column"
+							style={{ width: "100%" }}
 						>
 							{products.map((product) => (
-								// product.categorie === "Electroménager" &&
 								<Card style={{ width: 300, height: 300, marginRight: 30 }}>
-									<CardActionArea
-										disableRipple
-										onClick={() => history.push(`/product/${product._id}`)}
+									<a
+										href={`/product/${product._id}`}
+										style={{
+											width: "22%",
+											textDecoration: "none",
+											marginRight: 10,
+										}}
 									>
-										<img
-											style={{ width: "100%", maxHeight: "200px" }}
-											src={`/uploads/${product.productImages[0]}`}
-											alt="Product"
-										/>
+										<CardActionArea disableRipple>
+											<img
+												style={{ width: "100%", maxHeight: "200px" }}
+												src={`/uploads/${product.productImages[0]}`}
+												alt="Product"
+											/>
 
-										<CardContent>
-											<Typography
-												gutterBottom
-												style={{ fontSize: 18, fontWeight: 500 }}
-												variant="h6"
-												component="h2"
-												noWrap={true}
-											>
-												{product.name}
-											</Typography>
-											<Typography
-												style={{ fontSize: 18, fontWeight: 600 }}
-												gutterBottom
-												color="primary"
-											>
-												{[
-													product.price.slice(0, product.price.length - 3),
-													" ",
-													product.price.slice(product.price.length - 3),
-												]}{" "}
-												Da
-											</Typography>
-										</CardContent>
-									</CardActionArea>
+											<CardContent>
+												<Typography
+													gutterBottom
+													style={{ fontSize: 18, fontWeight: 500 }}
+													variant="h6"
+													component="h2"
+													noWrap={true}
+													color="textPrimary"
+												>
+													{product.name}
+												</Typography>
+												<Typography
+													style={{ fontSize: 18, fontWeight: 600 }}
+													gutterBottom
+													color="primary"
+												>
+													{product.price} Da
+												</Typography>
+											</CardContent>
+										</CardActionArea>
+									</a>
 								</Card>
 							))}
-						</Container>
+						</Masonry>
 					</Container>
 					<Fotter />
 				</div>

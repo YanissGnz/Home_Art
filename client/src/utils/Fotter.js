@@ -29,12 +29,7 @@ export default function Fotter() {
 					<Typography variant="h5" style={{ color: "white", fontWeight: 500 }}>
 						Categories
 					</Typography>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -47,12 +42,7 @@ export default function Fotter() {
 							Electroménager
 						</Typography>
 					</a>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -65,12 +55,7 @@ export default function Fotter() {
 							Meuble
 						</Typography>
 					</a>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -83,12 +68,7 @@ export default function Fotter() {
 							Vaisselle
 						</Typography>
 					</a>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -101,12 +81,7 @@ export default function Fotter() {
 							Décoration
 						</Typography>
 					</a>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -119,12 +94,7 @@ export default function Fotter() {
 							Literie
 						</Typography>
 					</a>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -146,12 +116,7 @@ export default function Fotter() {
 					<Typography variant="h5" style={{ color: "white", fontWeight: 500 }}>
 						A propos
 					</Typography>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -164,12 +129,7 @@ export default function Fotter() {
 							Qui somme nous?
 						</Typography>
 					</a>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -182,12 +142,7 @@ export default function Fotter() {
 							Confidentialité et notification sur les cookies
 						</Typography>
 					</a>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -209,12 +164,7 @@ export default function Fotter() {
 					<Typography variant="h5" style={{ color: "white", fontWeight: 500 }}>
 						Service Client
 					</Typography>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -227,12 +177,7 @@ export default function Fotter() {
 							Centre d'assistance
 						</Typography>
 					</a>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -245,17 +190,12 @@ export default function Fotter() {
 							Modes de paiement
 						</Typography>
 					</a>
-					<a
-						href="/"
-						style={{
-							textDecoration: "none",
-						}}
-					>
+					<a href="/" className="fotter_links">
 						<Typography
 							style={{
+								width: "100%",
 								marginTop: 15,
 								color: "white",
-								textDecoration: "none",
 								fontSize: 14,
 								fontWeight: 300,
 							}}
@@ -307,8 +247,7 @@ export default function Fotter() {
 						marginTop: 10,
 					}}
 				>
-					Copyright © 2010-2021 Home Art Company S.L. Tous les droits sont
-					réservés.
+					Copyright © 2021 Home Art Company S.L. Tous les droits sont réservés.
 				</Typography>
 			</div>
 		</div>

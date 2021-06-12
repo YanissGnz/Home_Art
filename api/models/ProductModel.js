@@ -1,3 +1,4 @@
+const { Double } = require("mongodb");
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
@@ -37,6 +38,18 @@ const productSchema = new mongoose.Schema({
 	},
 	archived: {
 		type: Boolean,
+	},
+	comments: {
+		type: Array,
+		default: [],
+	},
+	rating: {
+		type: Array,
+		default: [1, 1, 1, 1, 1],
+	},
+	ratingsNumber: {
+		type: Number,
+		default: 1,
 	},
 });
 

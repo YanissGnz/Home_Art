@@ -24,6 +24,7 @@ router.get("/get_similaire_products/", ProductCtrl.getSimilaireProducts);
 router.put("/edit_product/:product_id", auth, upload, ProductCtrl.editProduct);
 router.put("/archive_product/:product_id", auth, ProductCtrl.archiveProduct);
 router.put("/reveal_product/:product_id", auth, ProductCtrl.revealProduct);
+router.post("/update_rating", auth, ProductCtrl.updateRating);
 
 router.delete("/delete_product/:product_id", auth, ProductCtrl.deleteProduct);
 

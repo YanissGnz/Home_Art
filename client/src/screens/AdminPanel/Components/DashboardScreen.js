@@ -9,10 +9,7 @@ import RevenueIcon from "../../../Icons/RevenueIcon";
 
 export default function DashboardScreen({ usersCount }) {
 	const productCount = useSelector((state) => state.products.products);
-	const [users, setUsers] = React.useState(
-		useSelector((state) => state.users.slice(0, 5))
-	);
-	console.log(users);
+	const users = useSelector((state) => state.users.slice(0, 3));
 
 	const monthNames = [
 		"Janvier",

@@ -65,7 +65,9 @@ const userCtrl = {
 	},
 	getUsers: async (req, res) => {
 		try {
-			const users = await Users.find().select("-password");
+			const users = await Users.find()
+				.select("-password")
+				.sort({ createdAt: -1 });
 			res.status(200).json({
 				users,
 			});

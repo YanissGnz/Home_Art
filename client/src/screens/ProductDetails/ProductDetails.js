@@ -44,14 +44,14 @@ export default function ProductDetails(props) {
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
 	const user = useSelector((state) => state.auth.user);
-	// const [favoriteProducts, setFavoriteProducts] = React.useState([]);
 
 	const product_Id = props.match.params.productId;
 	const [product, setProduct] = React.useState({});
 	const [similaireProducts, setSimilaireProducts] = React.useState([]);
 
 	const [productImages, setProductImages] = React.useState([]);
-	const [ratingValue, setRatingValue] = React.useState(4.5);
+	const [ratingValue, setRatingValue] = React.useState(0);
+	const [ratingsNumber, setRatingsNumber] = React.useState(0);
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [favorite, setFavorite] = React.useState(
 		user ? user.favoriteProducts.indexOf(product_Id) !== -1 : false
@@ -59,6 +59,7 @@ export default function ProductDetails(props) {
 	const [msg, setMsg] = React.useState("");
 	const [alertOpen, setAlertOpen] = React.useState(false);
 	const [alertType, setAlertType] = React.useState("");
+	const [comments, setComments] = React.useState([]);
 
 	const handleAlertOpen = () => {
 		setAlertOpen(true);
@@ -110,6 +111,41 @@ export default function ProductDetails(props) {
 		}
 	};
 
+	const handleRating = async (event, value) => {
+		event.preventDefault();
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		await axios
+			.post(
+				`/products/update_rating?id=${product_Id}&type=single`,
+				{ value },
+				config
+			)
+			.then((res) => {
+				setRatingsNumber(res.data.newRatingNumber);
+				setRatingValue(
+					(5 * res.data.rating[4] +
+						4 * res.data.rating[3] +
+						3 * res.data.rating[2] +
+						2 * res.data.rating[1] +
+						1 * res.data.rating[0]) /
+						(res.data.rating[0] +
+							res.data.rating[1] +
+							res.data.rating[2] +
+							res.data.rating[3] +
+							res.data.rating[4])
+				);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	};
+
 	React.useEffect(() => {
 		const loadUser = async () => {
 			dispatch(dispatchUserLoading());
@@ -131,11 +167,10 @@ export default function ProductDetails(props) {
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
-					//dispatch(returnErrors(err.response.data.msg, err.response.status));
 				});
 		};
 		loadUser();
-	}, [dispatch, token]);
+	}, [dispatch, token, product_Id]);
 
 	React.useEffect(() => {
 		const loadProduct = async () => {
@@ -143,9 +178,21 @@ export default function ProductDetails(props) {
 			await axios
 				.get(`/products/get_product_by_id?id=${product_Id}&type=single`)
 				.then((res) => {
+					const rating = res.data.product[0].rating;
+					console.log(rating);
 					setProduct(res.data.product[0]);
 					setProductImages(res.data.product[0].productImages);
 					setIsLoading(false);
+					setRatingValue(
+						(5 * rating[4] +
+							4 * rating[3] +
+							3 * rating[2] +
+							2 * rating[1] +
+							1 * rating[0]) /
+							(rating[0] + rating[1] + rating[2] + rating[3] + rating[4])
+					);
+					setComments(res.data.product[0].comments);
+					setRatingsNumber(res.data.product[0].ratingsNumber);
 				})
 				.catch((err) => {
 					dispatch(productErrors(err));
@@ -154,7 +201,7 @@ export default function ProductDetails(props) {
 				});
 		};
 		loadProduct();
-	}, []);
+	}, [dispatch, product_Id]);
 	React.useEffect(() => {
 		const loadSimilaireProducts = async () => {
 			setIsLoading(true);
@@ -300,16 +347,17 @@ export default function ProductDetails(props) {
 						>
 							<Rating
 								style={{ marginRight: 10 }}
-								defaultValue={ratingValue}
+								value={ratingValue.toFixed(2)}
 								precision={0.5}
 								readOnly
 							/>
+
 							<Typography
 								variant="subtitle1
 							"
 								color="primary"
 							>
-								1 avis
+								{ratingsNumber} Avis
 							</Typography>
 						</div>
 						<Divider style={{ marginBottom: 10 }} />
@@ -391,7 +439,11 @@ export default function ProductDetails(props) {
 								product._id !== element._id && (
 									<a
 										href={`/product/${element._id}`}
-										style={{ width: "22%", textDecoration: "none" }}
+										style={{
+											width: "22%",
+											textDecoration: "none",
+											marginRight: 10,
+										}}
 									>
 										<Card
 											style={{ width: "100%", height: 300, marginRight: 30 }}
@@ -454,7 +506,7 @@ export default function ProductDetails(props) {
 						style={{ marginBottom: 10, fontWeight: 500 }}
 						variant="h5"
 					>
-						Commantaire et Avis
+						Commentaires et Avis
 					</Typography>
 					<Divider style={{ marginBottom: 10 }} />
 					<div style={{ display: "flex", width: "100%" }}>
@@ -475,45 +527,82 @@ export default function ProductDetails(props) {
 									color="primary"
 									style={{ fontSize: 25, fontWeight: 500, marginBottom: 5 }}
 								>
-									{ratingValue}/5
+									{ratingValue.toFixed(2)}/5
 								</Typography>
 								<Rating
 									style={{ marginRight: 10 }}
-									defaultValue={ratingValue}
+									value={ratingValue.toFixed(2)}
 									precision={0.5}
-									onChange={(e, v) => {
-										e.preventDefault();
-										setRatingValue(v);
-									}}
+									onChange={handleRating}
 								/>
 								<Typography
 									variant="h6"
 									color="primary"
 									style={{ fontSize: 16, fontWeight: 450, marginTop: 5 }}
 								>
-									1 avis
+									{ratingsNumber} Avis
 								</Typography>
 							</div>
 						</div>
-						<div style={{ width: "70%" }}>
-							<Typography variant="h6">Commantaire</Typography>
-							<div
-								style={{
-									display: "flex",
-									flexDirection: "column",
-									justifyContent: "center",
-									alignItems: "center",
-									marginTop: 30,
-									marginBottom: 30,
-								}}
-							>
-								<div style={{ marginBottom: 20 }}>
-									<CommentIcon />
+						<div style={{ width: "100%" }}>
+							<Typography variant="h6">
+								Commantaire ({comments.length})
+							</Typography>
+							{comments.length === 0 ? (
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column",
+										justifyContent: "center",
+										alignItems: "center",
+										marginTop: 30,
+										marginBottom: 30,
+									}}
+								>
+									<div style={{ marginBottom: 20 }}>
+										<CommentIcon />
+									</div>
+									<Typography variant="h6">
+										Ce produit n'a pas encore de commentaires.{" "}
+									</Typography>
 								</div>
-								<Typography variant="h6">
-									Ce produit n'a pas encore de commentaires.{" "}
-								</Typography>
-							</div>
+							) : (
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column",
+										alignItems: "flex-start",
+										marginTop: 5,
+										marginBottom: 5,
+									}}
+								>
+									{comments.map((comment) => (
+										<div
+											style={{
+												width: "98%",
+												borderBottom: "1px solid rgb(217 217 217)",
+												padding: 10,
+											}}
+										>
+											<Typography
+												style={{
+													fontSize: 18,
+													fontWeight: 400,
+													marginBottom: 5,
+												}}
+											>
+												{comment.comment}
+											</Typography>
+											<Typography
+												color="textSecondary"
+												style={{ fontSize: 15, fontWeight: 400 }}
+											>
+												par {comment.user}
+											</Typography>
+										</div>
+									))}
+								</div>
+							)}
 						</div>
 					</div>
 				</Container>

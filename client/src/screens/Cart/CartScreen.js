@@ -6,16 +6,24 @@ import {
 	Divider,
 	Typography,
 } from "@material-ui/core";
+import axios from "axios";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import EmptyCart from "../../Icons/EmptyCart";
+import {
+	dispatchUserError,
+	dispatchUserLoaded,
+	dispatchUserLoading,
+} from "../../redux/actions/authAction";
 import MyAppBar from "../../utils/AppBar";
 import Fotter from "../../utils/Fotter";
 import CartProducts from "./Components/CartProducts";
 
 export default function CartScreen() {
+	const dispatch = useDispatch();
 	const history = useHistory();
+	const token = useSelector((state) => state.auth.token);
 
 	//Jib l panier men State ta3 redux  ana dert haka berk bache nseyi
 	//Jib l panier men State ta3 redux  ana dert haka berk bache nseyi
@@ -25,10 +33,34 @@ export default function CartScreen() {
 		(state) => state.products.products
 	);
 
+	React.useEffect(() => {
+		const loadUser = async () => {
+			dispatch(dispatchUserLoading());
+
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
+
+			await axios
+				.get("/users/load_User", config)
+				.then((res) => {
+					dispatch(dispatchUserLoaded(res));
+				})
+				.catch((err) => {
+					dispatch(dispatchUserError());
+					//dispatch(returnErrors(err.response.data.msg, err.response.status));
+				});
+		};
+		loadUser();
+	}, [dispatch, token]);
+
 	return (
 		<div style={{ background: "#f1f1f1" }}>
 			<MyAppBar />
-			{cart.length < 0 ? (
+			{cart.length === 0 ? (
 				//Hadi ki ykon l panier faregh
 				<Container
 					maxWidth="xl"
@@ -51,6 +83,23 @@ export default function CartScreen() {
 						}}
 					>
 						Votre panier est vide!
+					</Typography>
+					<Typography
+						style={{
+							marginTop: 20,
+							fontSize: 25,
+							fontWeight: 400,
+						}}
+					>
+						Vous avez déjà un compte?{" "}
+						<a
+							href="/login"
+							title="Connecter vous"
+							style={{ color: "#F58634" }}
+						>
+							Connecter vous
+						</a>{" "}
+						pour voir votre panier
 					</Typography>
 					<Button
 						variant="contained"

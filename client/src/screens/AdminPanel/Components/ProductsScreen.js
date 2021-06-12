@@ -232,7 +232,6 @@ export default function ProductsScreen() {
 		//Body
 		const formData = new FormData();
 
-		console.log(productImage);
 		formData.append("name", product.name);
 		formData.append("brand", product.brand);
 		formData.append("price", product.price);

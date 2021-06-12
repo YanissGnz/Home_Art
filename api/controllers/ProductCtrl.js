@@ -90,13 +90,46 @@ const productCtrl = {
 			res.status(400).json({ msg: e.message });
 		}
 	},
+	updateRating: async (req, res) => {
+		let type = req.query.type;
+		let product_id = req.query.id;
+		const value = req.body.value;
+		try {
+			const product = await Product.findOne({ _id: { $in: product_id } });
+
+			var rating = product.rating;
+
+			rating[Math.ceil(value) - 1] = rating[Math.ceil(value) - 1] + 1;
+
+			const newRatingNumber =
+				rating[0] + rating[1] + rating[2] + rating[3] + rating[4];
+
+			console.log(rating);
+			console.log(newRatingNumber);
+
+			await Product.updateOne(
+				{ _id: product_id },
+				{
+					rating: rating,
+					ratingsNumber: newRatingNumber,
+				}
+			);
+
+			res.status(200).json({
+				rating,
+				newRatingNumber,
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
 	getSimilaireProducts: async (req, res) => {
 		let type = req.query.type;
 		let categorie = req.query.categorie;
 		try {
 			const products = await Product.find({ categorie: categorie })
 				.skip(0)
-				.limit(5);
+				.limit(6);
 
 			res.status(200).json({
 				products,
