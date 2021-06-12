@@ -19,4 +19,5 @@ router.post("/register", userCtrl2.register);
 router.post("/activation", userCtrl2.activateEmail);
 router.post("/google_login", userCtrl2.googleLogin);
 
+router.post('/add', auth, userCtrl2.addCart) ;
 module.exports = router;
