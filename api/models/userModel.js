@@ -19,15 +19,11 @@ const userSchema = new mongoose.Schema(
 		},
 		cart: {
 			type: Array,
-			default: []
-		}, 
+			default: [],
+		},
 		role: {
 			type: Number,
 			default: 0, // 0 = user, 1 = admin
-		},
-		cart: {
-			type: Array,
-			default: [],
 		},
 		favoriteProducts: {
 			type: Array,

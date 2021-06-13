@@ -224,20 +224,23 @@ const userCtrl2 = {
 			return res.status(500).json({ msg: err.message });
 		}
 	},
- 	addCart: async (req, res) =>{
-        try {
-            const user = await Users2.findById(req.user.id)
-            if(!user) return res.status(400).json({msg: "User does not exist."})
+	addToCart: async (req, res) => {
+		try {
+			const user = await Users2.findById(req.user.id);
+			if (!user) return res.status(400).json({ msg: "User does not exist." });
 
-            await Users2.findOneAndUpdate({_id: req.user.id}, {
-                cart: req.body.cart
-            })
+			await Users2.findOneAndUpdate(
+				{ _id: req.user.id },
+				{
+					cart: req.body.cart,
+				}
+			);
 
-            return res.json({msg: "Added to cart"})
-        } catch (err) {
-            return res.status(500).json({msg: err.message})
-        }
-    },  
+			return res.json({ msg: "Added to cart" });
+		} catch (err) {
+			return res.status(500).json({ msg: err.message });
+		}
+	},
 	googleLogin: async (req, res) => {
 		try {
 			const { tokenId } = req.body;

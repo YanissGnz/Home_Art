@@ -25,5 +25,5 @@ router.post(
 	userCtrl2.removeFromFavorite
 );
 
-router.post('/add', auth, userCtrl2.addCart) ;
+router.post("/add_to_cart", auth, userCtrl2.addToCart);
 module.exports = router;
