@@ -67,8 +67,16 @@ const productCtrl = {
 		}
 	},
 	getProducts: async (req, res) => {
+		const sortBy = req.body.sortBy ? parseInt(req.body.sortBy) : "_id";
+		const order = req.body.sortBy ? parseInt(req.body.sortBy) : "desc";
+		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
+		const skip = req.body.skip ? parseInt(req.body.skip) : 0;
+		console.log(req.body);
 		try {
-			const Products = await Product.find().sort({ categorie: 1 });
+			const Products = await Product.find()
+				.skip(skip)
+				.limit(limit)
+				.sort([[sortBy, order]]);
 
 			res.status(200).json({
 				Products,

@@ -61,7 +61,7 @@ export default function MyAppBar(props) {
 	};
 	return (
 		<ElevationScroll {...props}>
-			<AppBar color="white" position="sticky">
+			<AppBar color="inherit" position="sticky">
 				<Toolbar className="appbar">
 					<a
 						style={{

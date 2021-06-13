@@ -1,13 +1,14 @@
 import {
 	Button,
 	Card,
+	CardActionArea,
 	CardContent,
 	Container,
 	Divider,
 	Typography,
 } from "@material-ui/core";
 import axios from "axios";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import EmptyCart from "../../Icons/EmptyCart";
@@ -24,14 +25,18 @@ export default function CartScreen() {
 	const dispatch = useDispatch();
 	const history = useHistory();
 	const token = useSelector((state) => state.auth.token);
+	const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
 	//Jib l panier men State ta3 redux  ana dert haka berk bache nseyi
 	//Jib l panier men State ta3 redux  ana dert haka berk bache nseyi
 	//Jib l panier men State ta3 redux  ana dert haka berk bache nseyi
-	/*bedlo hadi tweli state.auth.user.cart --->*/ const cart = useSelector(
-		//state.auth.user.cart
-		(state) => state.products.products
-	);
+	// /*bedlo hadi tweli state.auth.user.cart --->*/ const cart = useSelector(
+	// 	//state.auth.user.cart
+	// 	(state) => state.products.products
+	// );
+
+	const [cart, setCart] = useState([]);
+	const [similaireProducts, setProducts] = useState([]);
 
 	React.useEffect(() => {
 		const loadUser = async () => {
@@ -48,14 +53,37 @@ export default function CartScreen() {
 				.get("/users/load_User", config)
 				.then((res) => {
 					dispatch(dispatchUserLoaded(res));
+					setCart(res.data.user.cart);
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
-					//dispatch(returnErrors(err.response.data.msg, err.response.status));
 				});
 		};
 		loadUser();
 	}, [dispatch, token]);
+
+	React.useEffect(() => {
+		const loadSomeProducts = async () => {
+			const skip = Math.floor(Math.random() * 5);
+			const limit = 5;
+
+			const body = {
+				skip: skip,
+				limit: limit,
+			};
+
+			await axios
+				.post("/products/get_products", body)
+				.then((res) => {
+					setProducts(res.data.Products);
+					console.log("Products", res.data.Products);
+				})
+				.catch((err) => {
+					console.log(err.message);
+				});
+		};
+		loadSomeProducts();
+	}, []);
 
 	return (
 		<div style={{ background: "#f1f1f1" }}>
@@ -84,29 +112,33 @@ export default function CartScreen() {
 					>
 						Votre panier est vide!
 					</Typography>
-					<Typography
-						style={{
-							marginTop: 20,
-							fontSize: 25,
-							fontWeight: 400,
-						}}
-					>
-						Vous avez déjà un compte?{" "}
-						<a
-							href="/login"
-							title="Connecter vous"
-							style={{ color: "#F58634" }}
-						>
-							Connecter vous
-						</a>{" "}
-						pour voir votre panier
-					</Typography>
+					{isAuthenticated === "false" && (
+						<div>
+							<Typography
+								style={{
+									marginTop: 20,
+									fontSize: 25,
+									fontWeight: 400,
+								}}
+							>
+								Vous avez déjà un compte?{" "}
+								<a
+									href="/login"
+									title="Connecter vous"
+									style={{ color: "#F58634" }}
+								>
+									Connecter vous
+								</a>{" "}
+								pour voir votre panier
+							</Typography>
+						</div>
+					)}
 					<Button
 						variant="contained"
 						color="primary"
 						size="large"
 						style={{
-							marginTop: 20,
+							marginTop: 30,
 							width: 300,
 							color: "white",
 							textTransform: "none",
@@ -240,7 +272,59 @@ export default function CartScreen() {
 								display: "flex",
 								width: "100%",
 							}}
-						></div>
+						>
+							{similaireProducts.map((element) => (
+								<a
+									href={`/product/${element._id}`}
+									style={{
+										width: "22%",
+										textDecoration: "none",
+										marginRight: 10,
+									}}
+								>
+									<Card style={{ width: "100%", height: 300, marginRight: 30 }}>
+										<CardActionArea
+											disableRipple
+											style={{ width: "100%", height: "100%" }}
+										>
+											<img
+												style={{
+													width: "100%",
+													maxHeight: "200px",
+													objectFit: "contain",
+												}}
+												src={`/uploads/${element.productImages[0]}`}
+												alt="Product"
+											/>
+
+											<CardContent>
+												<Typography
+													gutterBottom
+													style={{ fontSize: 18, fontWeight: 500 }}
+													variant="h6"
+													component="h2"
+													noWrap={true}
+												>
+													{element.name}
+												</Typography>
+												<Typography
+													style={{ fontSize: 18, fontWeight: 600 }}
+													gutterBottom
+													color="primary"
+												>
+													{[
+														element.price.slice(0, element.price.length - 3),
+														" ",
+														element.price.slice(element.price.length - 3),
+													]}{" "}
+													Da
+												</Typography>
+											</CardContent>
+										</CardActionArea>
+									</Card>
+								</a>
+							))}
+						</div>
 					</Container>
 				</Container>
 			)}

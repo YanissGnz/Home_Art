@@ -1,5 +1,4 @@
 import React from "react";
-import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	dispatchUserError,
@@ -32,7 +31,6 @@ import Masonry from "react-masonry-css";
 export default function Home(props) {
 	const classes = useStyles();
 
-	const history = useHistory();
 	const dispatch = useDispatch();
 
 	// Get token from localstorage
@@ -79,7 +77,7 @@ export default function Home(props) {
 			}
 			dispatch(productLoading());
 			await axios
-				.get("/products/get_products")
+				.post("/products/get_products")
 				.then((res) => {
 					dispatch(productsLoaded(res));
 					setProducts(res.data.Products);

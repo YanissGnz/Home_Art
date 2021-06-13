@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
 			type: Number,
 			default: 0, // 0 = user, 1 = admin
 		},
+		cart: {
+			type: Array,
+			default: [],
+		},
 		favoriteProducts: {
 			type: Array,
 			default: [],

@@ -224,7 +224,6 @@ export default function ProductDetails(props) {
 	}, [dispatch, product]);
 
 	const images = [];
-	console.log(similaireProducts);
 	productImages.forEach((image, index) =>
 		images.push({
 			original: `/uploads/${productImages[index]}`,
