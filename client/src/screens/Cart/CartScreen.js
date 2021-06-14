@@ -1,12 +1,16 @@
 import {
+	Backdrop,
 	Button,
 	Card,
 	CardActionArea,
 	CardContent,
+	CircularProgress,
 	Container,
 	Divider,
+	makeStyles,
 	Typography,
 } from "@material-ui/core";
+import { Skeleton } from "@material-ui/lab";
 import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,22 +25,52 @@ import MyAppBar from "../../utils/AppBar";
 import Fotter from "../../utils/Fotter";
 import CartProducts from "./Components/CartProducts";
 
+const useStyles = makeStyles((theme) => ({
+	backdrop: {
+		zIndex: theme.zIndex.drawer + 1,
+		color: "#fff",
+	},
+}));
+
 export default function CartScreen() {
+	const classes = useStyles();
 	const dispatch = useDispatch();
 	const history = useHistory();
 	const token = useSelector((state) => state.auth.token);
 	const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-
-	//Jib l panier men State ta3 redux  ana dert haka berk bache nseyi
-	//Jib l panier men State ta3 redux  ana dert haka berk bache nseyi
-	//Jib l panier men State ta3 redux  ana dert haka berk bache nseyi
-	// /*bedlo hadi tweli state.auth.user.cart --->*/ const cart = useSelector(
-	// 	//state.auth.user.cart
-	// 	(state) => state.products.products
-	// );
+	const [user, setUser] = React.useState(null);
 
 	const [cart, setCart] = useState([]);
-	const [similaireProducts, setProducts] = useState([]);
+	const [cartLength, setCartLength] = useState(cart.length);
+	const [someProducts, setProducts] = useState([]);
+	const [open, setOpen] = React.useState(false);
+
+	const handleClose = () => {
+		setOpen(false);
+	};
+	const handleToggle = () => {
+		setOpen(!open);
+	};
+
+	const handleRemoveItem = async (item) => {
+		handleToggle();
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+		await axios
+			.post(`/users/remove_item_from_cart`, { item }, config)
+			.then((res) => {
+				setCart(res.data.newCart);
+				handleClose();
+			})
+			.catch((err) => {
+				console.log(err);
+				handleClose();
+			});
+	};
 
 	React.useEffect(() => {
 		const loadUser = async () => {
@@ -53,6 +87,7 @@ export default function CartScreen() {
 				.get("/users/load_User", config)
 				.then((res) => {
 					dispatch(dispatchUserLoaded(res));
+					setUser(res.data.user);
 					setCart(res.data.user.cart);
 				})
 				.catch((err) => {
@@ -61,6 +96,13 @@ export default function CartScreen() {
 		};
 		loadUser();
 	}, [dispatch, token]);
+
+	React.useEffect(() => {
+		if (user !== null) {
+			setCart(user.cart);
+			setCartLength(user.cart.length);
+		}
+	}, [user]);
 
 	React.useEffect(() => {
 		const loadSomeProducts = async () => {
@@ -76,7 +118,6 @@ export default function CartScreen() {
 				.post("/products/get_products", body)
 				.then((res) => {
 					setProducts(res.data.Products);
-					console.log("Products", res.data.Products);
 				})
 				.catch((err) => {
 					console.log(err.message);
@@ -87,7 +128,10 @@ export default function CartScreen() {
 
 	return (
 		<div style={{ background: "#f1f1f1" }}>
-			<MyAppBar />
+			<MyAppBar cartLength={cartLength} />
+			<Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
+				<CircularProgress color="primary" />
+			</Backdrop>
 			{cart.length === 0 ? (
 				//Hadi ki ykon l panier faregh
 				<Container
@@ -174,7 +218,6 @@ export default function CartScreen() {
 					</Container>
 				</Container>
 			) : (
-				//Hadi ki ykon l panier m3amer
 				<Container
 					maxWidth="xl"
 					style={{
@@ -231,9 +274,13 @@ export default function CartScreen() {
 									Prix total
 								</Typography>
 							</CardContent>
-							{cart.map((product) => (
-								<CartProducts product={product} />
-							))}
+							{cart.length > 0 &&
+								cart.map((item) => (
+									<CartProducts
+										item={item}
+										handleRemoveItem={handleRemoveItem}
+									/>
+								))}
 						</Card>
 					</Container>
 					<Button
@@ -267,64 +314,116 @@ export default function CartScreen() {
 							Voir aussi
 						</Typography>
 						<Divider style={{ marginBottom: 10 }} />
-						<div
-							style={{
-								display: "flex",
-								width: "100%",
-							}}
-						>
-							{similaireProducts.map((element) => (
-								<a
-									href={`/product/${element._id}`}
+						{someProducts.length === 0 && (
+							<div
+								style={{
+									display: "flex",
+									width: "100%",
+									height: 400,
+								}}
+							>
+								<Skeleton
+									height="100%"
+									width="19%"
 									style={{
-										width: "22%",
-										textDecoration: "none",
-										marginRight: 10,
+										marginRight: 15,
+										marginTop: 0,
 									}}
-								>
-									<Card style={{ width: "100%", height: 300, marginRight: 30 }}>
-										<CardActionArea
-											disableRipple
-											style={{ width: "100%", height: "100%" }}
-										>
-											<img
-												style={{
-													width: "100%",
-													maxHeight: "200px",
-													objectFit: "contain",
-												}}
-												src={`/uploads/${element.productImages[0]}`}
-												alt="Product"
-											/>
+								/>
+								<Skeleton
+									height="100%"
+									width="19%"
+									style={{
+										marginRight: 15,
+										marginTop: 0,
+									}}
+								/>
+								<Skeleton
+									height="100%"
+									width="19%"
+									style={{
+										marginRight: 15,
+										marginTop: 0,
+									}}
+								/>
+								<Skeleton
+									height="100%"
+									width="19%"
+									style={{
+										marginRight: 15,
+										marginTop: 0,
+									}}
+								/>
+								<Skeleton height="100%" width="19%" />
+							</div>
+						)}
 
-											<CardContent>
-												<Typography
-													gutterBottom
-													style={{ fontSize: 18, fontWeight: 500 }}
-													variant="h6"
-													component="h2"
-													noWrap={true}
+						{someProducts.length > 0 && (
+							<div
+								style={{
+									display: "flex",
+									width: "100%",
+								}}
+							>
+								{someProducts.length > 0 &&
+									someProducts.map((element) => (
+										<a
+											href={`/product/${element._id}`}
+											style={{
+												width: "19%",
+												textDecoration: "none",
+												marginRight: 15,
+											}}
+										>
+											<Card
+												style={{ width: "100%", height: 300, marginRight: 30 }}
+											>
+												<CardActionArea
+													disableRipple
+													style={{ width: "100%", height: "100%" }}
 												>
-													{element.name}
-												</Typography>
-												<Typography
-													style={{ fontSize: 18, fontWeight: 600 }}
-													gutterBottom
-													color="primary"
-												>
-													{[
-														element.price.slice(0, element.price.length - 3),
-														" ",
-														element.price.slice(element.price.length - 3),
-													]}{" "}
-													Da
-												</Typography>
-											</CardContent>
-										</CardActionArea>
-									</Card>
-								</a>
-							))}
-						</div>
+													<img
+														style={{
+															width: "100%",
+															maxHeight: "200px",
+															objectFit: "contain",
+														}}
+														src={`/uploads/${element.productImages[0]}`}
+														alt="Product"
+													/>
+
+													<CardContent>
+														<Typography
+															gutterBottom
+															style={{ fontSize: 18, fontWeight: 500 }}
+															variant="h6"
+															component="h2"
+															noWrap={true}
+														>
+															{element.name}
+														</Typography>
+														<Typography
+															style={{ fontSize: 18, fontWeight: 600 }}
+															gutterBottom
+															color="primary"
+														>
+															{[
+																element.price.slice(
+																	0,
+																	element.price.length - 3
+																),
+																" ",
+																element.price.slice(element.price.length - 3),
+															]}{" "}
+															Da
+														</Typography>
+													</CardContent>
+												</CardActionArea>
+											</Card>
+										</a>
+									))}
+							</div>
+						)}
 					</Container>
 				</Container>
 			)}

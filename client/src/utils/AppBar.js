@@ -3,6 +3,7 @@ import { useHistory } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	AppBar,
+	Badge,
 	Button,
 	IconButton,
 	InputBase,
@@ -40,7 +41,7 @@ export default function MyAppBar(props) {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const auth = useSelector((state) => state.auth);
-
+	const [cart, setCart] = React.useState(0);
 	const [anchorEl, setAnchorEl] = React.useState(null);
 
 	const open = Boolean(anchorEl);
@@ -59,6 +60,11 @@ export default function MyAppBar(props) {
 		dispatch(dispatchLogout());
 		history.push("/login");
 	};
+
+	React.useEffect(() => {
+		setCart(props.cartLength);
+	}, [props]);
+
 	return (
 		<ElevationScroll {...props}>
 			<AppBar color="inherit" position="sticky">
@@ -89,9 +95,18 @@ export default function MyAppBar(props) {
 					</Paper>
 
 					{auth.isAuthenticated === "false" && <Menus />}
+
 					<Button
 						disableRipple
-						startIcon={<Cart />}
+						startIcon={
+							<Badge
+								badgeContent={cart}
+								color="primary"
+								classes={{ anchorOriginTopRightRectangle: classes.badge }}
+							>
+								<Cart />
+							</Badge>
+						}
 						className={classes.cart_button}
 						onClick={() => history.push("/cart")}
 					>

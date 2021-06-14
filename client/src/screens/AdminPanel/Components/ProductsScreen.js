@@ -78,7 +78,7 @@ function StockFormat(props) {
 
 const categories = [
 	{
-		value: "Electroménager",
+		value: "Robots",
 	},
 	{
 		value: "Meuble",
@@ -506,7 +506,7 @@ export default function ProductsScreen() {
 							onChange={handleChangeInput}
 							fullWidth
 							multiline
-							rowsMax={6}
+							rowsMax={20}
 							className={classes.descriptionInput}
 							helperText={descriptionMsg.id === 5 ? descriptionMsg.msg : null}
 							error={descriptionMsg.id === 5 ? true : false}

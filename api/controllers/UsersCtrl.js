@@ -1,4 +1,5 @@
 const Users2 = require("../models/userModel");
+const Product = require("../models/ProductModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./sendMail");
@@ -225,20 +226,111 @@ const userCtrl2 = {
 		}
 	},
 	addToCart: async (req, res) => {
+		let type = req.query.type;
+		let product_id = req.query.id;
+		const user_id = req.user.id;
+		try {
+			const user = await Users2.findById(req.user.id);
+			if (!user) return res.status(400).json({ msg: "User does not exist." });
+			const product = await Product.findOne({ _id: { $in: product_id } })
+				.select("-rating")
+				.select("-comments")
+				.select("-ratingsNumber")
+				.select("-description")
+				.select("-archived")
+				.select("-__v");
+
+			var newCart = user.cart;
+			var found = false;
+
+			newCart.forEach((item) => {
+				if (item.product._id.toString() === product._id.toString()) {
+					found = true;
+					item.quantity = item.quantity + 1;
+				}
+			});
+
+			if (!found) {
+				const newProduct = {
+					product: product,
+					quantity: 1,
+				};
+				newCart.push(newProduct);
+			}
+			const newUser = await Users2.findOneAndUpdate(
+				{ _id: req.user.id },
+				{
+					cart: newCart,
+				}
+			);
+			if (found) {
+				return res
+					.status(200)
+					.json({ msg: "La quantity de produit a été incrémenter." });
+			} else {
+				return res.json({ newCart, newUser, msg: "Le produit a été ajouter." });
+			}
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	reduceQuantity: async (req, res) => {
+		let type = req.query.type;
+		let product_id = req.query.id;
+		const user_id = req.user.id;
 		try {
 			const user = await Users2.findById(req.user.id);
 			if (!user) return res.status(400).json({ msg: "User does not exist." });
 
-			await Users2.findOneAndUpdate(
+			var newCart = user.cart;
+
+			console.log(newCart);
+			var found = false;
+
+			newCart.forEach((item) => {
+				if (item.product._id.toString() === product_id && item.quantity > 1) {
+					found = true;
+					item.quantity = item.quantity - 1;
+				}
+			});
+
+			const newUser = await Users2.findOneAndUpdate(
 				{ _id: req.user.id },
 				{
-					cart: req.body.cart,
+					cart: newCart,
+				}
+			);
+			if (found) {
+				return res
+					.status(200)
+					.json({ msg: "La quantity de produit a été décrémenter." });
+			} else {
+				return res.status(200).json({ msg: "Vous ne pouvez pas décrémenter" });
+			}
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	removeItem: async (req, res) => {
+		const user_id = req.user.id;
+		const item = req.body.item;
+		try {
+			const user = await Users2.findById(req.user.id);
+			if (!user) return res.status(404).json({ msg: "User does not exist." });
+
+			var newCart = user.cart;
+
+			newCart.splice(newCart.indexOf(item), 1);
+			const newUser = await Users2.findOneAndUpdate(
+				{ _id: req.user.id },
+				{
+					cart: newCart,
 				}
 			);
 
-			return res.json({ msg: "Added to cart" });
+			return res.json({ newCart, newUser, msg: "Le produit a été retirer." });
 		} catch (err) {
-			return res.status(500).json({ msg: err.message });
+			return res.status(400).json({ msg: err.message });
 		}
 	},
 	googleLogin: async (req, res) => {

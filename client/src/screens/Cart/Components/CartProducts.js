@@ -1,12 +1,95 @@
-import { Typography, Select, FormControl, IconButton } from "@material-ui/core";
+import {
+	Typography,
+	IconButton,
+	Backdrop,
+	CircularProgress,
+	makeStyles,
+} from "@material-ui/core";
+import AddIcon from "@material-ui/icons/Add";
+import RemoveIcon from "@material-ui/icons/Remove";
 import ClearIcon from "@material-ui/icons/Clear";
 import React from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
-export default function UserCard({ product }) {
-	const [state, setState] = React.useState(1);
-	const handleChange = (event) => {
-		setState(event.target.value);
+const useStyles = makeStyles((theme) => ({
+	backdrop: {
+		zIndex: theme.zIndex.drawer + 1,
+		color: "#fff",
+	},
+}));
+
+export default function UserCard({ item, handleRemoveItem }) {
+	const classes = useStyles();
+	const [product, setProduct] = React.useState({});
+	const [image, setImage] = React.useState("");
+	const [state, setState] = React.useState(item.quantity);
+	const token = useSelector((state) => state.auth.token);
+	const [open, setOpen] = React.useState(false);
+
+	const handleClose = () => {
+		setOpen(false);
 	};
+	const handleToggle = () => {
+		setOpen(!open);
+	};
+
+	const handleIncrement = async () => {
+		handleToggle();
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+		await axios
+			.post(
+				`/users/add_to_cart?id=${item.product._id.toString()}&type=single`,
+				null,
+				config
+			)
+			.then((res) => {
+				setState(state + 1);
+				handleClose();
+			})
+			.catch((err) => {
+				console.log(err);
+				handleClose();
+			});
+	};
+	const handleReduce = async () => {
+		if (state > 1) {
+			handleToggle();
+
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
+			await axios
+				.post(
+					`/users/reduce_quantity?id=${item.product._id.toString()}&type=single`,
+					null,
+					config
+				)
+				.then((res) => {
+					if (res.data.msg === "La quantity de produit a été décrémenter.") {
+						setState(state - 1);
+					}
+					handleClose();
+				})
+				.catch((err) => {
+					console.log(err);
+					handleClose();
+				});
+		}
+	};
+
+	React.useEffect(() => {
+		if (item) setProduct(item.product);
+		if (item.product.productImages) setImage(item.product.productImages[0]);
+	}, [item]);
 
 	return (
 		<div
@@ -19,7 +102,15 @@ export default function UserCard({ product }) {
 				position: "relative",
 			}}
 		>
-			<IconButton style={{ position: "absolute", left: "95.4%", top: 10 }}>
+			<Backdrop className={classes.backdrop} open={open}>
+				<CircularProgress color="primary" />
+			</Backdrop>
+			<IconButton
+				style={{ position: "absolute", left: "95.4%", top: 10 }}
+				onClick={() => {
+					handleRemoveItem(item);
+				}}
+			>
 				<ClearIcon />
 			</IconButton>
 			<div
@@ -37,39 +128,49 @@ export default function UserCard({ product }) {
 						objectFit: "contain",
 						marginRight: 8,
 					}}
-					src={`/uploads/${product.productImages[0]}`}
+					src={`/uploads/${image}`}
 					alt="product"
 				/>
-				<Typography variant="h6">{product.name}</Typography>
-			</div>
-			<FormControl variant="outlined" style={{ width: "23%", height: "100%" }}>
-				<Select
-					native
-					value={state}
-					onChange={handleChange}
-					inputProps={{
-						quantite: "state",
-					}}
-					style={{ width: 80, fontSize: 20 }}
+				<a
+					href={`/product/${product._id}`}
+					style={{ color: "black", fontWeight: 450 }}
+					className="fotter_links"
 				>
-					<option value={1}>1</option>
-					<option value={2}>2</option>
-					<option value={3}>3</option>
-					<option value={4}>4</option>
-					<option value={5}>5</option>
-					<option value={6}>6</option>
-					<option value={7}>7</option>
-					<option value={8}>8</option>
-				</Select>
-			</FormControl>
+					<Typography variant="h6">{product.name}</Typography>
+				</a>
+			</div>
+			<div
+				variant="outlined"
+				style={{
+					display: "flex",
+					alignItems: "center",
+					width: "23%",
+					height: "100%",
+				}}
+			>
+				<IconButton
+					aria-label="add"
+					size="large"
+					onClick={handleReduce}
+					style={{ marginRight: 10 }}
+				>
+					<RemoveIcon fontSize="inherit" />
+				</IconButton>
+				<Typography variant="h6" color="textPrimary">
+					{state}
+				</Typography>
+				<IconButton
+					aria-label="add"
+					size="large"
+					style={{ marginLeft: 10 }}
+					onClick={handleIncrement}
+				>
+					<AddIcon fontSize="inherit" />
+				</IconButton>
+			</div>
 			<div style={{ width: "23%", height: "100%" }}>
 				<Typography color="primary" style={{ fontWeight: 450, fontSize: 20 }}>
-					{[
-						product.price.slice(0, product.price.length - 3),
-						" ",
-						product.price.slice(product.price.length - 3),
-					]}{" "}
-					Da
+					{product.price} Da
 				</Typography>
 			</div>
 			<div style={{ width: "23%", height: "100%" }}>

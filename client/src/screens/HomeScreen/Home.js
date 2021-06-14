@@ -37,6 +37,7 @@ export default function Home(props) {
 	const token = useSelector((state) => state.auth.token);
 	const isLoading = useSelector((state) => state.auth.isLoading);
 	const [products, setProducts] = React.useState([]);
+	const [user, setUser] = React.useState(null);
 
 	/*For The Masonary Container*/
 	const breakpoints = {
@@ -61,6 +62,7 @@ export default function Home(props) {
 				.get("/users/load_User", config)
 				.then((res) => {
 					dispatch(dispatchUserLoaded(res));
+					setUser(res.data.user);
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
@@ -101,7 +103,7 @@ export default function Home(props) {
 			{!isLoading && (
 				<div className="home_body">
 					<CssBaseline />
-					<MyAppBar />
+					<MyAppBar cartLength={user ? user.cart.length : 0} />
 
 					{/*                          Main Home Screen (Product Page)                          */}
 					<Container maxWidth="xl" className="main">

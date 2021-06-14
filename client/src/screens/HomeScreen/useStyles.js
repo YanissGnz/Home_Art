@@ -53,5 +53,10 @@ export const useStyles = makeStyles((theme) => {
 		inline: {
 			display: "inline",
 		},
+		badge: {
+			color: "white",
+			fontSize: 12,
+			fontWeight: 550,
+		},
 	};
 });

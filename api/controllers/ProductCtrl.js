@@ -1,4 +1,5 @@
 const Product = require("../models/ProductModel");
+const Users2 = require("../models/userModel");
 const fs = require("fs");
 
 const productCtrl = {
@@ -71,7 +72,6 @@ const productCtrl = {
 		const order = req.body.sortBy ? parseInt(req.body.sortBy) : "desc";
 		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
 		const skip = req.body.skip ? parseInt(req.body.skip) : 0;
-		console.log(req.body);
 		try {
 			const Products = await Product.find()
 				.skip(skip)
@@ -112,9 +112,6 @@ const productCtrl = {
 			const newRatingNumber =
 				rating[0] + rating[1] + rating[2] + rating[3] + rating[4];
 
-			console.log(rating);
-			console.log(newRatingNumber);
-
 			await Product.updateOne(
 				{ _id: product_id },
 				{
@@ -126,6 +123,39 @@ const productCtrl = {
 			res.status(200).json({
 				rating,
 				newRatingNumber,
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
+	addComment: async (req, res) => {
+		let type = req.query.type;
+		let product_id = req.query.id;
+		const comment = req.body.comment;
+		const user_id = req.user.id;
+
+		try {
+			const user = await Users2.findOne({ _id: user_id });
+
+			const name = user.name;
+			const product = await Product.findOne({ _id: { $in: product_id } });
+			var comments = product.comments;
+			const newComment = {
+				comment: comment,
+				name: name,
+			};
+			comments.push(newComment);
+
+			await Product.updateOne(
+				{ _id: product_id },
+				{
+					comments: comments,
+				}
+			);
+
+			res.status(200).json({
+				newComment,
+				msg: "Le commentaire a été ajouter",
 			});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });

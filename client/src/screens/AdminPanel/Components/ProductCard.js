@@ -154,13 +154,7 @@ export default function ProductCard({
 				)}
 
 				<Typography variant="body1" className={classes.padding}>
-					Prix:{" "}
-					{[
-						product.price.slice(0, product.price.length - 3),
-						" ",
-						product.price.slice(product.price.length - 3),
-					]}{" "}
-					Da Da
+					Prix: {product.price} Da
 				</Typography>
 				<Typography variant="body1" className={classes.padding}>
 					Stock: {product.stock} unité(s)

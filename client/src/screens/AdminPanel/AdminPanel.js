@@ -72,6 +72,7 @@ export default function AdminPanel(props) {
 	const [open, setOpen] = React.useState(false);
 	const [screen, setScreen] = React.useState(0);
 	const isLoading = useSelector((state) => state.auth.isLoading);
+	const productIsLoading = useSelector((state) => state.products.isLoading);
 	// Get token from localstorage
 	const token = useSelector((state) => state.auth.token);
 	const [usersCount, setUsersCount] = React.useState([]);
@@ -129,18 +130,18 @@ export default function AdminPanel(props) {
 	React.useEffect(() => {
 		const loadProduct = async () => {
 			dispatch(productLoading());
-
 			await axios
-				.get("/products/get_products")
+				.post("/products/get_products")
 				.then((res) => {
 					dispatch(productsLoaded(res));
 				})
 				.catch((err) => {
 					dispatch(productErrors());
+					console.log(err);
 				});
 		};
-		const isAuthenticated = localStorage.getItem("isAuthenticated");
-		if (isAuthenticated === "false") loadProduct();
+		loadProduct();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch]);
 
 	const handleDrawerOpen = () => {
@@ -160,12 +161,12 @@ export default function AdminPanel(props) {
 
 	return (
 		<div>
-			{isLoading && (
+			{isLoading && productIsLoading && (
 				<div className="loader_div">
 					<img className="loader" src="/loader.gif" alt="loader" />
 				</div>
 			)}
-			{!isLoading && (
+			{!isLoading && !productIsLoading && (
 				<div className="panel_body">
 					<CssBaseline />
 					<ElevationScroll {...props}>

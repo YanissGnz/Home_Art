@@ -15,6 +15,9 @@ import {
 	Button,
 	Tooltip,
 	Snackbar,
+	TextField,
+	useTheme,
+	CircularProgress,
 } from "@material-ui/core";
 import Zoom from "@material-ui/core/Zoom";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -43,16 +46,18 @@ function Alert(props) {
 export default function ProductDetails(props) {
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
-	const user = useSelector((state) => state.auth.user);
-
+	const [user, setUser] = React.useState(null);
+	const [cartLength, setCartLength] = React.useState(0);
 	const product_Id = props.match.params.productId;
 	const [product, setProduct] = React.useState({});
 	const [similaireProducts, setSimilaireProducts] = React.useState([]);
-
 	const [productImages, setProductImages] = React.useState([]);
 	const [ratingValue, setRatingValue] = React.useState(0);
 	const [ratingsNumber, setRatingsNumber] = React.useState(0);
 	const [isLoading, setIsLoading] = React.useState(false);
+	const [userLoading, setUserLoading] = React.useState(false);
+	const [commentLoading, setCommentLoading] = React.useState(false);
+	const [addProductLoading, setAddProductLoading] = React.useState(false);
 	const [favorite, setFavorite] = React.useState(
 		user ? user.favoriteProducts.indexOf(product_Id) !== -1 : false
 	);
@@ -60,6 +65,9 @@ export default function ProductDetails(props) {
 	const [alertOpen, setAlertOpen] = React.useState(false);
 	const [alertType, setAlertType] = React.useState("");
 	const [comments, setComments] = React.useState([]);
+	const [comment, setComment] = React.useState("");
+	const [commentError, setCommentError] = React.useState("");
+	const theme = useTheme();
 
 	const handleAlertOpen = () => {
 		setAlertOpen(true);
@@ -146,8 +154,90 @@ export default function ProductDetails(props) {
 			});
 	};
 
+	const handleChangeInput = (e) => {
+		setComment(e.target.value);
+		setCommentError("");
+	};
+
+	const handleComment = async () => {
+		setCommentLoading(true);
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		if (user === null) {
+			setAlertOpen(true);
+			setMsg("Vous devez ètre connecter!");
+			setAlertType("error");
+		} else if (comment !== "") {
+			await axios
+				.post(
+					`/products/add_comment?id=${product_Id}&type=single`,
+					{ comment },
+					config
+				)
+				.then((res) => {
+					setMsg(res.data.msg);
+					setAlertType("success");
+					handleAlertOpen();
+					const newComments = comments;
+					newComments.push(res.data.newComment);
+					setComments(newComments);
+					setComment("");
+					setCommentLoading(false);
+				})
+				.catch((err) => {
+					console.log(err.message);
+					setCommentLoading(false);
+				});
+		} else {
+			setCommentError("Entrer votre commentaire");
+			setCommentLoading(false);
+		}
+		setCommentLoading(false);
+	};
+
+	const handleAddToCart = async () => {
+		setAddProductLoading(true);
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		if (user === null) {
+			setAlertOpen(true);
+			setMsg("Vous devez ètre connecter!");
+			setAlertType("error");
+		} else {
+			await axios
+				.post(`/users/add_to_cart?id=${product_Id}&type=single`, null, config)
+				.then((res) => {
+					setAddProductLoading(false);
+					setMsg(res.data.msg);
+					setAlertType("success");
+					handleAlertOpen();
+					if (res.data.msg === "Le produit a été ajouter.") {
+						setCartLength(cartLength + 1);
+					}
+				})
+				.catch((err) => {
+					setAlertType(err.status === 400 ? "error" : "info");
+					setMsg(err.response.data.msg);
+					handleAlertOpen();
+					setAddProductLoading(false);
+				});
+		}
+		setAddProductLoading(false);
+	};
+
 	React.useEffect(() => {
 		const loadUser = async () => {
+			setUserLoading(true);
 			dispatch(dispatchUserLoading());
 
 			// Headers
@@ -164,10 +254,15 @@ export default function ProductDetails(props) {
 					setFavorite(
 						res.data.user.favoriteProducts.indexOf(product_Id) !== -1
 					);
+					setUser(res.data.user);
+					setCartLength(res.data.user.cart.length);
+					setUserLoading(false);
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
+					setUserLoading(false);
 				});
+			setUserLoading(false);
 		};
 		loadUser();
 	}, [dispatch, token, product_Id]);
@@ -202,6 +297,7 @@ export default function ProductDetails(props) {
 		};
 		loadProduct();
 	}, [dispatch, product_Id]);
+
 	React.useEffect(() => {
 		const loadSimilaireProducts = async () => {
 			setIsLoading(true);
@@ -222,7 +318,6 @@ export default function ProductDetails(props) {
 		};
 		loadSimilaireProducts();
 	}, [dispatch, product]);
-
 	const images = [];
 	productImages.forEach((image, index) =>
 		images.push({
@@ -239,7 +334,7 @@ export default function ProductDetails(props) {
 	return (
 		<div style={{ backgroundColor: "#f1f1f1" }}>
 			<CssBaseline />
-			<MyAppBar />
+			<MyAppBar cartLength={cartLength} />
 			<Container maxWidth="lg" style={{ marginTop: 50 }}>
 				<Snackbar
 					open={alertOpen}
@@ -363,21 +458,45 @@ export default function ProductDetails(props) {
 						<Typography style={{ marginBottom: 10 }} variant="h6">
 							{isLoading ? <Skeleton width="50%" /> : product.price + " Da"}
 						</Typography>
-						<Button
-							color="primary"
-							variant="contained"
-							size="large"
-							fullWidth
-							startIcon={<AddToCart />}
+						<div
 							style={{
+								margin: 0,
+								position: "relative",
 								alignSelf: "center",
-								color: "white",
-								textTransform: "none",
-								marginTop: 50,
+								marginBottom: "1em",
+								width: "100%",
 							}}
 						>
-							Ajouter au panier
-						</Button>
+							<Button
+								color="primary"
+								variant="contained"
+								size="large"
+								fullWidth
+								startIcon={<AddToCart />}
+								style={{
+									alignSelf: "center",
+									color: "white",
+									textTransform: "none",
+									marginTop: 50,
+								}}
+								onClick={handleAddToCart}
+								disabled={addProductLoading}
+							>
+								Ajouter au panier
+							</Button>
+							{addProductLoading && (
+								<CircularProgress
+									size={24}
+									style={{
+										color: theme.palette.primary,
+										position: "absolute",
+										top: "50%",
+										left: "50%",
+										marginTop: 11,
+									}}
+								/>
+							)}
+						</div>
 					</Container>
 				</Container>
 				<Container
@@ -427,69 +546,117 @@ export default function ProductDetails(props) {
 						Produit simulaire
 					</Typography>
 					<Divider style={{ marginBottom: 10 }} />
-					<div
-						style={{
-							display: "flex",
-							width: "100%",
-						}}
-					>
-						{similaireProducts.map(
-							(element) =>
-								product._id !== element._id && (
-									<a
-										href={`/product/${element._id}`}
-										style={{
-											width: "22%",
-											textDecoration: "none",
-											marginRight: 10,
-										}}
-									>
-										<Card
-											style={{ width: "100%", height: 300, marginRight: 30 }}
+					{similaireProducts.length === 0 && (
+						<div
+							style={{
+								display: "flex",
+								width: "100%",
+								height: 400,
+							}}
+						>
+							<Skeleton
+								height="100%"
+								width="19%"
+								style={{
+									marginRight: 15,
+									marginTop: 0,
+								}}
+							/>
+							<Skeleton
+								height="100%"
+								width="19%"
+								style={{
+									marginRight: 15,
+									marginTop: 0,
+								}}
+							/>
+							<Skeleton
+								height="100%"
+								width="19%"
+								style={{
+									marginRight: 15,
+									marginTop: 0,
+								}}
+							/>
+							<Skeleton
+								height="100%"
+								width="19%"
+								style={{
+									marginRight: 15,
+									marginTop: 0,
+								}}
+							/>
+							<Skeleton height="100%" width="19%" />
+						</div>
+					)}
+					{similaireProducts.length > 0 && (
+						<div
+							style={{
+								display: "flex",
+								width: "100%",
+							}}
+						>
+							{similaireProducts.map(
+								(element) =>
+									product._id !== element._id && (
+										<a
+											href={`/product/${element._id}`}
+											style={{
+												width: "19%",
+												textDecoration: "none",
+												marginRight: 15,
+											}}
 										>
-											<CardActionArea
-												disableRipple
-												style={{ width: "100%", height: "100%" }}
+											<Card
+												style={{ width: "100%", height: 300, marginRight: 30 }}
 											>
-												<img
-													style={{
-														width: "100%",
-														maxHeight: "200px",
-														objectFit: "contain",
-													}}
-													src={`/uploads/${element.productImages[0]}`}
-													alt="Product"
-												/>
+												<CardActionArea
+													disableRipple
+													style={{ width: "100%", height: "100%" }}
+												>
+													<img
+														style={{
+															width: "100%",
+															maxHeight: "200px",
+															objectFit: "contain",
+														}}
+														src={`/uploads/${element.productImages[0]}`}
+														alt="Product"
+													/>
 
-												<CardContent>
-													<Typography
-														gutterBottom
-														style={{ fontSize: 18, fontWeight: 500 }}
-														variant="h6"
-														component="h2"
-														noWrap={true}
-													>
-														{element.name}
-													</Typography>
-													<Typography
-														style={{ fontSize: 18, fontWeight: 600 }}
-														gutterBottom
-														color="primary"
-													>
-														{[
-															element.price.slice(0, element.price.length - 3),
-															" ",
-															element.price.slice(element.price.length - 3),
-														]}{" "}
-														Da
-													</Typography>
-												</CardContent>
-											</CardActionArea>
-										</Card>
-									</a>
-								)
-						)}
-					</div>
+													<CardContent>
+														<Typography
+															gutterBottom
+															style={{ fontSize: 18, fontWeight: 500 }}
+															variant="h6"
+															component="h2"
+															noWrap={true}
+														>
+															{element.name}
+														</Typography>
+														<Typography
+															style={{ fontSize: 18, fontWeight: 600 }}
+															gutterBottom
+															color="primary"
+														>
+															{[
+																element.price.slice(
+																	0,
+																	element.price.length - 3
+																),
+																" ",
+																element.price.slice(element.price.length - 3),
+															]}{" "}
+															Da
+														</Typography>
+													</CardContent>
+												</CardActionArea>
+											</Card>
+										</a>
+									)
+							)}
+						</div>
+					)}
 				</Container>
 				<Container
 					maxWidth="lg"
@@ -545,7 +712,7 @@ export default function ProductDetails(props) {
 						</div>
 						<div style={{ width: "100%" }}>
 							<Typography variant="h6">
-								Commantaire ({comments.length})
+								Commentaire ({comments.length})
 							</Typography>
 							{comments.length === 0 ? (
 								<div
@@ -596,12 +763,91 @@ export default function ProductDetails(props) {
 												color="textSecondary"
 												style={{ fontSize: 15, fontWeight: 400 }}
 											>
-												par {comment.user}
+												par {comment.name}
 											</Typography>
 										</div>
 									))}
 								</div>
 							)}
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "column",
+									justifyContent: "center",
+									alignItems: "flex-start",
+									marginTop: 30,
+									marginBottom: 30,
+									width: "98%",
+								}}
+							>
+								<Typography
+									style={{
+										fontSize: 16,
+										fontWeight: 450,
+										marginBottom: 10,
+									}}
+								>
+									Ajouter un commentaires :
+								</Typography>
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "row",
+										width: "100%",
+									}}
+								>
+									<TextField
+										variant="outlined"
+										label="Votre Commentaire"
+										name="comment"
+										value={comment}
+										fullWidth
+										multiline
+										rowsMax={5}
+										onChange={handleChangeInput}
+										helperText={commentError}
+										error={commentError !== ""}
+									/>
+									<div
+										style={{
+											margin: 0,
+											position: "relative",
+											alignSelf: "center",
+											marginBottom: "1em",
+										}}
+									>
+										<Button
+											variant="contained"
+											size="large"
+											color="primary"
+											component="span"
+											onClick={handleComment}
+											style={{
+												color: "white",
+												textTransform: "none",
+												marginLeft: 10,
+												height: 55,
+											}}
+											disabled={commentLoading}
+										>
+											Commenter
+										</Button>
+										{commentLoading && (
+											<CircularProgress
+												size={24}
+												style={{
+													color: theme.palette.primary,
+													position: "absolute",
+													top: "50%",
+													left: "50%",
+													marginTop: -12,
+													marginLeft: -13,
+												}}
+											/>
+										)}
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</Container>
