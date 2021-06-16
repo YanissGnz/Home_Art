@@ -16,6 +16,7 @@ import AdminPanel from "./screens/AdminPanel/AdminPanel";
 import "./App.css";
 import ProductDetails from "./screens/ProductDetails/ProductDetails";
 import CartScreen from "./screens/Cart/CartScreen";
+import CategorieScreen from "./screens/Categorie/CategorieScreen";
 
 const theme = createMuiTheme({
 	palette: {
@@ -40,6 +41,12 @@ export default function App() {
 							path="/product/:productId"
 							component={ProductDetails}
 						/>
+						<Route
+							exact
+							path="/categorie/:categorie"
+							component={CategorieScreen}
+						/>
+
 						<Route exact path="/cart" component={CartScreen} />
 						<Route exact path="/Admin_panel" component={AdminPanel} />
 						<Route exact path="/admin" component={AdminLogin} />

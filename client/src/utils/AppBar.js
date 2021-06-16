@@ -21,6 +21,8 @@ import Logo from "../Icons/Logo";
 import Cart from "../Icons/Cart";
 import SearchIcon from "@material-ui/icons/Search";
 import { AccountCircle } from "@material-ui/icons";
+import { Autocomplete } from "@material-ui/lab";
+import axios from "axios";
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -43,6 +45,7 @@ export default function MyAppBar(props) {
 	const auth = useSelector((state) => state.auth);
 	const [cart, setCart] = React.useState(0);
 	const [anchorEl, setAnchorEl] = React.useState(null);
+	const [productsNames, setProductsNames] = React.useState([]);
 
 	const open = Boolean(anchorEl);
 
@@ -65,6 +68,22 @@ export default function MyAppBar(props) {
 		setCart(props.cartLength);
 	}, [props]);
 
+	React.useEffect(() => {
+		const loadProduct = async () => {
+			await axios
+				.post("/products/get_products_names")
+				.then((res) => {
+					console.log(res.data.productsNames);
+					setProductsNames(res.data.productsNames);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		};
+		loadProduct();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [dispatch]);
+
 	return (
 		<ElevationScroll {...props}>
 			<AppBar color="inherit" position="sticky">
@@ -82,17 +101,32 @@ export default function MyAppBar(props) {
 						</div>
 					</a>
 
-					<Paper component="form" className={classes.paper} variant="outlined">
-						<InputBase className={classes.input} placeholder="Rechercher" />
-						<IconButton
-							type="submit"
-							className={classes.search_Button}
-							aria-label="search"
-							onClick={handleSearch}
-						>
-							<SearchIcon />
-						</IconButton>
-					</Paper>
+					<Autocomplete
+						freeSolo
+						options={productsNames.map((option) => option.name)}
+						style={{ width: "50%", padding: 0 }}
+						renderInput={(params) => (
+							<Paper
+								component="form"
+								className={classes.paper}
+								variant="outlined"
+								style={{ padding: 0 }}
+							>
+								<div
+									ref={params.InputProps.ref}
+									style={{ width: "100%", padding: 0 }}
+								>
+									<InputBase
+										type="text"
+										placeholder="Rechercher"
+										{...params.inputProps}
+										style={{ width: "100%", padding: 10 }}
+										startAdornment={<SearchIcon style={{ paddingRight: 1 }} />}
+									/>
+								</div>
+							</Paper>
+						)}
+					/>
 
 					{auth.isAuthenticated === "false" && <Menus />}
 

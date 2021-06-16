@@ -19,6 +19,7 @@ import {
 	useTheme,
 	CircularProgress,
 } from "@material-ui/core";
+import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import Zoom from "@material-ui/core/Zoom";
 import MuiAlert from "@material-ui/lab/Alert";
 import NavigateNextIcon from "@material-ui/icons/NavigateNext";
@@ -34,7 +35,7 @@ import "./index.css";
 import { Rating, Skeleton } from "@material-ui/lab";
 import MyAppBar from "../../utils/AppBar";
 import CommentIcon from "../../Icons/CommentsIcon";
-import Fotter from "../../utils/Fotter";
+import Fotter from "../../utils/Footer";
 import AddToCart from "../../Icons/AddToCartIcon";
 import HeartIcon from "../../Icons/HeartIcon";
 import ActiveHeartIcon from "../../Icons/ActiveHeartIcon";
@@ -302,9 +303,13 @@ export default function ProductDetails(props) {
 		const loadSimilaireProducts = async () => {
 			setIsLoading(true);
 
+			const skip = Math.floor(Math.random() * 5);
+			const limit = 5;
+
 			await axios
 				.get(
-					`/products/get_similaire_products?categorie=${product.categorie}&type=single`
+					`/products/get_products_by_categorie?categorie=${product.categorie}&type=single`,
+					{ skip, limit }
 				)
 				.then((res) => {
 					setSimilaireProducts(res.data.products);
@@ -539,12 +544,31 @@ export default function ProductDetails(props) {
 					}}
 					className="main"
 				>
-					<Typography
-						style={{ marginBottom: 10, fontWeight: 500 }}
-						variant="h5"
-					>
-						Produit simulaire
-					</Typography>
+					<div style={{ display: "flex" }}>
+						<Typography
+							style={{ marginBottom: 10, fontWeight: 500, flexGrow: 1 }}
+							variant="h5"
+						>
+							Produit simulaire
+						</Typography>
+						<a
+							href={`/categorie/${product.categorie}`}
+							style={{
+								textDecoration: "none",
+								display: "flex",
+								alignItems: "center",
+							}}
+						>
+							<Typography
+								style={{ fontWeight: 400, marginRight: 5 }}
+								variant="h6"
+								color="textPrimary"
+							>
+								Voir Plus
+							</Typography>
+							<ArrowForwardIosIcon style={{ color: "black", fontSize: 18 }} />
+						</a>
+					</div>
 					<Divider style={{ marginBottom: 10 }} />
 					{similaireProducts.length === 0 && (
 						<div

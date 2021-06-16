@@ -1,10 +1,3 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-	dispatchUserError,
-	dispatchUserLoaded,
-	dispatchUserLoading,
-} from "../../redux/actions/authAction";
 import {
 	Card,
 	CardActionArea,
@@ -14,30 +7,36 @@ import {
 	CssBaseline,
 	Typography,
 } from "@material-ui/core";
-
-import { useStyles } from "./useStyles";
 import axios from "axios";
+import React, { useState } from "react";
+import Masonry from "react-masonry-css";
+import { useDispatch, useSelector } from "react-redux";
+import {
+	dispatchUserError,
+	dispatchUserLoaded,
+	dispatchUserLoading,
+} from "../../redux/actions/authAction";
 import { returnErrors } from "../../redux/actions/errAction";
-import "./Home.css";
 import {
 	productErrors,
 	productLoading,
-	productsLoaded,
 } from "../../redux/actions/productsAction";
 import MyAppBar from "../../utils/AppBar";
-import Fotter from "../../utils/Footer";
-import Masonry from "react-masonry-css";
+import Footer from "../../utils/Footer";
+import { useStyles } from "./useStyles";
 
-export default function Home(props) {
+export default function CategorieScreen(props) {
 	const classes = useStyles();
+	const categorie = props.match.params.categorie;
 
 	const dispatch = useDispatch();
-
 	// Get token from localstorage
 	const token = useSelector((state) => state.auth.token);
 	const isLoading = useSelector((state) => state.auth.isLoading);
 	const [products, setProducts] = React.useState([]);
 	const [user, setUser] = React.useState(null);
+	const [skip, setSkip] = useState(0);
+	const [limit, setLimit] = useState(20);
 
 	/*For The Masonary Container*/
 	const breakpoints = {
@@ -73,23 +72,23 @@ export default function Home(props) {
 	}, [dispatch, token]);
 
 	React.useEffect(() => {
-		const loadProduct = async () => {
+		const loadProducts = async () => {
 			dispatch(productLoading());
-
 			await axios
-				.post("/products/get_products")
+				.get(
+					`/products/get_products_by_categorie?categorie=${categorie}&type=single`,
+					{ skip, limit }
+				)
 				.then((res) => {
-					dispatch(productsLoaded(res));
-					setProducts(res.data.Products);
+					setProducts(res.data.products);
 				})
 				.catch((err) => {
-					dispatch(productErrors());
+					dispatch(productErrors(err));
 					console.log(err);
 				});
 		};
-		loadProduct();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dispatch]);
+		loadProducts();
+	}, [categorie, limit, skip]);
 
 	return (
 		<div>
@@ -99,10 +98,10 @@ export default function Home(props) {
 
 			{!isLoading && (
 				<div className="home_body">
+					{/*AppBar */}
 					<CssBaseline />
 					<MyAppBar cartLength={user ? user.cart.length : 0} />
 
-					{/*                          Main Home Screen (Product Page)                          */}
 					<Container maxWidth="xl" className="main">
 						<Masonry
 							breakpointCols={breakpoints}
@@ -152,7 +151,9 @@ export default function Home(props) {
 							))}
 						</Masonry>
 					</Container>
-					<Fotter />
+
+					{/*Footer */}
+					<Footer />
 				</div>
 			)}
 		</div>

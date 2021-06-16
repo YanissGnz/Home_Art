@@ -284,7 +284,6 @@ const userCtrl2 = {
 
 			var newCart = user.cart;
 
-			console.log(newCart);
 			var found = false;
 
 			newCart.forEach((item) => {

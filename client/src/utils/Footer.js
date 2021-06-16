@@ -4,7 +4,7 @@ import FacebookIcon from "../Icons/FacebookIcon";
 import GoogleIcon from "../Icons/GoogleIcon";
 import InstagramLogo from "../Icons/InstagramLogo";
 
-export default function Fotter() {
+export default function Footer() {
 	return (
 		<div
 			style={{
@@ -29,20 +29,7 @@ export default function Fotter() {
 					<Typography variant="h5" style={{ color: "white", fontWeight: 500 }}>
 						Categories
 					</Typography>
-					<a href="/" className="fotter_links">
-						<Typography
-							style={{
-								marginTop: 15,
-								color: "white",
-								textDecoration: "none",
-								fontSize: 14,
-								fontWeight: 300,
-							}}
-						>
-							Electroménager
-						</Typography>
-					</a>
-					<a href="/" className="fotter_links">
+					<a href="/categorie/Meuble" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -55,33 +42,7 @@ export default function Fotter() {
 							Meuble
 						</Typography>
 					</a>
-					<a href="/" className="fotter_links">
-						<Typography
-							style={{
-								marginTop: 15,
-								color: "white",
-								textDecoration: "none",
-								fontSize: 14,
-								fontWeight: 300,
-							}}
-						>
-							Vaisselle
-						</Typography>
-					</a>
-					<a href="/" className="fotter_links">
-						<Typography
-							style={{
-								marginTop: 15,
-								color: "white",
-								textDecoration: "none",
-								fontSize: 14,
-								fontWeight: 300,
-							}}
-						>
-							Décoration
-						</Typography>
-					</a>
-					<a href="/" className="fotter_links">
+					<a href="/categorie/Literie" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,
@@ -94,7 +55,46 @@ export default function Fotter() {
 							Literie
 						</Typography>
 					</a>
-					<a href="/" className="fotter_links">
+					<a href="/categorie/Vaisselle" className="fotter_links">
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Vaisselle
+						</Typography>
+					</a>
+					<a href="/categorie/Décoration" className="fotter_links">
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Décoration
+						</Typography>
+					</a>
+					<a href="/categorie/Robots" className="fotter_links">
+						<Typography
+							style={{
+								marginTop: 15,
+								color: "white",
+								textDecoration: "none",
+								fontSize: 14,
+								fontWeight: 300,
+							}}
+						>
+							Robots
+						</Typography>
+					</a>
+					<a href="/categorie/Autre" className="fotter_links">
 						<Typography
 							style={{
 								marginTop: 15,

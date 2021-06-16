@@ -22,7 +22,7 @@ import {
 	dispatchUserLoading,
 } from "../../redux/actions/authAction";
 import MyAppBar from "../../utils/AppBar";
-import Fotter from "../../utils/Fotter";
+import Fotter from "../../utils/Footer";
 import CartProducts from "./Components/CartProducts";
 
 const useStyles = makeStyles((theme) => ({
@@ -106,16 +106,11 @@ export default function CartScreen() {
 
 	React.useEffect(() => {
 		const loadSomeProducts = async () => {
-			const skip = Math.floor(Math.random() * 5);
+			const skip = Math.floor(Math.random() * 20);
 			const limit = 5;
 
-			const body = {
-				skip: skip,
-				limit: limit,
-			};
-
 			await axios
-				.post("/products/get_products", body)
+				.post("/products/get_products", { skip, limit })
 				.then((res) => {
 					setProducts(res.data.Products);
 				})
@@ -192,30 +187,6 @@ export default function CartScreen() {
 					>
 						Commancer vos achats
 					</Button>
-					<Container
-						maxWidth="xl"
-						style={{
-							backgroundColor: "white",
-							borderRadius: 20,
-							padding: 20,
-							marginTop: 50,
-						}}
-						className="main"
-					>
-						<Typography
-							style={{ marginBottom: 10, fontWeight: 500 }}
-							variant="h5"
-						>
-							Voir aussi
-						</Typography>
-						<Divider style={{ marginBottom: 10 }} />
-						<div
-							style={{
-								display: "flex",
-								width: "100%",
-							}}
-						></div>
-					</Container>
 				</Container>
 			) : (
 				<Container
@@ -297,136 +268,129 @@ export default function CartScreen() {
 					>
 						Valider vos achats
 					</Button>
-					<Container
-						maxWidth="xl"
-						style={{
-							backgroundColor: "white",
-							borderRadius: 20,
-							padding: 20,
-							marginTop: 50,
-						}}
-						className="main"
-					>
-						<Typography
-							style={{ marginBottom: 10, fontWeight: 500 }}
-							variant="h5"
-						>
-							Voir aussi
-						</Typography>
-						<Divider style={{ marginBottom: 10 }} />
-						{someProducts.length === 0 && (
-							<div
-								style={{
-									display: "flex",
-									width: "100%",
-									height: 400,
-								}}
-							>
-								<Skeleton
-									height="100%"
-									width="19%"
-									style={{
-										marginRight: 15,
-										marginTop: 0,
-									}}
-								/>
-								<Skeleton
-									height="100%"
-									width="19%"
-									style={{
-										marginRight: 15,
-										marginTop: 0,
-									}}
-								/>
-								<Skeleton
-									height="100%"
-									width="19%"
-									style={{
-										marginRight: 15,
-										marginTop: 0,
-									}}
-								/>
-								<Skeleton
-									height="100%"
-									width="19%"
-									style={{
-										marginRight: 15,
-										marginTop: 0,
-									}}
-								/>
-								<Skeleton height="100%" width="19%" />
-							</div>
-						)}
-
-						{someProducts.length > 0 && (
-							<div
-								style={{
-									display: "flex",
-									width: "100%",
-								}}
-							>
-								{someProducts.length > 0 &&
-									someProducts.map((element) => (
-										<a
-											href={`/product/${element._id}`}
-											style={{
-												width: "19%",
-												textDecoration: "none",
-												marginRight: 15,
-											}}
-										>
-											<Card
-												style={{ width: "100%", height: 300, marginRight: 30 }}
-											>
-												<CardActionArea
-													disableRipple
-													style={{ width: "100%", height: "100%" }}
-												>
-													<img
-														style={{
-															width: "100%",
-															maxHeight: "200px",
-															objectFit: "contain",
-														}}
-														src={`/uploads/${element.productImages[0]}`}
-														alt="Product"
-													/>
-
-													<CardContent>
-														<Typography
-															gutterBottom
-															style={{ fontSize: 18, fontWeight: 500 }}
-															variant="h6"
-															component="h2"
-															noWrap={true}
-														>
-															{element.name}
-														</Typography>
-														<Typography
-															style={{ fontSize: 18, fontWeight: 600 }}
-															gutterBottom
-															color="primary"
-														>
-															{[
-																element.price.slice(
-																	0,
-																	element.price.length - 3
-																),
-																" ",
-																element.price.slice(element.price.length - 3),
-															]}{" "}
-															Da
-														</Typography>
-													</CardContent>
-												</CardActionArea>
-											</Card>
-										</a>
-									))}
-							</div>
-						)}
-					</Container>
 				</Container>
 			)}
+			<Container
+				maxWidth="xl"
+				style={{
+					backgroundColor: "white",
+					borderRadius: 20,
+					padding: 20,
+					marginTop: 50,
+					width: "85%",
+				}}
+			>
+				<Typography style={{ marginBottom: 10, fontWeight: 500 }} variant="h5">
+					Voir aussi
+				</Typography>
+				<Divider style={{ marginBottom: 10 }} />
+				{someProducts.length === 0 && (
+					<div
+						style={{
+							display: "flex",
+							width: "100%",
+							height: 400,
+						}}
+					>
+						<Skeleton
+							height="100%"
+							width="19%"
+							style={{
+								marginRight: 15,
+								marginTop: 0,
+							}}
+						/>
+						<Skeleton
+							height="100%"
+							width="19%"
+							style={{
+								marginRight: 15,
+								marginTop: 0,
+							}}
+						/>
+						<Skeleton
+							height="100%"
+							width="19%"
+							style={{
+								marginRight: 15,
+								marginTop: 0,
+							}}
+						/>
+						<Skeleton
+							height="100%"
+							width="19%"
+							style={{
+								marginRight: 15,
+								marginTop: 0,
+							}}
+						/>
+						<Skeleton height="100%" width="19%" />
+					</div>
+				)}
+
+				{someProducts.length > 0 && (
+					<div
+						style={{
+							display: "flex",
+							width: "100%",
+						}}
+					>
+						{someProducts.length > 0 &&
+							someProducts.map((element) => (
+								<a
+									href={`/product/${element._id}`}
+									style={{
+										width: "19%",
+										textDecoration: "none",
+										marginRight: 20,
+									}}
+								>
+									<Card style={{ width: "100%", height: 300, marginRight: 30 }}>
+										<CardActionArea
+											disableRipple
+											style={{ width: "100%", height: "100%" }}
+										>
+											<img
+												style={{
+													width: "100%",
+													maxHeight: "200px",
+													objectFit: "contain",
+												}}
+												src={`/uploads/${element.productImages[0]}`}
+												alt="Product"
+											/>
+
+											<CardContent>
+												<Typography
+													gutterBottom
+													style={{ fontSize: 18, fontWeight: 500 }}
+													variant="h6"
+													component="h2"
+													noWrap={true}
+												>
+													{element.name}
+												</Typography>
+												<Typography
+													style={{ fontSize: 18, fontWeight: 600 }}
+													gutterBottom
+													color="primary"
+												>
+													{[
+														element.price.slice(0, element.price.length - 3),
+														" ",
+														element.price.slice(element.price.length - 3),
+													]}{" "}
+													Da
+												</Typography>
+											</CardContent>
+										</CardActionArea>
+									</Card>
+								</a>
+							))}
+					</div>
+				)}
+			</Container>
+
 			<Fotter />
 		</div>
 	);

@@ -68,10 +68,11 @@ const productCtrl = {
 		}
 	},
 	getProducts: async (req, res) => {
-		const sortBy = req.body.sortBy ? parseInt(req.body.sortBy) : "_id";
-		const order = req.body.sortBy ? parseInt(req.body.sortBy) : "desc";
+		const sortBy = req.body.sortBy ? req.body.sortBy : "_id";
+		const order = req.body.sortBy ? req.body.sortBy : "desc";
 		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
 		const skip = req.body.skip ? parseInt(req.body.skip) : 0;
+
 		try {
 			const Products = await Product.find()
 				.skip(skip)
@@ -85,6 +86,22 @@ const productCtrl = {
 			res.status(400).json({ msg: e.message });
 		}
 	},
+	getProductNames: async (req, res) => {
+		const sortBy = "name";
+		const order = "desc";
+
+		try {
+			const productsNames = await Product.find()
+				.select("name")
+				.sort([[sortBy, order]]);
+
+			res.status(200).json({
+				productsNames,
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
 	getProductById: async (req, res) => {
 		let type = req.query.type;
 		let product_id = req.query.id;
@@ -93,6 +110,23 @@ const productCtrl = {
 
 			res.status(200).json({
 				product,
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
+	getProductsByCategorie: async (req, res) => {
+		let type = req.query.type;
+		let categorie = req.query.categorie;
+		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
+		const skip = req.body.skip ? parseInt(req.body.skip) : 0;
+		try {
+			const products = await Product.find({ categorie: categorie })
+				.skip(skip)
+				.limit(limit);
+
+			res.status(200).json({
+				products,
 			});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
@@ -156,21 +190,6 @@ const productCtrl = {
 			res.status(200).json({
 				newComment,
 				msg: "Le commentaire a été ajouter",
-			});
-		} catch (e) {
-			res.status(400).json({ msg: e.message });
-		}
-	},
-	getSimilaireProducts: async (req, res) => {
-		let type = req.query.type;
-		let categorie = req.query.categorie;
-		try {
-			const products = await Product.find({ categorie: categorie })
-				.skip(0)
-				.limit(6);
-
-			res.status(200).json({
-				products,
 			});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
