@@ -56,7 +56,7 @@ export default function ProductCard({
 
 	return (
 		<Card
-			elevation={3}
+			elevation={4}
 			className={
 				product.archived ? classes.archivedproductCard : classes.productCard
 			}

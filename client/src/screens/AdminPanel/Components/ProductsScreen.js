@@ -19,6 +19,7 @@ import {
 	TextField,
 	Toolbar,
 	Typography,
+	Divider,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 
@@ -137,8 +138,8 @@ export default function ProductsScreen() {
 
 	/*For The Masonary Container*/
 	const breakpoints = {
-		default: 4,
-		1600: 3,
+		default: 5,
+		1600: 4,
 		1100: 2,
 		700: 1,
 	};
@@ -804,25 +805,174 @@ export default function ProductsScreen() {
 
 			{/*__________________Product Container__________________*/}
 			<Container maxWidth="xl">
-				<Typography variant="h6" className={classes.dashboardText}>
+				<Typography variant="h5" className={classes.dashboardText}>
 					List des produit
 				</Typography>
-				<Masonry
-					breakpointCols={breakpoints}
-					className="my-masonry-grid"
-					columnClassName="my-masonry-grid_column"
-					style={{ width: "100%" }}
+				<Container
+					maxWidth="xl"
+					style={{
+						backgroundColor: "white",
+						borderRadius: 20,
+						padding: 20,
+					}}
+					className="main"
 				>
-					{products.map((product) => (
-						<ProductCard
-							product={product}
-							handleClickEditOpen={handleClickEditOpen}
-							handleDelete={handleDelete}
-							handleArchive={handleArchive}
-							handleReveal={handleReveal}
-						/>
-					))}
-				</Masonry>
+					<Typography variant="h6" className={classes.dashboardText}>
+						Meuble
+					</Typography>
+					<Divider style={{ marginBottom: 10 }} />
+					<Masonry
+						breakpointCols={breakpoints}
+						className="my-masonry-grid"
+						columnClassName="my-masonry-grid_column"
+						style={{ width: "100%" }}
+					>
+						{products.map(
+							(product) =>
+								product.categorie === "Meuble" && (
+									<ProductCard
+										product={product}
+										handleClickEditOpen={handleClickEditOpen}
+										handleDelete={handleDelete}
+										handleArchive={handleArchive}
+										handleReveal={handleReveal}
+									/>
+								)
+						)}
+					</Masonry>
+				</Container>
+				<Container
+					maxWidth="xl"
+					style={{
+						backgroundColor: "white",
+						borderRadius: 20,
+						padding: 20,
+					}}
+					className="main"
+				>
+					<Typography variant="h6" className={classes.dashboardText}>
+						Décoration
+					</Typography>
+					<Divider style={{ marginBottom: 10 }} />
+					<Masonry
+						breakpointCols={breakpoints}
+						className="my-masonry-grid"
+						columnClassName="my-masonry-grid_column"
+						style={{ width: "100%" }}
+					>
+						{products.map(
+							(product) =>
+								product.categorie === "Décoration" && (
+									<ProductCard
+										product={product}
+										handleClickEditOpen={handleClickEditOpen}
+										handleDelete={handleDelete}
+										handleArchive={handleArchive}
+										handleReveal={handleReveal}
+									/>
+								)
+						)}
+					</Masonry>
+				</Container>
+				<Container
+					maxWidth="xl"
+					style={{
+						backgroundColor: "white",
+						borderRadius: 20,
+						padding: 20,
+					}}
+					className="main"
+				>
+					<Typography variant="h6" className={classes.dashboardText}>
+						Literie
+					</Typography>
+					<Divider style={{ marginBottom: 10 }} />
+					<Masonry
+						breakpointCols={breakpoints}
+						className="my-masonry-grid"
+						columnClassName="my-masonry-grid_column"
+						style={{ width: "100%" }}
+					>
+						{products.map(
+							(product) =>
+								product.categorie === "Literie" && (
+									<ProductCard
+										product={product}
+										handleClickEditOpen={handleClickEditOpen}
+										handleDelete={handleDelete}
+										handleArchive={handleArchive}
+										handleReveal={handleReveal}
+									/>
+								)
+						)}
+					</Masonry>
+				</Container>
+				<Container
+					maxWidth="xl"
+					style={{
+						backgroundColor: "white",
+						borderRadius: 20,
+						padding: 20,
+					}}
+					className="main"
+				>
+					<Typography variant="h6" className={classes.dashboardText}>
+						Vaisselle
+					</Typography>
+					<Divider style={{ marginBottom: 10 }} />
+					<Masonry
+						breakpointCols={breakpoints}
+						className="my-masonry-grid"
+						columnClassName="my-masonry-grid_column"
+						style={{ width: "100%" }}
+					>
+						{products.map(
+							(product) =>
+								product.categorie === "Vaisselle" && (
+									<ProductCard
+										product={product}
+										handleClickEditOpen={handleClickEditOpen}
+										handleDelete={handleDelete}
+										handleArchive={handleArchive}
+										handleReveal={handleReveal}
+									/>
+								)
+						)}
+					</Masonry>
+				</Container>
+				<Container
+					maxWidth="xl"
+					style={{
+						backgroundColor: "white",
+						borderRadius: 20,
+						padding: 20,
+					}}
+					className="main"
+				>
+					<Typography variant="h6" className={classes.dashboardText}>
+						Robots
+					</Typography>
+					<Divider style={{ marginBottom: 10 }} />
+					<Masonry
+						breakpointCols={breakpoints}
+						className="my-masonry-grid"
+						columnClassName="my-masonry-grid_column"
+						style={{ width: "100%" }}
+					>
+						{products.map(
+							(product) =>
+								product.categorie === "Robots" && (
+									<ProductCard
+										product={product}
+										handleClickEditOpen={handleClickEditOpen}
+										handleDelete={handleDelete}
+										handleArchive={handleArchive}
+										handleReveal={handleReveal}
+									/>
+								)
+						)}
+					</Masonry>
+				</Container>
 			</Container>
 		</Container>
 	);

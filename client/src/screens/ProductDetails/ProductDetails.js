@@ -18,6 +18,7 @@ import {
 	TextField,
 	useTheme,
 	CircularProgress,
+	Grid,
 } from "@material-ui/core";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import Zoom from "@material-ui/core/Zoom";
@@ -39,6 +40,7 @@ import Fotter from "../../utils/Footer";
 import AddToCart from "../../Icons/AddToCartIcon";
 import HeartIcon from "../../Icons/HeartIcon";
 import ActiveHeartIcon from "../../Icons/ActiveHeartIcon";
+import Masonry from "react-masonry-css";
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -50,13 +52,12 @@ export default function ProductDetails(props) {
 	const [user, setUser] = React.useState(null);
 	const [cartLength, setCartLength] = React.useState(0);
 	const product_Id = props.match.params.productId;
-	const [product, setProduct] = React.useState({});
+	const [product, setProduct] = React.useState({ price: "0000" });
 	const [similaireProducts, setSimilaireProducts] = React.useState([]);
 	const [productImages, setProductImages] = React.useState([]);
 	const [ratingValue, setRatingValue] = React.useState(0);
 	const [ratingsNumber, setRatingsNumber] = React.useState(0);
 	const [isLoading, setIsLoading] = React.useState(false);
-	const [userLoading, setUserLoading] = React.useState(false);
 	const [commentLoading, setCommentLoading] = React.useState(false);
 	const [addProductLoading, setAddProductLoading] = React.useState(false);
 	const [favorite, setFavorite] = React.useState(
@@ -69,6 +70,12 @@ export default function ProductDetails(props) {
 	const [comment, setComment] = React.useState("");
 	const [commentError, setCommentError] = React.useState("");
 	const theme = useTheme();
+
+	/*For The Masonary Container*/
+	const breakpoints = {
+		default: 2,
+		1000: 1,
+	};
 
 	const handleAlertOpen = () => {
 		setAlertOpen(true);
@@ -238,7 +245,6 @@ export default function ProductDetails(props) {
 
 	React.useEffect(() => {
 		const loadUser = async () => {
-			setUserLoading(true);
 			dispatch(dispatchUserLoading());
 
 			// Headers
@@ -257,13 +263,10 @@ export default function ProductDetails(props) {
 					);
 					setUser(res.data.user);
 					setCartLength(res.data.user.cart.length);
-					setUserLoading(false);
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
-					setUserLoading(false);
 				});
-			setUserLoading(false);
 		};
 		loadUser();
 	}, [dispatch, token, product_Id]);
@@ -275,7 +278,6 @@ export default function ProductDetails(props) {
 				.get(`/products/get_product_by_id?id=${product_Id}&type=single`)
 				.then((res) => {
 					const rating = res.data.product[0].rating;
-					console.log(rating);
 					setProduct(res.data.product[0]);
 					setProductImages(res.data.product[0].productImages);
 					setIsLoading(false);
@@ -293,7 +295,6 @@ export default function ProductDetails(props) {
 				.catch((err) => {
 					dispatch(productErrors(err));
 					console.log(err);
-					setIsLoading(false);
 				});
 		};
 		loadProduct();
@@ -301,29 +302,27 @@ export default function ProductDetails(props) {
 
 	React.useEffect(() => {
 		const loadSimilaireProducts = async () => {
-			setIsLoading(true);
-
 			const skip = Math.floor(Math.random() * 5);
 			const limit = 5;
-
+			console.log("i did this");
 			await axios
-				.get(
+				.post(
 					`/products/get_products_by_categorie?categorie=${product.categorie}&type=single`,
 					{ skip, limit }
 				)
 				.then((res) => {
+					console.log(res.data.products);
 					setSimilaireProducts(res.data.products);
-					setIsLoading(false);
 				})
 				.catch((err) => {
 					dispatch(productErrors(err));
 					console.log(err);
-					setIsLoading(false);
 				});
 		};
 		loadSimilaireProducts();
 	}, [dispatch, product]);
 	const images = [];
+
 	productImages.forEach((image, index) =>
 		images.push({
 			original: `/uploads/${productImages[index]}`,
@@ -340,16 +339,18 @@ export default function ProductDetails(props) {
 		<div style={{ backgroundColor: "#f1f1f1" }}>
 			<CssBaseline />
 			<MyAppBar cartLength={cartLength} />
+
 			<Container maxWidth="lg" style={{ marginTop: 50 }}>
 				<Snackbar
 					open={alertOpen}
-					autoHideDuration={2500}
+					autoHideDuration={3000}
 					onClose={handleAlertClose}
 				>
 					<Alert severity={alertType}>
 						<Typography>{msg}</Typography>
 					</Alert>
 				</Snackbar>
+
 				<Breadcrumbs
 					separator={<NavigateNextIcon fontSize="small" />}
 					aria-label="breadcrumb"
@@ -371,6 +372,7 @@ export default function ProductDetails(props) {
 					</a>
 					<Typography color="textSecondary">{product.name}</Typography>
 				</Breadcrumbs>
+
 				<Container
 					maxWidth="lg"
 					style={{
@@ -381,129 +383,165 @@ export default function ProductDetails(props) {
 					}}
 					className="main"
 				>
-					<Container style={{ width: 600, margin: 20 }}>
-						{isLoading ? (
-							<Skeleton height="600px" />
-						) : (
-							<ImageGallery
-								className="image-gallery-slide"
-								items={images}
-								{...properties}
-							/>
-						)}
-					</Container>
-					<Container
-						maxWidth="sm"
-						style={{
-							position: "relative",
-							height: "100%",
-							width: 600,
-							display: "flex",
-							flexDirection: "column",
-						}}
+					<Masonry
+						breakpointCols={breakpoints}
+						className="my-masonry-grid"
+						columnClassName="my-masonry-grid_column"
+						style={{ width: "100%" }}
 					>
-						<Tooltip
-							title={
-								favorite
-									? "Supprimer du produit favoris"
-									: "Ajouter au produit favoris"
-							}
-							aria-label="add"
-							placement="left"
-							TransitionComponent={Zoom}
-							style={{ fontSize: 16 }}
-						>
-							<IconButton
-								style={{ position: "absolute", right: 0, top: 10 }}
-								size="medium"
-								onClick={handleFavorites}
-							>
-								{favorite ? <ActiveHeartIcon /> : <HeartIcon />}
-							</IconButton>
-						</Tooltip>
-
-						<Typography
-							style={{ marginTop: 50, marginBottom: 15, fontWeight: 500 }}
-							variant="h5"
-						>
-							{isLoading ? <Skeleton width="50%" /> : product.name}
-						</Typography>
-						<Typography style={{ marginBottom: 20, fontWeight: 400 }}>
+						<Container style={{ width: 600, margin: 20 }}>
 							{isLoading ? (
-								<Skeleton width="50%" />
+								<Skeleton height="600px" style={{ transform: "none" }} />
 							) : (
-								"Marque: " + product.brand
-							)}
-						</Typography>
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "row",
-								alignItems: "center",
-								justifyContent: "flex-start",
-								marginBottom: 10,
-							}}
-						>
-							<Rating
-								style={{ marginRight: 10 }}
-								value={ratingValue.toFixed(2)}
-								precision={0.5}
-								readOnly
-							/>
-
-							<Typography
-								variant="subtitle1
-							"
-								color="primary"
-							>
-								{ratingsNumber} Avis
-							</Typography>
-						</div>
-						<Divider style={{ marginBottom: 10 }} />
-						<Typography style={{ marginBottom: 10 }} variant="h6">
-							{isLoading ? <Skeleton width="50%" /> : product.price + " Da"}
-						</Typography>
-						<div
-							style={{
-								margin: 0,
-								position: "relative",
-								alignSelf: "center",
-								marginBottom: "1em",
-								width: "100%",
-							}}
-						>
-							<Button
-								color="primary"
-								variant="contained"
-								size="large"
-								fullWidth
-								startIcon={<AddToCart />}
-								style={{
-									alignSelf: "center",
-									color: "white",
-									textTransform: "none",
-									marginTop: 50,
-								}}
-								onClick={handleAddToCart}
-								disabled={addProductLoading}
-							>
-								Ajouter au panier
-							</Button>
-							{addProductLoading && (
-								<CircularProgress
-									size={24}
-									style={{
-										color: theme.palette.primary,
-										position: "absolute",
-										top: "50%",
-										left: "50%",
-										marginTop: 11,
-									}}
+								<ImageGallery
+									className="image-gallery-slide"
+									items={images}
+									{...properties}
 								/>
 							)}
-						</div>
-					</Container>
+						</Container>
+						<Container
+							maxWidth="sm"
+							style={{
+								position: "relative",
+								height: "100%",
+								width: 600,
+								display: "flex",
+								flexDirection: "column",
+							}}
+						>
+							<Tooltip
+								title={
+									favorite
+										? "Supprimer du produit favoris"
+										: "Ajouter au produit favoris"
+								}
+								aria-label="add"
+								placement="left"
+								TransitionComponent={Zoom}
+								style={{ fontSize: 16 }}
+							>
+								<IconButton
+									style={{ position: "absolute", right: 0, top: 10 }}
+									size="medium"
+									onClick={handleFavorites}
+								>
+									{favorite ? <ActiveHeartIcon /> : <HeartIcon />}
+								</IconButton>
+							</Tooltip>
+
+							<Typography
+								style={{ marginTop: 50, marginBottom: 15, fontWeight: 500 }}
+								variant="h5"
+							>
+								{isLoading ? <Skeleton width="50%" /> : product.name}
+							</Typography>
+							<Typography style={{ marginBottom: 20, fontWeight: 400 }}>
+								{isLoading ? (
+									<Skeleton width="50%" />
+								) : (
+									"Marque: " + product.brand
+								)}
+							</Typography>
+							<div style={{ display: "flex" }}>
+								<Typography style={{ marginBottom: 20, fontWeight: 400 }}>
+									{isLoading ? <Skeleton width="50%" /> : "Categorie: "}
+								</Typography>
+								<a
+									href={`/categorie/${product.categorie}`}
+									style={{
+										fontSize: 16,
+										fontWeight: 400,
+										marginLeft: 5,
+										color: "#F58634",
+									}}
+								>
+									{product.categorie}
+								</a>
+							</div>
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "row",
+									alignItems: "center",
+									justifyContent: "flex-start",
+									marginBottom: 10,
+								}}
+							>
+								<Rating
+									style={{ marginRight: 10 }}
+									value={ratingValue.toFixed(2)}
+									precision={0.5}
+									readOnly
+								/>
+
+								<Typography
+									variant="subtitle1
+								"
+									color="primary"
+								>
+									{ratingsNumber} Avis
+								</Typography>
+							</div>
+							<Divider style={{ marginBottom: 10 }} />
+							<Typography
+								style={{ marginBottom: 10, fontWeight: 550, fontSize: 20 }}
+								color="primary"
+							>
+								{isLoading ? (
+									<Skeleton width="50%" />
+								) : (
+									[
+										product.price.slice(0, product.price.length - 3),
+										" ",
+										product.price.slice(product.price.length - 3),
+										" Da",
+									]
+								)}
+							</Typography>
+							<div
+								style={{
+									margin: 0,
+									position: "relative",
+									alignSelf: "center",
+									marginBottom: "1em",
+									width: "100%",
+								}}
+							>
+								<Button
+									color="primary"
+									variant="contained"
+									size="large"
+									fullWidth
+									startIcon={<AddToCart />}
+									style={{
+										alignSelf: "center",
+										color: "white",
+										textTransform: "none",
+										marginTop: 50,
+									}}
+									onClick={handleAddToCart}
+									disabled={addProductLoading}
+								>
+									Ajouter au panier
+								</Button>
+								{addProductLoading && (
+									<CircularProgress
+										size={24}
+										style={{
+											color: theme.palette.primary,
+											position: "absolute",
+											top: "50%",
+											left: "50%",
+											marginTop: 11,
+										}}
+									/>
+								)}
+							</div>
+						</Container>
+					</Masonry>
 				</Container>
+
 				<Container
 					maxWidth="lg"
 					style={{
@@ -535,6 +573,7 @@ export default function ProductDetails(props) {
 						)}
 					</Typography>
 				</Container>
+
 				<Container
 					maxWidth="lg"
 					style={{
@@ -575,7 +614,7 @@ export default function ProductDetails(props) {
 							style={{
 								display: "flex",
 								width: "100%",
-								height: 400,
+								height: 300,
 							}}
 						>
 							<Skeleton
@@ -584,6 +623,7 @@ export default function ProductDetails(props) {
 								style={{
 									marginRight: 15,
 									marginTop: 0,
+									transform: "none",
 								}}
 							/>
 							<Skeleton
@@ -592,6 +632,7 @@ export default function ProductDetails(props) {
 								style={{
 									marginRight: 15,
 									marginTop: 0,
+									transform: "none",
 								}}
 							/>
 							<Skeleton
@@ -600,6 +641,7 @@ export default function ProductDetails(props) {
 								style={{
 									marginRight: 15,
 									marginTop: 0,
+									transform: "none",
 								}}
 							/>
 							<Skeleton
@@ -608,9 +650,14 @@ export default function ProductDetails(props) {
 								style={{
 									marginRight: 15,
 									marginTop: 0,
+									transform: "none",
 								}}
 							/>
-							<Skeleton height="100%" width="19%" />
+							<Skeleton
+								height="100%"
+								width="19%"
+								style={{ transform: "none" }}
+							/>
 						</div>
 					)}
 					{similaireProducts.length > 0 && (
@@ -682,6 +729,7 @@ export default function ProductDetails(props) {
 						</div>
 					)}
 				</Container>
+
 				<Container
 					maxWidth="lg"
 					style={{
@@ -876,6 +924,7 @@ export default function ProductDetails(props) {
 					</div>
 				</Container>
 			</Container>
+
 			<Fotter />
 		</div>
 	);

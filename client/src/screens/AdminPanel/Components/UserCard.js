@@ -12,12 +12,11 @@ export default function UserCard({ user, handleDeleteUser }) {
 	return (
 		<div>
 			<Card
-				variant="outlined"
+				elevation={0}
 				style={{
 					width: "100%",
 					borderRadius: 0,
-					borderBottom: "3px solid rgb(154 154 154)",
-					borderTop: "3px solid rgb(154 154 154)",
+					borderTop: "1px solid rgb(154 154 154)",
 				}}
 			>
 				<CardContent
@@ -27,6 +26,8 @@ export default function UserCard({ user, handleDeleteUser }) {
 						alignItems: "center",
 						position: "relative",
 						height: 60,
+						marginTop: 10,
+						marginBottom: 5,
 					}}
 				>
 					<div

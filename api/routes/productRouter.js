@@ -21,7 +21,7 @@ router.post("/add_product", auth, upload, ProductCtrl.addProduct);
 router.post("/get_products", ProductCtrl.getProducts);
 router.post("/get_products_names", ProductCtrl.getProductNames);
 router.get("/get_product_by_id/", ProductCtrl.getProductById);
-router.get("/get_products_by_categorie/", ProductCtrl.getProductsByCategorie);
+router.post("/get_products_by_categorie/", ProductCtrl.getProductsByCategorie);
 router.put("/edit_product/:product_id", auth, upload, ProductCtrl.editProduct);
 router.put("/archive_product/:product_id", auth, ProductCtrl.archiveProduct);
 router.put("/reveal_product/:product_id", auth, ProductCtrl.revealProduct);

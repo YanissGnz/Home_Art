@@ -120,6 +120,7 @@ const productCtrl = {
 		let categorie = req.query.categorie;
 		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
 		const skip = req.body.skip ? parseInt(req.body.skip) : 0;
+
 		try {
 			const products = await Product.find({ categorie: categorie })
 				.skip(skip)

@@ -242,11 +242,12 @@ const userCtrl2 = {
 
 			var newCart = user.cart;
 			var found = false;
-
+			var quantity;
 			newCart.forEach((item) => {
 				if (item.product._id.toString() === product._id.toString()) {
 					found = true;
 					item.quantity = item.quantity + 1;
+					quantity = item.quantity;
 				}
 			});
 
@@ -266,7 +267,7 @@ const userCtrl2 = {
 			if (found) {
 				return res
 					.status(200)
-					.json({ msg: "La quantity de produit a été incrémenter." });
+					.json({ msg: "La quantity de produit a été incrémenter.", quantity });
 			} else {
 				return res.json({ newCart, newUser, msg: "Le produit a été ajouter." });
 			}
@@ -285,11 +286,13 @@ const userCtrl2 = {
 			var newCart = user.cart;
 
 			var found = false;
+			var quantity;
 
 			newCart.forEach((item) => {
 				if (item.product._id.toString() === product_id && item.quantity > 1) {
 					found = true;
 					item.quantity = item.quantity - 1;
+					quantity = item.quantity;
 				}
 			});
 
@@ -300,11 +303,9 @@ const userCtrl2 = {
 				}
 			);
 			if (found) {
-				return res
-					.status(200)
-					.json({ msg: "La quantity de produit a été décrémenter." });
+				return res.status(200).json(quantity);
 			} else {
-				return res.status(200).json({ msg: "Vous ne pouvez pas décrémenter" });
+				return res.status(200).json(quantity);
 			}
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });

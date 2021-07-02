@@ -64,6 +64,7 @@ export default function CartScreen() {
 			.post(`/users/remove_item_from_cart`, { item }, config)
 			.then((res) => {
 				setCart(res.data.newCart);
+				setCartLength(cartLength - 1);
 				handleClose();
 			})
 			.catch((err) => {

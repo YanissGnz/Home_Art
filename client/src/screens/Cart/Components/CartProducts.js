@@ -1,47 +1,28 @@
-import {
-	Typography,
-	IconButton,
-	Backdrop,
-	CircularProgress,
-	makeStyles,
-} from "@material-ui/core";
+import { Typography, IconButton } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
 import ClearIcon from "@material-ui/icons/Clear";
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const useStyles = makeStyles((theme) => ({
-	backdrop: {
-		zIndex: theme.zIndex.drawer + 1,
-		color: "#fff",
-	},
-}));
-
 export default function UserCard({ item, handleRemoveItem }) {
-	const classes = useStyles();
 	const [product, setProduct] = React.useState({});
 	const [image, setImage] = React.useState("");
 	const [state, setState] = React.useState(item.quantity);
 	const token = useSelector((state) => state.auth.token);
-	const [open, setOpen] = React.useState(false);
-
-	const handleClose = () => {
-		setOpen(false);
-	};
-	const handleToggle = () => {
-		setOpen(!open);
-	};
+	const [loading, setLoading] = useState(false);
 
 	const handleIncrement = async () => {
-		handleToggle();
 		// Headers
 		const config = {
 			headers: {
 				"x-auth-token": token,
 			},
 		};
+		setLoading(true);
+
+		setState(state + 1);
 		await axios
 			.post(
 				`/users/add_to_cart?id=${item.product._id.toString()}&type=single`,
@@ -49,24 +30,24 @@ export default function UserCard({ item, handleRemoveItem }) {
 				config
 			)
 			.then((res) => {
-				setState(state + 1);
-				handleClose();
+				setLoading(false);
+				setState(res.data.quantity);
 			})
 			.catch((err) => {
+				setLoading(false);
 				console.log(err);
-				handleClose();
 			});
 	};
 	const handleReduce = async () => {
 		if (state > 1) {
-			handleToggle();
-
 			// Headers
 			const config = {
 				headers: {
 					"x-auth-token": token,
 				},
 			};
+			setLoading(true);
+			setState(state - 1);
 			await axios
 				.post(
 					`/users/reduce_quantity?id=${item.product._id.toString()}&type=single`,
@@ -75,13 +56,13 @@ export default function UserCard({ item, handleRemoveItem }) {
 				)
 				.then((res) => {
 					if (res.data.msg === "La quantity de produit a été décrémenter.") {
-						setState(state - 1);
+						setState(res.data.quantity);
 					}
-					handleClose();
+					setLoading(false);
 				})
 				.catch((err) => {
 					console.log(err);
-					handleClose();
+					setLoading(false);
 				});
 		}
 	};
@@ -102,14 +83,13 @@ export default function UserCard({ item, handleRemoveItem }) {
 				position: "relative",
 			}}
 		>
-			<Backdrop className={classes.backdrop} open={open}>
-				<CircularProgress color="primary" />
-			</Backdrop>
 			<IconButton
 				style={{ position: "absolute", left: "95.4%", top: 10 }}
 				onClick={() => {
 					handleRemoveItem(item);
+					setLoading(true);
 				}}
+				disabled={loading}
 			>
 				<ClearIcon />
 			</IconButton>
@@ -153,6 +133,7 @@ export default function UserCard({ item, handleRemoveItem }) {
 					size="large"
 					onClick={handleReduce}
 					style={{ marginRight: 10 }}
+					disabled={loading}
 				>
 					<RemoveIcon fontSize="inherit" />
 				</IconButton>
@@ -164,6 +145,7 @@ export default function UserCard({ item, handleRemoveItem }) {
 					size="large"
 					style={{ marginLeft: 10 }}
 					onClick={handleIncrement}
+					disabled={loading}
 				>
 					<AddIcon fontSize="inherit" />
 				</IconButton>

@@ -288,23 +288,31 @@ export default function ClientLogin() {
 								</Typography>
 								<div className={classes.line} />
 							</div>
-							<GoogleLogin
-								clientId="664430788321-7nplkv1bhj864bcedgirrug2vdtf0e4g.apps.googleusercontent.com"
-								onSuccess={responseGoogle}
-								render={(renderProps) => (
-									<Button
-										onClick={renderProps.onClick}
-										disabled={renderProps.disabled}
-										startIcon={<GoogleIcon />}
-										variant="outlined"
-										fullWidth
-										style={{ marginTop: 20, textTransform: "capitalize" }}
-									>
-										Continue avec Google
-									</Button>
+							<div className={classes.wrapper}>
+								<GoogleLogin
+									clientId="664430788321-7nplkv1bhj864bcedgirrug2vdtf0e4g.apps.googleusercontent.com"
+									onSuccess={responseGoogle}
+									render={(renderProps) => (
+										<Button
+											onClick={renderProps.onClick}
+											disabled={renderProps.disabled}
+											startIcon={<GoogleIcon />}
+											variant="outlined"
+											fullWidth
+											style={{ marginTop: 20, textTransform: "capitalize" }}
+										>
+											Continue avec Google
+										</Button>
+									)}
+									cookiePolicy={"single_host_origin"}
+								/>
+								{isLoading && (
+									<CircularProgress
+										size={24}
+										className={classes.buttonProgress}
+									/>
 								)}
-								cookiePolicy={"single_host_origin"}
-							/>
+							</div>
 							<div className={classes.div}>
 								<Typography
 									className={classes.signup_txt}

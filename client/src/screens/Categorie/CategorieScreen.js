@@ -75,7 +75,7 @@ export default function CategorieScreen(props) {
 		const loadProducts = async () => {
 			dispatch(productLoading());
 			await axios
-				.get(
+				.post(
 					`/products/get_products_by_categorie?categorie=${categorie}&type=single`,
 					{ skip, limit }
 				)
@@ -88,7 +88,7 @@ export default function CategorieScreen(props) {
 				});
 		};
 		loadProducts();
-	}, [categorie, limit, skip]);
+	}, [categorie, dispatch, limit, skip]);
 
 	return (
 		<div>
