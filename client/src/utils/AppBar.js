@@ -173,7 +173,9 @@ export default function MyAppBar(props) {
 								open={open}
 								onClose={handleClose}
 							>
-								<MenuItem>Profile</MenuItem>
+								<MenuItem onClick={() => history.push("/profile/info")}>
+									Profile
+								</MenuItem>
 								<MenuItem onClick={handleLogout}>Se déconnecter</MenuItem>
 							</Menu>
 						</div>

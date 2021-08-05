@@ -17,6 +17,11 @@ import "./App.css";
 import ProductDetails from "./screens/ProductDetails/ProductDetails";
 import CartScreen from "./screens/Cart/CartScreen";
 import CategorieScreen from "./screens/Categorie/CategorieScreen";
+import Profile from "./screens/Profile/Profile";
+import ProfileAddresses from "./screens/Profile/ProfileAddresses";
+import ProfileCommande from "./screens/Profile/ProfileCommande";
+import ProfileFavoris from "./screens/Profile/ProfileFavoris";
+import ProfilePassword from "./screens/Profile/ProfilePassword";
 
 const theme = createMuiTheme({
 	palette: {
@@ -52,6 +57,19 @@ export default function App() {
 						<Route exact path="/admin" component={AdminLogin} />
 						<Route exact path="/login" component={ClientLogin} />
 						<Route exact path="/register" component={ClientRegister} />
+						<Route exact path="/profile/info" component={Profile} />
+						<Route exact path="/profile/favorites" component={ProfileFavoris} />
+						<Route
+							exact
+							path="/profile/commandes"
+							component={ProfileCommande}
+						/>
+						<Route
+							exact
+							path="/profile/addresses"
+							component={ProfileAddresses}
+						/>
+						<Route exact path="/profile/password" component={ProfilePassword} />
 						<Route
 							path="/users/activate/:activation_token"
 							component={ActivationEmail}
