@@ -9,88 +9,38 @@ import {
 	Button,
 	TextField,
 	Divider,
-	MenuItem,
-	IconButton,
+	Dialog,
+	DialogTitle,
+	DialogActions,
+	DialogContent,
 } from "@material-ui/core";
-import {
-	MuiPickersUtilsProvider,
-	KeyboardDatePicker,
-} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
-import NumberFormat from "react-number-format";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import CheckBoxOutlinedIcon from "@material-ui/icons/CheckBoxOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import PinDropOutlinedIcon from "@material-ui/icons/PinDropOutlined";
 import VpnKeyOutlinedIcon from "@material-ui/icons/VpnKeyOutlined";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
-import { useState } from "react";
-import getOverlappingDaysInIntervals from "date-fns/getOverlappingDaysInIntervals/index";
-import { useHistory } from "react-router";
 
-const genders = [
-	{
-		value: "Sélectionner votre genre",
-	},
-	{
-		value: "Homme",
-	},
-	{
-		value: "Femme",
-	},
-];
-var userInfo = {
-	name: "Yaniss",
-	familyName: "Guendouzi",
-	email: "m.guendouzi@esi-sba.dz",
-	phoneNumber: "0000000",
-	gender: "Homme",
-};
+import LocationOffOutlinedIcon from "@material-ui/icons/LocationOffOutlined";
+import { useState } from "react";
+import { useHistory } from "react-router";
+import Slide from "@material-ui/core/Slide";
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+	return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function Profile() {
-	const [selectedGenre, setSelectedGenre] = React.useState("");
-	const [enableEdit, setEnableEdit] = React.useState(false);
-	const [user, setUser] = useState(userInfo);
 	const history = useHistory();
+	const [open, setOpen] = React.useState(false);
+	const [addresses, setAddresses] = useState([]);
 
-	const [selectedDate, setSelectedDate] = React.useState(
-		new Date("2014-08-18T21:11:54")
-	);
-	const handleDateChange = (date) => {
-		setSelectedDate(date);
+	const handleClickOpen = () => {
+		setOpen(true);
 	};
 
-	const { name, familyName, email, phoneNumber } = user;
-
-	const handleChangeInput = (e) => {
-		const { name, value } = e.target;
-		setUser({ ...user, [name]: value });
+	const handleClose = () => {
+		setOpen(false);
 	};
-
-	const handleGenderChange = (e) => {
-		setSelectedGenre(e.target.value);
-	};
-
-	function PhoneNumberFormat(props) {
-		const { inputRef, onChange, ...other } = props;
-
-		return (
-			<NumberFormat
-				{...other}
-				getInputRef={inputRef}
-				onValueChange={(values) => {
-					onChange({
-						target: {
-							name: props.name,
-							value: values.value,
-						},
-					});
-				}}
-				isNumericString
-			/>
-		);
-	}
 
 	return (
 		<div>
@@ -219,7 +169,144 @@ export default function Profile() {
 							position: "relative",
 							padding: 30,
 						}}
-					></div>
+					>
+						<div
+							style={{
+								width: "99%",
+								height: "100%",
+								display: "flex",
+								flexDirection: "column",
+								marginTop: 50,
+							}}
+						>
+							<Typography variant="h5" style={{ marginBottom: 20 }}>
+								Addresses
+							</Typography>
+							<Divider style={{ marginBottom: 20 }} />
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "column",
+									height: "100%",
+								}}
+							>
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column",
+										height: "70%",
+										width: "100%",
+										padding: 10,
+										overflow: "auto",
+										marginBottom: 20,
+									}}
+								>
+									{addresses.length === 0 ? (
+										<div
+											style={{
+												display: "flex",
+												flexDirection: "column",
+												height: "80%",
+												alignItems: "center",
+												justifyContent: "center",
+											}}
+										>
+											<LocationOffOutlinedIcon
+												style={{ fontSize: 100, marginBottom: 20 }}
+											/>
+											<Typography variant="h5">
+												Vous n'avez pas d'address
+											</Typography>
+										</div>
+									) : (
+										addresses.map((address) => (
+											<div>
+												<Typography style={{ fontSize: 18, marginBottom: 15 }}>
+													{address}
+												</Typography>
+												<Divider style={{ marginBottom: 15 }} />
+											</div>
+										))
+									)}
+								</div>
+								<Button
+									variant="contained"
+									color="primary"
+									style={{
+										color: "white",
+										textTransform: "none",
+										width: 400,
+										alignSelf: "center",
+									}}
+									onClick={handleClickOpen}
+								>
+									Ajouter une address
+								</Button>
+							</div>
+						</div>
+					</div>
+					<Dialog
+						open={open}
+						TransitionComponent={Transition}
+						keepMounted
+						onClose={handleClose}
+						aria-labelledby="alert-dialog-slide-title"
+						aria-describedby="alert-dialog-slide-description"
+						maxWidth="lg"
+					>
+						<DialogTitle id="alert-dialog-slide-title">
+							Ajouter une address
+						</DialogTitle>
+						<DialogContent
+							style={{ display: "flex", flexDirection: "column", width: 800 }}
+						>
+							<TextField
+								autoFocus
+								label="Address"
+								fullWidth
+								style={{ marginBottom: 50 }}
+								variant="outlined"
+							/>
+							<div style={{ display: "flex", marginBottom: 50 }}>
+								<TextField
+									autoFocus
+									label="Région"
+									fullWidth
+									style={{ marginRight: 20 }}
+									variant="outlined"
+								/>
+								<TextField
+									autoFocus
+									label="Ville"
+									fullWidth
+									variant="outlined"
+								/>
+							</div>
+							<Button
+								variant="contained"
+								color="primary"
+								style={{
+									color: "white",
+									textTransform: "none",
+									width: 400,
+									alignSelf: "center",
+								}}
+								onClick={handleClickOpen}
+							>
+								Enregistrer
+							</Button>
+						</DialogContent>
+
+						<DialogActions>
+							<Button
+								onClick={handleClose}
+								color="primary"
+								style={{ textTransform: "none" }}
+							>
+								Annuller
+							</Button>
+						</DialogActions>
+					</Dialog>
 				</Container>
 				<Fotter />
 			</div>
