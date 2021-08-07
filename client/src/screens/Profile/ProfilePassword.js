@@ -9,88 +9,18 @@ import {
 	Button,
 	TextField,
 	Divider,
-	MenuItem,
-	IconButton,
 } from "@material-ui/core";
-import {
-	MuiPickersUtilsProvider,
-	KeyboardDatePicker,
-} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
-import NumberFormat from "react-number-format";
+
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import CheckBoxOutlinedIcon from "@material-ui/icons/CheckBoxOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import PinDropOutlinedIcon from "@material-ui/icons/PinDropOutlined";
 import VpnKeyOutlinedIcon from "@material-ui/icons/VpnKeyOutlined";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
-import { useState } from "react";
-import getOverlappingDaysInIntervals from "date-fns/getOverlappingDaysInIntervals/index";
+
 import { useHistory } from "react-router";
 
-const genders = [
-	{
-		value: "Sélectionner votre genre",
-	},
-	{
-		value: "Homme",
-	},
-	{
-		value: "Femme",
-	},
-];
-var userInfo = {
-	name: "Yaniss",
-	familyName: "Guendouzi",
-	email: "m.guendouzi@esi-sba.dz",
-	phoneNumber: "0000000",
-	gender: "Homme",
-};
-
 export default function Profile() {
-	const [selectedGenre, setSelectedGenre] = React.useState("");
-	const [enableEdit, setEnableEdit] = React.useState(false);
-	const [user, setUser] = useState(userInfo);
 	const history = useHistory();
-
-	const [selectedDate, setSelectedDate] = React.useState(
-		new Date("2014-08-18T21:11:54")
-	);
-	const handleDateChange = (date) => {
-		setSelectedDate(date);
-	};
-
-	const { name, familyName, email, phoneNumber } = user;
-
-	const handleChangeInput = (e) => {
-		const { name, value } = e.target;
-		setUser({ ...user, [name]: value });
-	};
-
-	const handleGenderChange = (e) => {
-		setSelectedGenre(e.target.value);
-	};
-
-	function PhoneNumberFormat(props) {
-		const { inputRef, onChange, ...other } = props;
-
-		return (
-			<NumberFormat
-				{...other}
-				getInputRef={inputRef}
-				onValueChange={(values) => {
-					onChange({
-						target: {
-							name: props.name,
-							value: values.value,
-						},
-					});
-				}}
-				isNumericString
-			/>
-		);
-	}
 
 	return (
 		<div>
@@ -219,7 +149,62 @@ export default function Profile() {
 							position: "relative",
 							padding: 30,
 						}}
-					></div>
+					>
+						<div
+							style={{
+								width: "99%",
+								height: "100%",
+								display: "flex",
+								flexDirection: "column",
+								marginTop: 50,
+							}}
+						>
+							<Typography variant="h5" style={{ marginBottom: 20 }}>
+								Modifier le mot de passe
+							</Typography>
+							<Divider style={{ marginBottom: 50 }} />
+							<TextField
+								label="Mot de pass actuel"
+								variant="outlined"
+								style={{
+									width: "50%",
+									marginBottom: 50,
+									alignSelf: "center",
+								}}
+							/>
+							<TextField
+								label="Nouveau mot de passe"
+								variant="outlined"
+								style={{
+									width: "50%",
+									marginBottom: 50,
+									alignSelf: "center",
+								}}
+							/>
+							<TextField
+								label="confirmer votre mot de passe"
+								variant="outlined"
+								style={{
+									width: "50%",
+									marginBottom: 50,
+									alignSelf: "center",
+								}}
+							/>
+							<Button
+								variant="contained"
+								color="primary"
+								style={{
+									color: "white",
+									textTransform: "none",
+									width: 400,
+									alignSelf: "center",
+								}}
+								size="large"
+							>
+								Ajouter une address
+							</Button>
+						</div>
+					</div>
 				</Container>
 				<Fotter />
 			</div>

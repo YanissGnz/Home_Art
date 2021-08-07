@@ -239,6 +239,7 @@ export default function Profile() {
 										alignSelf: "center",
 									}}
 									onClick={handleClickOpen}
+									size="large"
 								>
 									Ajouter une address
 								</Button>
