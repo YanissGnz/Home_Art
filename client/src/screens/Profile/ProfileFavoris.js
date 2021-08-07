@@ -9,88 +9,80 @@ import {
 	Button,
 	TextField,
 	Divider,
-	MenuItem,
-	IconButton,
 } from "@material-ui/core";
-import {
-	MuiPickersUtilsProvider,
-	KeyboardDatePicker,
-} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
-import NumberFormat from "react-number-format";
+
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import CheckBoxOutlinedIcon from "@material-ui/icons/CheckBoxOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import PinDropOutlinedIcon from "@material-ui/icons/PinDropOutlined";
 import VpnKeyOutlinedIcon from "@material-ui/icons/VpnKeyOutlined";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
-import { useState } from "react";
-import getOverlappingDaysInIntervals from "date-fns/getOverlappingDaysInIntervals/index";
-import { useHistory } from "react-router";
+import FavoriteOutlinedIcon from "@material-ui/icons/FavoriteOutlined";
 
-const genders = [
-	{
-		value: "Sélectionner votre genre",
-	},
-	{
-		value: "Homme",
-	},
-	{
-		value: "Femme",
-	},
-];
-var userInfo = {
-	name: "Yaniss",
-	familyName: "Guendouzi",
-	email: "m.guendouzi@esi-sba.dz",
-	phoneNumber: "0000000",
-	gender: "Homme",
-};
+import { useHistory } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import {
+	dispatchUserError,
+	dispatchUserLoaded,
+} from "../../redux/actions/authAction";
+import axios from "axios";
+import FavoritesProductContainer from "./FavoritesProductContainer";
+import Masonry from "react-masonry-css";
 
 export default function Profile() {
-	const [selectedGenre, setSelectedGenre] = React.useState("");
-	const [enableEdit, setEnableEdit] = React.useState(false);
-	const [user, setUser] = useState(userInfo);
 	const history = useHistory();
+	const dispatch = useDispatch();
+	const token = useSelector((state) => state.auth.token);
 
-	const [selectedDate, setSelectedDate] = React.useState(
-		new Date("2014-08-18T21:11:54")
-	);
-	const handleDateChange = (date) => {
-		setSelectedDate(date);
+	const [favorites, setFavorites] = React.useState([]);
+
+	/*For The Masonary Container*/
+	const breakpoints = {
+		default: 3,
+		1100: 2,
+		700: 1,
 	};
 
-	const { name, familyName, email, phoneNumber } = user;
+	React.useEffect(() => {
+		const loadUser = async () => {
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
 
-	const handleChangeInput = (e) => {
-		const { name, value } = e.target;
-		setUser({ ...user, [name]: value });
+			await axios
+				.get("/users/load_User", config)
+				.then((res) => {
+					dispatch(dispatchUserLoaded(res));
+					setFavorites(res.data.user.favoriteProducts);
+				})
+				.catch((err) => {
+					dispatch(dispatchUserError());
+				});
+		};
+		loadUser();
+	}, [dispatch, token]);
+	const newFavorites = favorites;
+
+	const handleDelete = async (product_id) => {
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		await axios
+			.post(`/users/remove_from_favorite/${product_id}`, null, config)
+			.then((res) => {
+				newFavorites.splice(newFavorites.indexOf(product_id), 1);
+			})
+			.catch((err) => {
+				console.log(err.message);
+			});
+		setFavorites(newFavorites);
 	};
-
-	const handleGenderChange = (e) => {
-		setSelectedGenre(e.target.value);
-	};
-
-	function PhoneNumberFormat(props) {
-		const { inputRef, onChange, ...other } = props;
-
-		return (
-			<NumberFormat
-				{...other}
-				getInputRef={inputRef}
-				onValueChange={(values) => {
-					onChange({
-						target: {
-							name: props.name,
-							value: values.value,
-						},
-					});
-				}}
-				isNumericString
-			/>
-		);
-	}
 
 	return (
 		<div>
@@ -189,7 +181,7 @@ export default function Profile() {
 									padding: 20,
 								}}
 								startIcon={<PinDropOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/addresses")}
+								onClick={() => history.push("/profile/favorites")}
 							>
 								Addresses
 							</Button>
@@ -217,7 +209,60 @@ export default function Profile() {
 							position: "relative",
 							padding: 30,
 						}}
-					></div>
+					>
+						<div
+							style={{
+								width: "99%",
+								height: "100%",
+								display: "flex",
+								flexDirection: "column",
+								marginTop: 50,
+							}}
+						>
+							<Typography variant="h5" style={{ marginBottom: 20 }}>
+								Vos produit favoris
+							</Typography>
+							<Divider style={{ marginBottom: 50 }} />
+							{favorites.length === 0 ? (
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column",
+										height: "70%",
+										alignItems: "center",
+										justifyContent: "center",
+									}}
+								>
+									<FavoriteOutlinedIcon
+										style={{
+											fontSize: 100,
+											marginBottom: 20,
+										}}
+										color="disabled"
+									/>
+									<Typography variant="h5" color="textSecondary">
+										Vous n'avez pas des produit favoris
+									</Typography>
+								</div>
+							) : (
+								<Masonry
+									breakpointCols={breakpoints}
+									className="my-masonry-grid"
+									columnClassName="my-masonry-grid_column"
+									style={{ width: "100%", overflow: "auto", height: "70%" }}
+								>
+									{favorites.map((product_id) => (
+										<div>
+											<FavoritesProductContainer
+												product_id={product_id}
+												handleDelete={handleDelete}
+											/>
+										</div>
+									))}
+								</Masonry>
+							)}
+						</div>
+					</div>
 				</Container>
 				<Fotter />
 			</div>

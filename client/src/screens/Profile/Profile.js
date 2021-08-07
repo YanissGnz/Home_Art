@@ -26,7 +26,6 @@ import VpnKeyOutlinedIcon from "@material-ui/icons/VpnKeyOutlined";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
 import { useState } from "react";
-import getOverlappingDaysInIntervals from "date-fns/getOverlappingDaysInIntervals/index";
 import { useHistory } from "react-router";
 
 const genders = [

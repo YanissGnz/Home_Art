@@ -212,9 +212,13 @@ export default function Profile() {
 											}}
 										>
 											<LocationOffOutlinedIcon
-												style={{ fontSize: 100, marginBottom: 20 }}
+												style={{
+													fontSize: 100,
+													marginBottom: 20,
+												}}
+												color="disabled"
 											/>
-											<Typography variant="h5">
+											<Typography variant="h5" color="textSecondary">
 												Vous n'avez pas d'address
 											</Typography>
 										</div>

@@ -68,21 +68,20 @@ export default function MyAppBar(props) {
 		setCart(props.cartLength);
 	}, [props]);
 
-	React.useEffect(() => {
-		const loadProduct = async () => {
-			await axios
-				.post("/products/get_products_names")
-				.then((res) => {
-					console.log(res.data.productsNames);
-					setProductsNames(res.data.productsNames);
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-		};
-		loadProduct();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dispatch]);
+	// React.useEffect(() => {
+	// 	const loadProduct = async () => {
+	// 		await axios
+	// 			.post("/products/get_products_names")
+	// 			.then((res) => {
+	// 				setProductsNames(res.data.productsNames);
+	// 			})
+	// 			.catch((err) => {
+	// 				console.log(err);
+	// 			});
+	// 	};
+	// 	loadProduct();
+	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// }, [dispatch]);
 
 	return (
 		<ElevationScroll {...props}>
