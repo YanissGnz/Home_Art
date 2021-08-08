@@ -201,7 +201,7 @@ export default function Profile() {
 								}}
 								size="large"
 							>
-								Ajouter une address
+								Enregistrer
 							</Button>
 						</div>
 					</div>
