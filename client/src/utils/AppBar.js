@@ -13,16 +13,20 @@ import {
 	Toolbar,
 	Typography,
 	useScrollTrigger,
+	ListItemText,
 } from "@material-ui/core";
 import { dispatchLogout } from "../redux/actions/authAction";
 import { useStyles } from "../screens/HomeScreen/useStyles";
 import Menus from "./Menu";
 import Logo from "../Icons/Logo";
 import Cart from "../Icons/Cart";
+import ShoppingCartOutlinedIcon from "@material-ui/icons/ShoppingCartOutlined";
+import NotificationsNoneOutlinedIcon from "@material-ui/icons/NotificationsNoneOutlined";
 import SearchIcon from "@material-ui/icons/Search";
-import { AccountCircle } from "@material-ui/icons";
+import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
 import { Autocomplete } from "@material-ui/lab";
-import axios from "axios";
+import { List } from "@material-ui/icons";
+import { ListItem } from "@material-ui/core";
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -45,9 +49,12 @@ export default function MyAppBar(props) {
 	const auth = useSelector((state) => state.auth);
 	const [cart, setCart] = React.useState(0);
 	const [anchorEl, setAnchorEl] = React.useState(null);
+	const [notificationAnchorEl, setNotificationAnchorEl] = React.useState(null);
+
 	const [productsNames, setProductsNames] = React.useState([]);
 
 	const open = Boolean(anchorEl);
+	const openNotificaion = Boolean(notificationAnchorEl);
 
 	const handleSearch = (event) => event.preventDefault();
 
@@ -55,8 +62,13 @@ export default function MyAppBar(props) {
 		setAnchorEl(event.currentTarget);
 	};
 
+	const handleNotification = (event) => {
+		setNotificationAnchorEl(event.currentTarget);
+	};
+
 	const handleClose = () => {
 		setAnchorEl(null);
+		setNotificationAnchorEl(null);
 	};
 
 	const handleLogout = (event) => {
@@ -67,21 +79,6 @@ export default function MyAppBar(props) {
 	React.useEffect(() => {
 		setCart(props.cartLength);
 	}, [props]);
-
-	// React.useEffect(() => {
-	// 	const loadProduct = async () => {
-	// 		await axios
-	// 			.post("/products/get_products_names")
-	// 			.then((res) => {
-	// 				setProductsNames(res.data.productsNames);
-	// 			})
-	// 			.catch((err) => {
-	// 				console.log(err);
-	// 			});
-	// 	};
-	// 	loadProduct();
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [dispatch]);
 
 	return (
 		<ElevationScroll {...props}>
@@ -137,7 +134,7 @@ export default function MyAppBar(props) {
 								color="primary"
 								classes={{ anchorOriginTopRightRectangle: classes.badge }}
 							>
-								<Cart />
+								<ShoppingCartOutlinedIcon />
 							</Badge>
 						}
 						className={classes.cart_button}
@@ -152,22 +149,52 @@ export default function MyAppBar(props) {
 								aria-label="account of current user"
 								aria-controls="menu-appbar"
 								aria-haspopup="true"
+								onClick={handleNotification}
+								color="inherit"
+							>
+								<NotificationsNoneOutlinedIcon />
+							</IconButton>
+
+							<IconButton
+								aria-label="account of current user"
+								aria-controls="menu-appbar"
+								aria-haspopup="true"
 								onClick={handleMenu}
 								color="inherit"
 							>
-								<AccountCircle size={50} />
+								<AccountCircleOutlinedIcon />
 							</IconButton>
+
+							<Menu
+								id="menu-appbar"
+								anchorEl={notificationAnchorEl}
+								anchorOrigin={{
+									vertical: "bottom",
+									horizontal: "center",
+								}}
+								transformOrigin={{
+									vertical: "bottom",
+									horizontal: "center",
+								}}
+								keepMounted
+								open={openNotificaion}
+								onClose={handleClose}
+							>
+								<MenuItem disableRipple>
+									<ListItemText primary="Sent mail" />
+								</MenuItem>
+							</Menu>
+
 							<Menu
 								id="menu-appbar"
 								anchorEl={anchorEl}
 								anchorOrigin={{
-									vertical: "top",
-									horizontal: "right",
+									vertical: "bottom",
+									horizontal: "center",
 								}}
-								keepMounted
 								transformOrigin={{
-									vertical: "top",
-									horizontal: "right",
+									vertical: "center",
+									horizontal: "center",
 								}}
 								open={open}
 								onClose={handleClose}
