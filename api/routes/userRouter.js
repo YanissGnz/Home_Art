@@ -20,12 +20,13 @@ router.post("/activation", userCtrl2.activateEmail);
 router.post("/google_login", userCtrl2.googleLogin);
 router.post("/add_to_favorite/:product_Id", auth, userCtrl2.addToFavorite);
 router.post(
-	"/remove_from_favorite/:product_Id",
-	auth,
-	userCtrl2.removeFromFavorite
+  "/remove_from_favorite/:product_Id",
+  auth,
+  userCtrl2.removeFromFavorite
 );
 router.post("/add_to_cart", auth, userCtrl2.addToCart);
 router.post("/reduce_quantity", auth, userCtrl2.reduceQuantity);
 router.post("/remove_item_from_cart", auth, userCtrl2.removeItem);
+router.put("/edit_profile/:user_id", auth, userCtrl2.editProfile);
 
 module.exports = router;
