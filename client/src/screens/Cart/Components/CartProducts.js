@@ -63,8 +63,8 @@ export default function UserCard({
 				.then((res) => {
 					if (res.data.msg === "La quantity de produit a été décrémenter.") {
 						setState(res.data.quantity);
-						handleTotalPriceReduce(item.product.price);
 					}
+					handleTotalPriceReduce(item.product.price);
 					setLoading(false);
 				})
 				.catch((err) => {
