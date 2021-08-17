@@ -6,7 +6,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-export default function UserCard({ item, handleRemoveItem }) {
+export default function UserCard({
+	item,
+	handleRemoveItem,
+	handleTotalPriceReduce,
+	handleTotalPriceIncrease,
+}) {
 	const [product, setProduct] = React.useState({});
 	const [image, setImage] = React.useState("");
 	const [state, setState] = React.useState(item.quantity);
@@ -32,6 +37,7 @@ export default function UserCard({ item, handleRemoveItem }) {
 			.then((res) => {
 				setLoading(false);
 				setState(res.data.quantity);
+				handleTotalPriceIncrease(item.product.price);
 			})
 			.catch((err) => {
 				setLoading(false);
@@ -58,6 +64,7 @@ export default function UserCard({ item, handleRemoveItem }) {
 					if (res.data.msg === "La quantity de produit a été décrémenter.") {
 						setState(res.data.quantity);
 					}
+					handleTotalPriceReduce(item.product.price);
 					setLoading(false);
 				})
 				.catch((err) => {

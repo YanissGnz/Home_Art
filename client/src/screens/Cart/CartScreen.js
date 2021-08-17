@@ -53,6 +53,14 @@ export default function CartScreen() {
 		setOpen(!open);
 	};
 
+	const handleTotalPriceIncrease = (price) => {
+		setTotalPrice((parseInt(totalPrice) + parseInt(price)).toString());
+	};
+
+	const handleTotalPriceReduce = (price) => {
+		setTotalPrice((parseInt(totalPrice) - parseInt(price)).toString());
+	};
+
 	const handleRemoveItem = async (item) => {
 		handleToggle();
 		// Headers
@@ -262,6 +270,8 @@ export default function CartScreen() {
 									<CartProducts
 										item={item}
 										handleRemoveItem={handleRemoveItem}
+										handleTotalPriceIncrease={handleTotalPriceIncrease}
+										handleTotalPriceReduce={handleTotalPriceReduce}
 									/>
 								))}
 							<div
