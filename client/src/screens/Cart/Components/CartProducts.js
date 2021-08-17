@@ -99,7 +99,6 @@ export default function UserCard({
 					style={{ position: "absolute", left: "95.4%", top: 10 }}
 					onClick={() => {
 						handleRemoveItem(item);
-						setLoading(true);
 					}}
 					disabled={loading}
 					size="medium"

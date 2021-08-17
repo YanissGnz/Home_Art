@@ -334,10 +334,15 @@ const userCtrl2 = {
 		try {
 			const user = await Users2.findById(req.user.id);
 			if (!user) return res.status(404).json({ msg: "User does not exist." });
+			const cart = user.cart;
+			console.log(cart);
+			console.log(item.product._id);
 
-			var newCart = user.cart;
+			const newCart = cart.filter(
+				(product) => product.product._id != item.product._id
+			);
+			console.log(newCart);
 
-			newCart.splice(newCart.indexOf(item), 1);
 			const newUser = await Users2.findOneAndUpdate(
 				{ _id: req.user.id },
 				{
@@ -345,7 +350,7 @@ const userCtrl2 = {
 				}
 			);
 
-			return res.json({ newCart, newUser, msg: "Le produit a été retirer." });
+			return res.json({ newCart, msg: "Le produit a été retirer." });
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
 		}
@@ -416,7 +421,7 @@ const userCtrl2 = {
 				favoriteProducts.push(product_id);
 			}
 			user = await Users2.updateOne({ _id: user_Id }, { favoriteProducts });
-			return res.status(200).json({ msg: "Le Produit a été ajouter" });
+			return res.status(200).json({ msg: "Ajouter aux favoris" });
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
@@ -433,7 +438,7 @@ const userCtrl2 = {
 			user = await Users2.updateOne({ _id: user_Id }, { favoriteProducts });
 			return res
 				.status(200)
-				.json({ favoriteProducts, msg: "Le Produit a été supprimer" });
+				.json({ favoriteProducts, msg: "Supprimer des favoris" });
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
@@ -535,7 +540,6 @@ const userCtrl2 = {
 					item.ville != address.ville &&
 					item.region != address.region
 			);
-			console.log(newAddresses);
 
 			const newUser = await Users2.findOneAndUpdate(
 				{ _id: req.user.id },

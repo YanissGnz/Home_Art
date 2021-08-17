@@ -67,14 +67,14 @@ export default function Home(props) {
 
 	const settings = {
 		infinite: true,
-		speed: 800,
+		speed: 1000,
 		slidesToShow: 1,
 		slidesToScroll: 1,
 		autoplay: true,
 		dots: false,
 		arrows: true,
 		adaptiveHeight: true,
-
+		autoplaySpeed: 5000,
 		prevArrow: <SamplePrevArrow />,
 		nextArrow: <SampleNextArrow color="primary" />,
 	};
