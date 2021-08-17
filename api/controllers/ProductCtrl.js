@@ -265,6 +265,28 @@ const productCtrl = {
 			res.status(400).json({ msg: e.message });
 		}
 	},
+	promoteProduct: async (req, res) => {
+		const product_id = req.params.product_id;
+		const { newPrice } = req.body;
+		try {
+			const check = await Product.findOne({ _id: product_id });
+			if (!check) {
+				return res.status(400).json({ msg: "Produit n'exist pas." });
+			}
+			if (newPrice === "" || newPrice === 0) {
+				return res.status(400).json({ msg: "Enter le nouveau prix.", id: 6 });
+			}
+			const archivedProduct = await Product.updateOne(
+				{ _id: product_id },
+				{ newPrice: newPrice, promoted: true }
+			);
+			return res.status(200).json({
+				msg: "Le produit a été promoter.",
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
 	archiveProduct: async (req, res) => {
 		const product_id = req.params.product_id;
 		try {

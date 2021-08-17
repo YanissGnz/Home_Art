@@ -26,10 +26,12 @@
 		"react-router-dom": "^5.1.2",
 		"react-script": "^2.0.5",
 		"react-simple-image-slider": "^2.1.0",
+		"react-slick": "^0.28.1",
 		"react-slideshow-image": "^3.4.6",
 		"react-text-mask": "^5.4.3",
 		"redux": "^4.1.0",
 		"redux-thunk": "^2.3.0",
+		"slick-carousel": "^1.8.1",
 		"web-vitals": "^1.1.1"
 	},
 	"scripts": {

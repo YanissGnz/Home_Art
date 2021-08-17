@@ -50,6 +50,8 @@ import {
 import Users from "../../Icons/Users";
 import UsersScreen from "./Components/UsersScreen";
 import { dispatchGetAllUsers } from "../../redux/actions/usersAction";
+import OfferMenuIcon from "../../Icons/OfferMenuIcon";
+import OffersScreen from "./Components/OffersScreen";
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -277,15 +279,27 @@ export default function AdminPanel(props) {
 								style={{ marginBottom: 5 }}
 							>
 								<ListItemIcon>
-									<Users />
+									<OfferMenuIcon />
 								</ListItemIcon>
 								<ListItemText primary="Utilisateur" />
 							</ListItem>
 						</List>
+						<ListItem
+							button
+							onClick={() => setScreen(3)}
+							className={screen === 3 && classes.active}
+							style={{ marginBottom: 5 }}
+						>
+							<ListItemIcon>
+								<Users />
+							</ListItemIcon>
+							<ListItemText primary="Utilisateur" />
+						</ListItem>
 					</Drawer>
 					{screen === 0 && <DashboardScreen usersCount={usersCount} />}
 					{screen === 1 && <ProductsScreen />}
-					{screen === 2 && <UsersScreen />}
+					{screen === 2 && <OffersScreen />}
+					{screen === 3 && <UsersScreen />}
 				</div>
 			)}
 		</div>

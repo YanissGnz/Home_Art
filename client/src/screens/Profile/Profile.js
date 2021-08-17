@@ -11,6 +11,7 @@ import {
 	Divider,
 	MenuItem,
 	IconButton,
+	Snackbar,
 } from "@material-ui/core";
 import {
 	MuiPickersUtilsProvider,
@@ -24,9 +25,21 @@ import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutline
 import PinDropOutlinedIcon from "@material-ui/icons/PinDropOutlined";
 import VpnKeyOutlinedIcon from "@material-ui/icons/VpnKeyOutlined";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
+import DoneOutlineRoundedIcon from "@material-ui/icons/DoneOutlineRounded";
 import { useState } from "react";
 import { useHistory } from "react-router";
+import {
+	dispatchUserError,
+	dispatchUserLoaded,
+	dispatchUserLoading,
+} from "../../redux/actions/authAction";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { returnErrors } from "../../redux/actions/errAction";
+import { CircularProgress } from "@material-ui/core";
+import { useTheme } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
+import { Tooltip } from "@material-ui/core";
 
 const genders = [
 	{
@@ -40,27 +53,62 @@ const genders = [
 	},
 ];
 var userInfo = {
-	name: "Yaniss",
-	familyName: "Guendouzi",
-	email: "m.guendouzi@esi-sba.dz",
-	phoneNumber: "0000000",
-	gender: "Homme",
+	name: "",
+	last_name: "",
+	email: "",
+	phoneNumber: "",
+	gender: "",
+	dateOfBirth: new Date("2014-08-18T21:11:54"),
+	cart: [],
 };
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+function PhoneNumberFormat(props) {
+	const { inputRef, onChange, ...other } = props;
 
+	return (
+		<NumberFormat
+			{...other}
+			getInputRef={inputRef}
+			onValueChange={(values) => {
+				onChange({
+					target: {
+						name: props.name,
+						value: values.value,
+					},
+				});
+			}}
+			isNumericString
+			format="+213 #########"
+			mask="_"
+		/>
+	);
+}
 export default function Profile() {
-	const [selectedGenre, setSelectedGenre] = React.useState("");
 	const [enableEdit, setEnableEdit] = React.useState(false);
 	const [user, setUser] = useState(userInfo);
+	const [msg, setMsg] = useState("");
 	const history = useHistory();
+	const dispatch = useDispatch();
+	const token = useSelector((state) => state.auth.token);
+	const [isLoading, setIsLoading] = useState(false);
+	const [alertOpen, setAlertOpen] = React.useState(false);
+	const [alertType, setAlertType] = React.useState("");
+	const theme = useTheme();
 
-	const [selectedDate, setSelectedDate] = React.useState(
-		new Date("2014-08-18T21:11:54")
-	);
-	const handleDateChange = (date) => {
-		setSelectedDate(date);
+	const handleAlertOpen = () => {
+		setAlertOpen(true);
+	};
+	const handleAlertClose = () => {
+		setAlertOpen(false);
 	};
 
-	const { name, familyName, email, phoneNumber } = user;
+	const handleDateChange = (date) => {
+		setUser({ ...user, dateOfBirth: date });
+	};
+
+	const { name, last_name, email, phoneNumber } = user;
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
@@ -68,34 +116,77 @@ export default function Profile() {
 	};
 
 	const handleGenderChange = (e) => {
-		setSelectedGenre(e.target.value);
+		setUser({ ...user, gender: e.target.value });
 	};
 
-	function PhoneNumberFormat(props) {
-		const { inputRef, onChange, ...other } = props;
+	React.useEffect(() => {
+		const loadUser = async () => {
+			dispatch(dispatchUserLoading());
 
-		return (
-			<NumberFormat
-				{...other}
-				getInputRef={inputRef}
-				onValueChange={(values) => {
-					onChange({
-						target: {
-							name: props.name,
-							value: values.value,
-						},
-					});
-				}}
-				isNumericString
-			/>
-		);
-	}
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
+
+			await axios
+				.get("/users/load_User", config)
+				.then((res) => {
+					dispatch(dispatchUserLoaded(res));
+					setUser(res.data.user);
+				})
+				.catch((err) => {
+					dispatch(dispatchUserError());
+					dispatch(returnErrors(err.response.data.msg, err.response.status));
+				});
+		};
+		loadUser();
+	}, [dispatch, token]);
+
+	const handleEdit = () => {
+		setIsLoading(true);
+
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+		const { name, last_name, dateOfBirth, phoneNumber, gender } = user;
+		axios
+			.put(
+				"/users/edit_profile",
+				{ name, last_name, dateOfBirth, phoneNumber, gender },
+				config
+			)
+			.then((res) => {
+				setMsg(res.data.msg);
+				setEnableEdit(!enableEdit);
+				handleAlertOpen();
+				setAlertType("success");
+				setIsLoading(false);
+			})
+			.catch((err) => {
+				setMsg(err.response.data);
+				setIsLoading(false);
+			});
+	};
 
 	return (
 		<div>
 			<div className="profile_body">
 				<CssBaseline />
-				<MyAppBar />
+				<MyAppBar cartLength={user ? user.cart.length : 0} />
+				<Snackbar
+					open={alertOpen}
+					autoHideDuration={3000}
+					onClose={handleAlertClose}
+				>
+					<Alert severity={alertType}>
+						<Typography>{msg}</Typography>
+					</Alert>
+				</Snackbar>
 				<Container
 					maxWidth="lg"
 					style={{
@@ -217,29 +308,64 @@ export default function Profile() {
 						}}
 					>
 						{enableEdit ? (
-							<IconButton
-								color="primary"
-								aria-label="upload picture"
-								component="span"
-								size="large"
-								style={{ position: "absolute", right: 20, top: 10 }}
-								disableRipple
-								onClick={() => setEnableEdit(!enableEdit)}
-							>
-								<DoneOutlineIcon style={{ fontSize: 30 }} />
-							</IconButton>
+							<div style={{ position: "absolute", right: 20, top: 10 }}>
+								<div
+									style={{
+										margin: 0,
+										position: "relative",
+										alignSelf: "center",
+									}}
+								>
+									<Tooltip
+										title="Enregistrer"
+										aria-label="save"
+										placement="left-center"
+									>
+										<IconButton
+											color="primary"
+											aria-label="upload picture"
+											component="span"
+											size="large"
+											disableRipple
+											onClick={handleEdit}
+											disabled={isLoading}
+										>
+											<DoneOutlineRoundedIcon style={{ fontSize: 30 }} />
+										</IconButton>
+									</Tooltip>
+									{isLoading && (
+										<CircularProgress
+											size={24}
+											style={{
+												color: theme.palette.primary,
+												position: "absolute",
+												top: "25%",
+												left: "50%",
+												marginTop: -1,
+												marginLeft: -12,
+											}}
+										/>
+									)}
+								</div>
+							</div>
 						) : (
-							<IconButton
-								color="primary"
-								aria-label="upload picture"
-								component="span"
-								size="large"
-								style={{ position: "absolute", right: 20, top: 10 }}
-								disableRipple
-								onClick={() => setEnableEdit(!enableEdit)}
+							<Tooltip
+								title="Modifier"
+								aria-label="edit"
+								placement="left-center"
 							>
-								<EditOutlinedIcon style={{ fontSize: 30 }} />
-							</IconButton>
+								<IconButton
+									color="primary"
+									aria-label="upload picture"
+									component="span"
+									size="large"
+									style={{ position: "absolute", right: 20, top: 10 }}
+									disableRipple
+									onClick={() => setEnableEdit(!enableEdit)}
+								>
+									<EditOutlinedIcon style={{ fontSize: 30 }} />
+								</IconButton>
+							</Tooltip>
 						)}
 
 						<div
@@ -270,8 +396,8 @@ export default function Profile() {
 									disabled={!enableEdit}
 								/>
 								<TextField
-									name="familyName"
-									value={familyName}
+									name="last_name"
+									value={last_name}
 									label="Prénom"
 									size="medium"
 									variant="outlined"
@@ -292,7 +418,7 @@ export default function Profile() {
 										width: "49%",
 										marginRight: "2%",
 									}}
-									disabled={!enableEdit}
+									disabled={true}
 									onChange={handleChangeInput}
 								/>
 
@@ -316,7 +442,7 @@ export default function Profile() {
 									name="gender"
 									select
 									label="Genre"
-									value={selectedGenre}
+									value={user.gender}
 									onChange={handleGenderChange}
 									variant="outlined"
 									style={{
@@ -338,7 +464,7 @@ export default function Profile() {
 										inputVariant="outlined"
 										label="Date de naissance"
 										format="MM/dd/yyyy"
-										value={selectedDate}
+										value={user.dateOfBirth}
 										onChange={(date) => handleDateChange(date)}
 										style={{
 											width: "49%",

@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/img-redundant-alt */
 import React from "react";
 import axios from "axios";
 import NumberFormat from "react-number-format";
@@ -20,6 +19,7 @@ import {
 	Toolbar,
 	Typography,
 	Divider,
+	useTheme,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 
@@ -105,10 +105,12 @@ const initialState = {
 	stock: 0,
 	categorie: "",
 	description: "",
+	newPrice: "",
 };
 
 export default function ProductsScreen() {
 	const classes = useStyles();
+	const theme = useTheme();
 
 	const [product, setProduct] = React.useState(initialState);
 	const [categorie, setCategorie] = React.useState("");
@@ -119,7 +121,9 @@ export default function ProductsScreen() {
 	const [isLoading, setIsLoading] = React.useState(false);
 	const [addOpen, setAddOpen] = React.useState(false);
 	const [editOpen, setEditOpen] = React.useState(false);
+	const [promotionOpen, setPromotionOpen] = React.useState(false);
 	const [editedProdcutId, setEditedProductId] = React.useState("");
+	const [promotedProductId, setPromotedProductId] = React.useState("");
 	const [alertOpen, setAlertOpen] = React.useState(false);
 	const [backdropOpen, setBackdropOpen] = React.useState(false);
 
@@ -134,6 +138,7 @@ export default function ProductsScreen() {
 	const stockMsg = useSelector((state) => state.err);
 	const categorieMsg = useSelector((state) => state.err);
 	const descriptionMsg = useSelector((state) => state.err);
+	const [newPriceMsg, setNewPriceMsg] = React.useState("");
 	let imageMsg = useSelector((state) => state.err);
 
 	/*For The Masonary Container*/
@@ -173,6 +178,10 @@ export default function ProductsScreen() {
 		setCategorie(editedProduct.categorie);
 		setEditedProductId(editedProduct._id);
 	};
+	const handleClickPromotionOpen = (PromotedProduct) => {
+		setPromotionOpen(true);
+		setPromotedProductId(PromotedProduct);
+	};
 	const handleEditClose = () => {
 		setEditOpen(false);
 		setProductImage("");
@@ -180,6 +189,12 @@ export default function ProductsScreen() {
 		setImageSlide("");
 		dispatch(clearErrors());
 		setMsg("");
+	};
+	const handlePromotionClose = () => {
+		setPromotionOpen(false);
+		dispatch(clearErrors());
+		setMsg("");
+		setProduct(initialState);
 	};
 	/*__________________________________________ */
 
@@ -310,6 +325,38 @@ export default function ProductsScreen() {
 				);
 			});
 	};
+	const handlePromote = async (e) => {
+		e.preventDefault();
+		setIsLoading(true);
+
+		setMsg("");
+		dispatch(clearErrors());
+
+		//Header
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		//Body
+		const formData = new FormData();
+
+		formData.append("newPrice", product.newPrice);
+		axios
+			.put(`/products/promote_product/${promotedProductId}`, formData, config)
+			.then((res) => {
+				setIsLoading(false);
+				dispatch(clearErrors());
+				setMsg(res.data.msg);
+				handleAlertOpen();
+			})
+			.catch((err) => {
+				setIsLoading(false);
+				setNewPriceMsg(err.response.data.msg);
+			});
+	};
+
 	const handleDelete = async (deletedProductId, deletedProductImage) => {
 		handleBackdropOpen();
 		//Header
@@ -786,7 +833,66 @@ export default function ProductsScreen() {
 					</Button>
 				</DialogActions>
 			</Dialog>
+			{/*_________________Promotion Dialog________________*/}
+			<Dialog open={promotionOpen} onClose={handlePromotionClose} maxWidth="lg">
+				<DialogTitle>Promoter le produit</DialogTitle>
+				<DialogContent>
+					<form
+						onSubmit={handlePromote}
+						className={classes.productForm}
+						encType="multipart/form-data"
+					>
+						<TextField
+							variant="outlined"
+							label="Nouveau Prix"
+							name="newPrice"
+							value={product.newPrice}
+							onChange={handleChangeInput}
+							InputProps={{
+								startAdornment: (
+									<InputAdornment position="start">Da</InputAdornment>
+								),
 
+								inputComponent: PriceFormat,
+							}}
+							fullWidth
+							style={{ marginBottom: 30 }}
+							helperText={newPriceMsg !== "" ? newPriceMsg.msg : null}
+							error={newPriceMsg !== "" ? true : false}
+						/>
+						<div className={classes.wrapper}>
+							<Button
+								variant="contained"
+								color="primary"
+								className={classes.addProductBtn}
+								type="submit"
+								size="large"
+								disabled={isLoading}
+							>
+								Promoter le produit
+							</Button>
+							{isLoading && (
+								<CircularProgress
+									size={24}
+									style={{
+										color: theme.palette.primary,
+										position: "absolute",
+										top: "50%",
+										left: "50%",
+										marginTop: -12,
+										marginLeft: -13,
+									}}
+								/>
+							)}
+						</div>
+					</form>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={handlePromotionClose} color="primary">
+						Annuler
+					</Button>
+				</DialogActions>
+			</Dialog>
 			{/*_________________Backdrop (LOADING...)________________*/}
 			<Backdrop className={classes.backdrop} open={backdropOpen}>
 				<CircularProgress size={60} thickness={5} color="primary" />
@@ -836,6 +942,7 @@ export default function ProductsScreen() {
 										handleDelete={handleDelete}
 										handleArchive={handleArchive}
 										handleReveal={handleReveal}
+										handleClickPromotionOpen={handleClickPromotionOpen}
 									/>
 								)
 						)}
@@ -869,6 +976,7 @@ export default function ProductsScreen() {
 										handleDelete={handleDelete}
 										handleArchive={handleArchive}
 										handleReveal={handleReveal}
+										handleClickPromotionOpen={handleClickPromotionOpen}
 									/>
 								)
 						)}
@@ -902,6 +1010,7 @@ export default function ProductsScreen() {
 										handleDelete={handleDelete}
 										handleArchive={handleArchive}
 										handleReveal={handleReveal}
+										handleClickPromotionOpen={handleClickPromotionOpen}
 									/>
 								)
 						)}
@@ -935,6 +1044,7 @@ export default function ProductsScreen() {
 										handleDelete={handleDelete}
 										handleArchive={handleArchive}
 										handleReveal={handleReveal}
+										handleClickPromotionOpen={handleClickPromotionOpen}
 									/>
 								)
 						)}
@@ -968,6 +1078,7 @@ export default function ProductsScreen() {
 										handleDelete={handleDelete}
 										handleArchive={handleArchive}
 										handleReveal={handleReveal}
+										handleClickPromotionOpen={handleClickPromotionOpen}
 									/>
 								)
 						)}

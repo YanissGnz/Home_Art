@@ -64,6 +64,9 @@ const userCtrl2 = {
 				email,
 				password: passwordHash,
 				cf_password: passwordHash,
+				dateOfBirth: null,
+				phoneNumber: "",
+				gender: "",
 			};
 
 			const access_token = createActivationToken(newUser);
@@ -87,7 +90,16 @@ const userCtrl2 = {
 				process.env.ACTIVATION_TOKEN_SECRET
 			);
 
-			const { name, email, password } = user;
+			const {
+				name,
+				last_name,
+				email,
+				password,
+				dateOfBirth,
+				phoneNumber,
+				gender,
+				addresses,
+			} = user;
 
 			const check = await Users2.findOne({ email });
 			if (check)
@@ -95,13 +107,18 @@ const userCtrl2 = {
 
 			const newUser = new Users2({
 				name,
+				last_name,
 				email,
 				password,
+				dateOfBirth,
+				phoneNumber,
+				gender,
+				addresses,
 			});
 
 			await newUser.save();
 
-			res.json({ msg: "Account has been activated!" });
+			res.json({ msg: "Le compte a été activer." });
 		} catch (err) {
 			return res.status(500).json({ msg: err.message });
 		}
@@ -180,7 +197,7 @@ const userCtrl2 = {
 			return res.status(500).json({ msg: err.message });
 		}
 	},
-	resetPassword: async (req, res) => {
+	recoverPassword: async (req, res) => {
 		try {
 			const { password, cf_password } = req.body;
 			if (password == "") {
@@ -368,7 +385,12 @@ const userCtrl2 = {
 			} else {
 				const newUser = new Users2({
 					name,
+					last_name,
 					email,
+					dateOfBirth,
+					phoneNumber,
+					genders,
+					addresses,
 					password: passwordHash,
 				});
 
@@ -409,13 +431,180 @@ const userCtrl2 = {
 				favoriteProducts.splice(favoriteProducts.indexOf(product_id), 1);
 			}
 			user = await Users2.updateOne({ _id: user_Id }, { favoriteProducts });
-			return res.status(200).json({ msg: "Le Produit a été supprimer" });
+			return res
+				.status(200)
+				.json({ favoriteProducts, msg: "Le Produit a été supprimer" });
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
 	},
-};
+	editProfile: async (req, res) => {
+		const user_id = req.user.id;
+		const { name, last_name, dateOfBirth, phoneNumber, gender } = req.body;
+		try {
+			if (name === "") {
+				return res.status(400).json({ msg: "Enter votre nom.", id: 0 });
+			}
+			if (last_name == "") {
+				return res
+					.status(400)
+					.json({ msg: "Enter votre nom de famille.", id: 1 });
+			}
 
+			const check = await Users2.findOne({ _id: user_id });
+			if (!check) {
+				return res.status(400).json({ msg: "client n'exist pas.", id: 5 });
+			}
+
+			const editedProfile = await Users2.updateOne(
+				{ _id: user_id },
+				{
+					name,
+					last_name,
+					dateOfBirth,
+					phoneNumber,
+					gender,
+				}
+			);
+
+			return res.status(200).json({
+				editedProfile,
+				msg: "Vous information ont été modifier.",
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
+	addAddress: async (req, res) => {
+		const user_id = req.user.id;
+		const { address, ville, region } = req.body;
+
+		try {
+			if (address === "") {
+				return res.status(400).json({ msg: "Enter votre address.", id: 0 });
+			}
+			if (region === "") {
+				return res.status(400).json({ msg: "Enter votre région.", id: 1 });
+			}
+			if (ville === "") {
+				return res.status(400).json({ msg: "Enter votre ville.", id: 2 });
+			}
+
+			const user = await Users2.findOne({ _id: user_id });
+			var addresses = user.addresses;
+
+			console.log(user.addresses);
+
+			const newAddress = {
+				address: address,
+				ville: ville,
+				region: region,
+			};
+			addresses.push({
+				address: address,
+				ville: ville,
+				region: region,
+			});
+			console.log(addresses);
+			await Users2.updateOne(
+				{ _id: user_id },
+				{
+					addresses: addresses,
+				}
+			);
+			res.status(200).json({
+				addresses,
+				msg: "L'address à été ajouter.",
+			});
+		} catch (e) {
+			res.status(404).json({ msg: e.message });
+		}
+	},
+	retirerAddress: async (req, res) => {
+		const user_id = req.user.id;
+		const address = req.body.address;
+
+		try {
+			const user = await Users2.findById(req.user.id);
+			if (!user) return res.status(404).json({ msg: "User does not exist." });
+			var addresses = user.addresses;
+
+			const newAddresses = addresses.filter(
+				(item) =>
+					item.address != address.address &&
+					item.ville != address.ville &&
+					item.region != address.region
+			);
+			console.log(newAddresses);
+
+			const newUser = await Users2.findOneAndUpdate(
+				{ _id: req.user.id },
+				{
+					addresses: newAddresses,
+				}
+			);
+			return res.json({
+				newAddresses,
+				msg: "L'addresse' a été supprimer.",
+			});
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	resetPassword: async (req, res) => {
+		const user_id = req.user.id;
+		const { password, newPassword, confirmPassword } = req.body;
+		try {
+			if (password == "") {
+				res.status(400).json({
+					msg: "Entrer votre mot de passe",
+					id: 0,
+				});
+			}
+			if (newPassword === "") {
+				res.status(400).json({
+					msg: "Entrer votre nouveau mot de passe",
+					id: 1,
+				});
+			}
+			if (newPassword.length < 6) {
+				res.status(400).json({
+					msg: "Le mot de passe doit être au moins de 6 caractères",
+					id: 1,
+				});
+			}
+			if (confirmPassword === "") {
+				res.status(400).json({
+					msg: "Confirmer votre mot de passe",
+					id: 2,
+				});
+			}
+			if (!isMatch(newPassword, confirmPassword)) {
+				res.status(400).json({
+					msg: "Le nouveau mot de passe ne correspond pas",
+					id: 2,
+				});
+			}
+			const user = await Users2.findOne({ _id: user_id });
+			const matchPassword = await bcrypt.compare(password, user.password);
+			if (!matchPassword)
+				return res.status(400).json({ msg: "Password is incorrect.", id: 0 });
+
+			const passwordHash = await bcrypt.hash(newPassword, 12);
+
+			await Users2.findOneAndUpdate(
+				{ _id: req.user.id },
+				{
+					password: passwordHash,
+				}
+			);
+
+			res.status(200).json({ msg: "Le mot de passe a été changer" });
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+};
 function validateEmail(email) {
 	const re =
 		/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

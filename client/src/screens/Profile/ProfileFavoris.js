@@ -7,7 +7,6 @@ import {
 	Typography,
 	ButtonGroup,
 	Button,
-	TextField,
 	Divider,
 } from "@material-ui/core";
 
@@ -25,14 +24,14 @@ import {
 	dispatchUserLoaded,
 } from "../../redux/actions/authAction";
 import axios from "axios";
-import FavoritesProductContainer from "./FavoritesProductContainer";
+import FavoritesProductContainer from "../../utils/FavoritesProductContainer";
 import Masonry from "react-masonry-css";
 
 export default function Profile() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
-
+	const [user, setUser] = React.useState(null);
 	const [favorites, setFavorites] = React.useState([]);
 
 	/*For The Masonary Container*/
@@ -56,6 +55,7 @@ export default function Profile() {
 				.then((res) => {
 					dispatch(dispatchUserLoaded(res));
 					setFavorites(res.data.user.favoriteProducts);
+					setUser(res.data.user);
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
@@ -63,7 +63,6 @@ export default function Profile() {
 		};
 		loadUser();
 	}, [dispatch, token]);
-	const newFavorites = favorites;
 
 	const handleDelete = async (product_id) => {
 		// Headers
@@ -76,19 +75,18 @@ export default function Profile() {
 		await axios
 			.post(`/users/remove_from_favorite/${product_id}`, null, config)
 			.then((res) => {
-				newFavorites.splice(newFavorites.indexOf(product_id), 1);
+				setFavorites(res.data.favoriteProducts);
 			})
 			.catch((err) => {
 				console.log(err.message);
 			});
-		setFavorites(newFavorites);
 	};
 
 	return (
 		<div>
 			<div className="profile_body">
 				<CssBaseline />
-				<MyAppBar />
+				<MyAppBar cartLength={user ? user.cart.length : 0} />
 				<Container
 					maxWidth="lg"
 					style={{
@@ -181,7 +179,7 @@ export default function Profile() {
 									padding: 20,
 								}}
 								startIcon={<PinDropOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/favorites")}
+								onClick={() => history.push("/profile/addresses")}
 							>
 								Addresses
 							</Button>

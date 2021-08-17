@@ -1,102 +1,62 @@
 import React from "react";
 import MyAppBar from "../../utils/AppBar";
 import Fotter from "../../utils/Footer";
-import {
-	Container,
-	CssBaseline,
-	Typography,
-	ButtonGroup,
-	Button,
-	TextField,
-	Divider,
-	MenuItem,
-	IconButton,
-} from "@material-ui/core";
-import {
-	MuiPickersUtilsProvider,
-	KeyboardDatePicker,
-} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
-import NumberFormat from "react-number-format";
+import { Container, CssBaseline, ButtonGroup, Button } from "@material-ui/core";
+
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import CheckBoxOutlinedIcon from "@material-ui/icons/CheckBoxOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import PinDropOutlinedIcon from "@material-ui/icons/PinDropOutlined";
 import VpnKeyOutlinedIcon from "@material-ui/icons/VpnKeyOutlined";
-import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
-import DoneOutlineIcon from "@material-ui/icons/DoneOutline";
-import { useState } from "react";
-import getOverlappingDaysInIntervals from "date-fns/getOverlappingDaysInIntervals/index";
-import { useHistory } from "react-router";
 
-const genders = [
-	{
-		value: "Sélectionner votre genre",
-	},
-	{
-		value: "Homme",
-	},
-	{
-		value: "Femme",
-	},
-];
-var userInfo = {
-	name: "Yaniss",
-	familyName: "Guendouzi",
-	email: "m.guendouzi@esi-sba.dz",
-	phoneNumber: "0000000",
-	gender: "Homme",
-};
+import { useState } from "react";
+import { useHistory } from "react-router";
+import {
+	dispatchUserError,
+	dispatchUserLoaded,
+	dispatchUserLoading,
+} from "../../redux/actions/authAction";
+import { returnErrors } from "../../redux/actions/errAction";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
 export default function Profile() {
-	const [selectedGenre, setSelectedGenre] = React.useState("");
-	const [enableEdit, setEnableEdit] = React.useState(false);
-	const [user, setUser] = useState(userInfo);
+	const token = useSelector((state) => state.auth.token);
+
+	const [user, setUser] = useState(null);
 	const history = useHistory();
+	const dispatch = useDispatch();
 
-	const [selectedDate, setSelectedDate] = React.useState(
-		new Date("2014-08-18T21:11:54")
-	);
-	const handleDateChange = (date) => {
-		setSelectedDate(date);
-	};
+	React.useEffect(() => {
+		const loadUser = async () => {
+			dispatch(dispatchUserLoading());
 
-	const { name, familyName, email, phoneNumber } = user;
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
 
-	const handleChangeInput = (e) => {
-		const { name, value } = e.target;
-		setUser({ ...user, [name]: value });
-	};
-
-	const handleGenderChange = (e) => {
-		setSelectedGenre(e.target.value);
-	};
-
-	function PhoneNumberFormat(props) {
-		const { inputRef, onChange, ...other } = props;
-
-		return (
-			<NumberFormat
-				{...other}
-				getInputRef={inputRef}
-				onValueChange={(values) => {
-					onChange({
-						target: {
-							name: props.name,
-							value: values.value,
-						},
-					});
-				}}
-				isNumericString
-			/>
-		);
-	}
+			await axios
+				.get("/users/load_User", config)
+				.then((res) => {
+					dispatch(dispatchUserLoaded(res));
+					setUser(res.data.user);
+				})
+				.catch((err) => {
+					dispatch(dispatchUserError());
+					dispatch(returnErrors(err.response.data.msg, err.response.status));
+				});
+		};
+		loadUser();
+	}, [dispatch, token]);
 
 	return (
 		<div>
 			<div className="profile_body">
 				<CssBaseline />
-				<MyAppBar />
+				<MyAppBar cartLength={user ? user.cart.length : 0} />
 				<Container
 					maxWidth="lg"
 					style={{

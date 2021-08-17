@@ -18,7 +18,6 @@ import {
 	TextField,
 	useTheme,
 	CircularProgress,
-	Grid,
 } from "@material-ui/core";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import Zoom from "@material-ui/core/Zoom";
@@ -37,9 +36,11 @@ import { Rating, Skeleton } from "@material-ui/lab";
 import MyAppBar from "../../utils/AppBar";
 import CommentIcon from "../../Icons/CommentsIcon";
 import Fotter from "../../utils/Footer";
-import AddToCart from "../../Icons/AddToCartIcon";
 import HeartIcon from "../../Icons/HeartIcon";
 import ActiveHeartIcon from "../../Icons/ActiveHeartIcon";
+import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart";
+import CheckBoxOutlinedIcon from "@material-ui/icons/CheckBoxOutlined";
+import IndeterminateCheckBoxOutlinedIcon from "@material-ui/icons/IndeterminateCheckBoxOutlined";
 import Masonry from "react-masonry-css";
 
 function Alert(props) {
@@ -52,7 +53,10 @@ export default function ProductDetails(props) {
 	const [user, setUser] = React.useState(null);
 	const [cartLength, setCartLength] = React.useState(0);
 	const product_Id = props.match.params.productId;
-	const [product, setProduct] = React.useState({ price: "0000" });
+	const [product, setProduct] = React.useState({
+		price: "0000",
+		newPrice: "0000",
+	});
 	const [similaireProducts, setSimilaireProducts] = React.useState([]);
 	const [productImages, setProductImages] = React.useState([]);
 	const [ratingValue, setRatingValue] = React.useState(0);
@@ -77,6 +81,12 @@ export default function ProductDetails(props) {
 		1000: 1,
 	};
 
+	const productBreakpoints = {
+		default: 5,
+		1600: 4,
+		1000: 3,
+		600: 2,
+	};
 	const handleAlertOpen = () => {
 		setAlertOpen(true);
 	};
@@ -279,6 +289,7 @@ export default function ProductDetails(props) {
 				.then((res) => {
 					const rating = res.data.product[0].rating;
 					setProduct(res.data.product[0]);
+					console.log(res.data.product[0]);
 					setProductImages(res.data.product[0].productImages);
 					setIsLoading(false);
 					setRatingValue(
@@ -379,7 +390,6 @@ export default function ProductDetails(props) {
 						backgroundColor: "white",
 						display: "flex",
 						borderRadius: 20,
-						height: 800,
 					}}
 					className="main"
 				>
@@ -387,9 +397,9 @@ export default function ProductDetails(props) {
 						breakpointCols={breakpoints}
 						className="my-masonry-grid"
 						columnClassName="my-masonry-grid_column"
-						style={{ width: "100%" }}
+						style={{ width: "100%", height: "100%" }}
 					>
-						<Container style={{ width: 600, margin: 20 }}>
+						<Container style={{ width: "100%", margin: 20 }}>
 							{isLoading ? (
 								<Skeleton height="600px" style={{ transform: "none" }} />
 							) : (
@@ -405,7 +415,7 @@ export default function ProductDetails(props) {
 							style={{
 								position: "relative",
 								height: "100%",
-								width: 600,
+								width: "100%",
 								display: "flex",
 								flexDirection: "column",
 							}}
@@ -459,6 +469,32 @@ export default function ProductDetails(props) {
 									{product.categorie}
 								</a>
 							</div>
+
+							{product.stock > 0 && (
+								<Typography
+									style={{
+										color: "green",
+										fontSize: 16,
+										fontWeight: 400,
+										marginBottom: 20,
+										display: "flex",
+										alignItems: "center",
+									}}
+								>
+									{product.stock > 0 ? (
+										<CheckBoxOutlinedIcon
+											fontSize="small"
+											style={{ marginRight: 5 }}
+										/>
+									) : (
+										<IndeterminateCheckBoxOutlinedIcon
+											fontSize="small"
+											style={{ marginRight: 5 }}
+										/>
+									)}
+									{product.stock > 0 ? "En stock" : "Hors stock"}
+								</Typography>
+							)}
 							<div
 								style={{
 									display: "flex",
@@ -484,9 +520,27 @@ export default function ProductDetails(props) {
 								</Typography>
 							</div>
 							<Divider style={{ marginBottom: 10 }} />
+							{product.promoted === true && (
+								<Typography
+									style={{ marginBottom: 10, fontWeight: 550, fontSize: 20 }}
+									color="primary"
+								>
+									{isLoading ? (
+										<Skeleton width="50%" />
+									) : (
+										[
+											product.newPrice.slice(0, product.price.length - 3),
+											" ",
+											product.newPrice.slice(product.price.length - 3),
+											" Da",
+										]
+									)}
+								</Typography>
+							)}
 							<Typography
 								style={{ marginBottom: 10, fontWeight: 550, fontSize: 20 }}
 								color="primary"
+								className={product.promoted === true ? "old-price" : null}
 							>
 								{isLoading ? (
 									<Skeleton width="50%" />
@@ -513,7 +567,7 @@ export default function ProductDetails(props) {
 									variant="contained"
 									size="large"
 									fullWidth
-									startIcon={<AddToCart />}
+									startIcon={<AddShoppingCartIcon />}
 									style={{
 										alignSelf: "center",
 										color: "white",
@@ -609,13 +663,13 @@ export default function ProductDetails(props) {
 						</a>
 					</div>
 					<Divider style={{ marginBottom: 10 }} />
+
 					{similaireProducts.length === 0 && (
-						<div
-							style={{
-								display: "flex",
-								width: "100%",
-								height: 300,
-							}}
+						<Masonry
+							breakpointCols={productBreakpoints}
+							className="my-masonry-grid"
+							columnClassName="my-masonry-grid_column"
+							style={{ width: "100%", height: "100%" }}
 						>
 							<Skeleton
 								height="100%"
@@ -658,14 +712,14 @@ export default function ProductDetails(props) {
 								width="19%"
 								style={{ transform: "none" }}
 							/>
-						</div>
+						</Masonry>
 					)}
 					{similaireProducts.length > 0 && (
-						<div
-							style={{
-								display: "flex",
-								width: "100%",
-							}}
+						<Masonry
+							breakpointCols={productBreakpoints}
+							className="my-masonry-grid"
+							columnClassName="my-masonry-grid_column"
+							style={{ width: "100%", height: "100%" }}
 						>
 							{similaireProducts.map(
 								(element) =>
@@ -679,7 +733,11 @@ export default function ProductDetails(props) {
 											}}
 										>
 											<Card
-												style={{ width: "100%", height: 300, marginRight: 30 }}
+												style={{
+													width: "100%",
+													height: 300,
+													marginRight: 30,
+												}}
 											>
 												<CardActionArea
 													disableRipple
@@ -726,7 +784,7 @@ export default function ProductDetails(props) {
 										</a>
 									)
 							)}
-						</div>
+						</Masonry>
 					)}
 				</Container>
 

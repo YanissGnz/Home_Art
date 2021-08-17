@@ -13,26 +13,71 @@ import {
 	DialogTitle,
 	DialogActions,
 	DialogContent,
+	CircularProgress,
+	IconButton,
+	Snackbar,
 } from "@material-ui/core";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import CheckBoxOutlinedIcon from "@material-ui/icons/CheckBoxOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import PinDropOutlinedIcon from "@material-ui/icons/PinDropOutlined";
 import VpnKeyOutlinedIcon from "@material-ui/icons/VpnKeyOutlined";
-
+import DeleteOutlineOutlinedIcon from "@material-ui/icons/DeleteOutlineOutlined";
 import LocationOffOutlinedIcon from "@material-ui/icons/LocationOffOutlined";
 import { useState } from "react";
 import { useHistory } from "react-router";
 import Slide from "@material-ui/core/Slide";
+import { useSelector, useDispatch } from "react-redux";
+import {
+	dispatchUserError,
+	dispatchUserLoaded,
+	dispatchUserLoading,
+} from "../../redux/actions/authAction";
+import { returnErrors } from "../../redux/actions/errAction";
+import axios from "axios";
+import { Tooltip } from "@material-ui/core";
+import { useTheme } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
 	return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const address = {
+	address: "",
+	ville: "",
+	region: "",
+};
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export default function Profile() {
 	const history = useHistory();
+	const dispatch = useDispatch();
+	const token = useSelector((state) => state.auth.token);
 	const [open, setOpen] = React.useState(false);
 	const [addresses, setAddresses] = useState([]);
+	const [newAddress, setNewAddress] = useState(address);
+	const [msg, setMsg] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
+	const [user, setUser] = React.useState(null);
+	const theme = useTheme();
+	const [alertOpen, setAlertOpen] = React.useState(false);
+	const [alertType, setAlertType] = React.useState("");
+
+	const handleAlertOpen = () => {
+		setAlertOpen(true);
+	};
+	const handleAlertClose = () => {
+		setAlertOpen(false);
+	};
+
+	const handleChangeInput = (e) => {
+		const { name, value } = e.target;
+		setNewAddress({ ...newAddress, [name]: value });
+	};
 
 	const handleClickOpen = () => {
 		setOpen(true);
@@ -40,13 +85,95 @@ export default function Profile() {
 
 	const handleClose = () => {
 		setOpen(false);
+		setNewAddress(address);
+	};
+
+	React.useEffect(() => {
+		const loadUser = async () => {
+			dispatch(dispatchUserLoading());
+
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
+
+			await axios
+				.get("/users/load_User", config)
+				.then((res) => {
+					dispatch(dispatchUserLoaded(res));
+					setAddresses(res.data.user.addresses);
+					setUser(res.data.user);
+				})
+				.catch((err) => {
+					dispatch(dispatchUserError());
+					dispatch(returnErrors(err.response.data.msg, err.response.status));
+				});
+		};
+		loadUser();
+	}, [dispatch, token]);
+
+	const addAdresse = () => {
+		setIsLoading(true);
+
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		const { address, ville, region } = newAddress;
+		axios
+			.post("/users/add_Address", { address, ville, region }, config)
+			.then((res) => {
+				setMsg(res.data.msg);
+				setAddresses(res.data.addresses);
+				handleAlertOpen();
+				setAlertType("success");
+				setIsLoading(false);
+			})
+			.catch((err) => {
+				setMsg(err.response.data);
+
+				setIsLoading(false);
+			});
+	};
+
+	const handleremove = (address) => {
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		axios
+			.post("/users/delete_address", { address }, config)
+			.then((res) => {
+				setMsg(res.data.msg);
+				setAddresses(res.data.newAddresses);
+			})
+			.catch((err) => {
+				console.log(err.response.data.msg);
+			});
 	};
 
 	return (
 		<div>
 			<div className="profile_body">
 				<CssBaseline />
-				<MyAppBar />
+				<MyAppBar cartLength={user ? user.cart.length : 0} />
+				<Snackbar
+					open={alertOpen}
+					autoHideDuration={3000}
+					onClose={handleAlertClose}
+				>
+					<Alert severity={alertType}>
+						<Typography>{msg}</Typography>
+					</Alert>
+				</Snackbar>
 				<Container
 					maxWidth="lg"
 					style={{
@@ -219,20 +346,129 @@ export default function Profile() {
 												color="disabled"
 											/>
 											<Typography variant="h5" color="textSecondary">
-												Vous n'avez pas d'address
+												Vous n'avez pas d'addresses
 											</Typography>
 										</div>
 									) : (
 										addresses.map((address) => (
-											<div>
-												<Typography style={{ fontSize: 18, marginBottom: 15 }}>
-													{address}
-												</Typography>
-												<Divider style={{ marginBottom: 15 }} />
+											<div
+												style={{
+													display: "flex",
+													width: "100%",
+													justifyContent: "space-between",
+													alignItems: "center",
+													borderBottom: "1px solid rgb(0 0 0 / 12%)",
+													marginBottom: 10,
+													padding: 10,
+												}}
+											>
+												<div
+													style={{
+														display: "flex",
+														flexDirection: "column",
+													}}
+												>
+													<div
+														style={{ display: "inline-flex", marginBottom: 3 }}
+													>
+														<Typography
+															style={{
+																fontSize: 16,
+																fontWeight: 500,
+															}}
+															color="primary"
+														>
+															Address :{" "}
+														</Typography>
+														<Typography
+															style={{
+																fontSize: 16,
+																fontWeight: 400,
+																marginLeft: 5,
+															}}
+														>
+															{" "}
+															{address.address}
+														</Typography>
+													</div>
+													<div
+														style={{ display: "inline-flex", marginBottom: 3 }}
+													>
+														<div
+															style={{
+																display: "inline-flex",
+																marginBottom: 3,
+																marginRight: 10,
+															}}
+														>
+															<Typography
+																style={{
+																	fontSize: 16,
+																	marginBottom: 5,
+																	fontWeight: 500,
+																}}
+																color="primary"
+															>
+																Région :
+															</Typography>
+															<Typography
+																style={{
+																	fontSize: 16,
+																	fontWeight: 400,
+																	marginLeft: 5,
+																}}
+															>
+																{address.region}
+															</Typography>
+														</div>
+														<div
+															style={{
+																display: "inline-flex",
+																marginBottom: 3,
+															}}
+														>
+															<Typography
+																style={{
+																	fontSize: 16,
+																	marginBottom: 3,
+																	fontWeight: 500,
+																}}
+																color="primary"
+															>
+																Ville :
+															</Typography>
+															<Typography
+																style={{
+																	fontSize: 16,
+																	fontWeight: 400,
+																	marginLeft: 5,
+																}}
+															>
+																{address.ville}
+															</Typography>
+														</div>
+													</div>
+												</div>
+
+												<Tooltip
+													title="Supprimer"
+													aria-label="delete"
+													placement="left-center"
+												>
+													<IconButton
+														onClick={() => {
+															handleremove(address);
+														}}
+														style={{ height: 50 }}
+													>
+														<DeleteOutlineOutlinedIcon />
+													</IconButton>
+												</Tooltip>
 											</div>
 										))
 									)}
 								</div>
+
 								<Button
 									variant="contained"
 									color="primary"
@@ -267,39 +503,76 @@ export default function Profile() {
 						>
 							<TextField
 								autoFocus
+								name="address"
 								label="Address"
 								fullWidth
 								style={{ marginBottom: 50 }}
 								variant="outlined"
+								onChange={handleChangeInput}
+								value={newAddress.address}
+								helperText={msg.id === 0 && msg.msg}
+								error={msg.id === 0}
 							/>
 							<div style={{ display: "flex", marginBottom: 50 }}>
 								<TextField
 									autoFocus
+									name="region"
 									label="Région"
 									fullWidth
 									style={{ marginRight: 20 }}
 									variant="outlined"
+									onChange={handleChangeInput}
+									value={newAddress.region}
+									helperText={msg.id === 1 && msg.msg}
+									error={msg.id === 1}
 								/>
 								<TextField
 									autoFocus
+									name="ville"
 									label="Ville"
 									fullWidth
 									variant="outlined"
+									onChange={handleChangeInput}
+									value={newAddress.ville}
+									helperText={msg.id === 2 && msg.msg}
+									error={msg.id === 2}
 								/>
 							</div>
-							<Button
-								variant="contained"
-								color="primary"
+							<div
 								style={{
-									color: "white",
-									textTransform: "none",
-									width: 400,
+									margin: 0,
+									position: "relative",
 									alignSelf: "center",
 								}}
-								onClick={handleClickOpen}
 							>
-								Enregistrer
-							</Button>
+								<Button
+									variant="contained"
+									color="primary"
+									style={{
+										color: "white",
+										textTransform: "none",
+										width: 400,
+										alignSelf: "center",
+									}}
+									onClick={addAdresse}
+									disabled={isLoading}
+								>
+									Enregistrer
+								</Button>
+								{isLoading && (
+									<CircularProgress
+										size={24}
+										style={{
+											color: theme.palette.primary,
+											position: "absolute",
+											top: "25%",
+											left: "50%",
+											marginTop: -1,
+											marginLeft: -12,
+										}}
+									/>
+								)}
+							</div>
 						</DialogContent>
 
 						<DialogActions>

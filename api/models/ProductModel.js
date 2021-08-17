@@ -17,10 +17,16 @@ const productSchema = new mongoose.Schema({
 		required: [true, "Entrer le prix de produit"],
 		trim: true,
 	},
+	newPrice: {
+		type: String,
+		trim: true,
+	},
+	promoted: {
+		type: Boolean,
+	},
 	stock: {
 		type: Number,
 		required: [true, "Entrer le nombre de stock"],
-		trim: true,
 	},
 	categorie: {
 		type: String,
@@ -45,11 +51,11 @@ const productSchema = new mongoose.Schema({
 	},
 	rating: {
 		type: Array,
-		default: [1, 1, 1, 1, 1],
+		default: [0, 0, 0, 0, 0],
 	},
 	ratingsNumber: {
 		type: Number,
-		default: 1,
+		default: 0,
 	},
 });
 

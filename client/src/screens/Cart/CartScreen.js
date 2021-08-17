@@ -15,7 +15,6 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import EmptyCart from "../../Icons/EmptyCart";
 import {
 	dispatchUserError,
 	dispatchUserLoaded,
@@ -24,6 +23,7 @@ import {
 import MyAppBar from "../../utils/AppBar";
 import Fotter from "../../utils/Footer";
 import CartProducts from "./Components/CartProducts";
+import ShoppingCartOutlinedIcon from "@material-ui/icons/ShoppingCartOutlined";
 
 const useStyles = makeStyles((theme) => ({
 	backdrop: {
@@ -41,6 +41,7 @@ export default function CartScreen() {
 	const [user, setUser] = React.useState(null);
 
 	const [cart, setCart] = useState([]);
+	const [totalPrice, setTotalPrice] = useState("");
 	const [cartLength, setCartLength] = useState(cart.length);
 	const [someProducts, setProducts] = useState([]);
 	const [open, setOpen] = React.useState(false);
@@ -106,6 +107,17 @@ export default function CartScreen() {
 	}, [user]);
 
 	React.useEffect(() => {
+		var totalPrice = 0;
+		if (cart.length !== 0) {
+			// eslint-disable-next-line array-callback-return
+			cart.map((item) => {
+				totalPrice = totalPrice + parseInt(item.product.price) * item.quantity;
+			});
+			setTotalPrice(totalPrice.toString());
+		}
+	}, [cart]);
+
+	React.useEffect(() => {
 		const loadSomeProducts = async () => {
 			const skip = Math.floor(Math.random() * 20);
 			const limit = 5;
@@ -129,7 +141,6 @@ export default function CartScreen() {
 				<CircularProgress color="primary" />
 			</Backdrop>
 			{cart.length === 0 ? (
-				//Hadi ki ykon l panier faregh
 				<Container
 					maxWidth="xl"
 					style={{
@@ -141,7 +152,7 @@ export default function CartScreen() {
 						padding: 80,
 					}}
 				>
-					<EmptyCart />
+					<ShoppingCartOutlinedIcon style={{ fontSize: 100 }} />
 					<Typography
 						variant="h5"
 						style={{
@@ -243,7 +254,7 @@ export default function CartScreen() {
 									}}
 									variant="h5"
 								>
-									Prix total
+									Sous-total
 								</Typography>
 							</CardContent>
 							{cart.length > 0 &&
@@ -253,6 +264,34 @@ export default function CartScreen() {
 										handleRemoveItem={handleRemoveItem}
 									/>
 								))}
+							<div
+								style={{
+									display: "flex",
+									borderTop: "1px solid grey",
+									borderBottom: "1px solid grey",
+									alignItems: "center",
+									padding: 10,
+									position: "relative",
+									justifyContent: "flex-end",
+								}}
+							>
+								<Typography
+									style={{ fontSize: 28, fontWeight: 400, marginRight: 10 }}
+								>
+									Prix Total:{" "}
+								</Typography>
+								<Typography
+									style={{ fontSize: 28, fontWeight: 550 }}
+									color="primary"
+								>
+									{[
+										totalPrice.slice(0, totalPrice.length - 3),
+										" ",
+										totalPrice.slice(totalPrice.length - 3),
+										" Da",
+									]}
+								</Typography>
+							</div>
 						</Card>
 					</Container>
 					<Button

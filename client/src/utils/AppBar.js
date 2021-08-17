@@ -15,18 +15,79 @@ import {
 	useScrollTrigger,
 	ListItemText,
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import { dispatchLogout } from "../redux/actions/authAction";
-import { useStyles } from "../screens/HomeScreen/useStyles";
 import Menus from "./Menu";
 import Logo from "../Icons/Logo";
-import Cart from "../Icons/Cart";
 import ShoppingCartOutlinedIcon from "@material-ui/icons/ShoppingCartOutlined";
 import NotificationsNoneOutlinedIcon from "@material-ui/icons/NotificationsNoneOutlined";
 import SearchIcon from "@material-ui/icons/Search";
 import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined";
-import { Autocomplete } from "@material-ui/lab";
-import { List } from "@material-ui/icons";
-import { ListItem } from "@material-ui/core";
+
+const drawerWidth = 400;
+
+const useStyles = makeStyles((theme) => {
+	return {
+		loader: {
+			marginTop: "22%",
+			marginLeft: "49%",
+		},
+		paper: {
+			padding: "2px 4px",
+			display: "flex",
+			alignItems: "center",
+			height: 40,
+			marginRight: "3em",
+			marginLeft: "3em",
+			flex: 0.5,
+		},
+		input: {
+			marginLeft: theme.spacing(1),
+			flex: 1,
+		},
+		search_Button: {
+			padding: 6,
+		},
+		cart_button: {
+			marginRight: 20,
+			padding: 10,
+			fontWeight: "450",
+			fontSize: "16px",
+			textTransform: "capitalize",
+			"&:hover": {
+				backgroundColor: theme.palette.common.white,
+			},
+		},
+		logout_button: {
+			marginRight: 20,
+			padding: 10,
+			fontWeight: "550",
+			fontSize: "16px",
+			textTransform: "capitalize",
+			"&:hover": {
+				backgroundColor: theme.palette.common.white,
+			},
+		},
+		drawer: {
+			width: drawerWidth,
+		},
+		drawerPaper: {
+			width: drawerWidth,
+		},
+		inline: {
+			display: "inline",
+		},
+		badge: {
+			color: "white",
+			fontSize: 12,
+			fontWeight: 550,
+		},
+
+		iconButton: {
+			padding: 5,
+		},
+	};
+});
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -50,8 +111,6 @@ export default function MyAppBar(props) {
 	const [cart, setCart] = React.useState(0);
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [notificationAnchorEl, setNotificationAnchorEl] = React.useState(null);
-
-	const [productsNames, setProductsNames] = React.useState([]);
 
 	const open = Boolean(anchorEl);
 	const openNotificaion = Boolean(notificationAnchorEl);
@@ -97,32 +156,21 @@ export default function MyAppBar(props) {
 						</div>
 					</a>
 
-					<Autocomplete
-						freeSolo
-						options={productsNames.map((option) => option.name)}
-						style={{ width: "50%", padding: 0 }}
-						renderInput={(params) => (
-							<Paper
-								component="form"
-								className={classes.paper}
-								variant="outlined"
-								style={{ padding: 0 }}
-							>
-								<div
-									ref={params.InputProps.ref}
-									style={{ width: "100%", padding: 0 }}
-								>
-									<InputBase
-										type="text"
-										placeholder="Rechercher"
-										{...params.inputProps}
-										style={{ width: "100%", padding: 10 }}
-										startAdornment={<SearchIcon style={{ paddingRight: 1 }} />}
-									/>
-								</div>
-							</Paper>
-						)}
-					/>
+					<Paper component="form" className={classes.paper} variant="outlined">
+						<InputBase
+							className={classes.input}
+							placeholder="Rechercher"
+							inputProps={{ "aria-label": "search" }}
+						/>
+						<IconButton
+							type="submit"
+							className={classes.iconButton}
+							aria-label="search"
+							onClick={handleSearch}
+						>
+							<SearchIcon />
+						</IconButton>
+					</Paper>
 
 					{auth.isAuthenticated === "false" && <Menus />}
 

@@ -19,3 +19,7 @@
 	width: 400px;
 	height: 600px;
 }
+
+.old-price {
+	text-decoration: line-through;
+}

@@ -1,7 +1,4 @@
 import {
-	Card,
-	CardActionArea,
-	CardContent,
 	CircularProgress,
 	Container,
 	CssBaseline,
@@ -23,6 +20,7 @@ import {
 } from "../../redux/actions/productsAction";
 import MyAppBar from "../../utils/AppBar";
 import Footer from "../../utils/Footer";
+import ProductCard from "../../utils/ProductCard";
 import { useStyles } from "./useStyles";
 
 export default function CategorieScreen(props) {
@@ -110,44 +108,7 @@ export default function CategorieScreen(props) {
 							style={{ width: "100%" }}
 						>
 							{products.map((product) => (
-								<Card style={{ width: 300, height: 300, marginRight: 30 }}>
-									<a
-										href={`/product/${product._id}`}
-										style={{
-											width: "22%",
-											textDecoration: "none",
-											marginRight: 10,
-										}}
-									>
-										<CardActionArea disableRipple>
-											<img
-												style={{ width: "100%", maxHeight: "200px" }}
-												src={`/uploads/${product.productImages[0]}`}
-												alt="Product"
-											/>
-
-											<CardContent>
-												<Typography
-													gutterBottom
-													style={{ fontSize: 18, fontWeight: 500 }}
-													variant="h6"
-													component="h2"
-													noWrap={true}
-													color="textPrimary"
-												>
-													{product.name}
-												</Typography>
-												<Typography
-													style={{ fontSize: 18, fontWeight: 600 }}
-													gutterBottom
-													color="primary"
-												>
-													{product.price} Da
-												</Typography>
-											</CardContent>
-										</CardActionArea>
-									</a>
-								</Card>
+								<ProductCard product={product} />
 							))}
 						</Masonry>
 					</Container>

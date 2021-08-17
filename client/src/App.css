@@ -18,3 +18,7 @@
 .fotter_links:hover {
 	text-decoration: underline;
 }
+
+.old-price {
+	text-decoration: line-through;
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import MyAppBar from "../../utils/AppBar";
 import Fotter from "../../utils/Footer";
 import {
@@ -9,6 +9,7 @@ import {
 	Button,
 	TextField,
 	Divider,
+	Snackbar,
 } from "@material-ui/core";
 
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
@@ -18,15 +19,121 @@ import PinDropOutlinedIcon from "@material-ui/icons/PinDropOutlined";
 import VpnKeyOutlinedIcon from "@material-ui/icons/VpnKeyOutlined";
 
 import { useHistory } from "react-router";
+import axios from "axios";
+import {
+	dispatchUserError,
+	dispatchUserLoaded,
+	dispatchUserLoading,
+} from "../../redux/actions/authAction";
+import { returnErrors } from "../../redux/actions/errAction";
+import { useDispatch, useSelector } from "react-redux";
+import MuiAlert from "@material-ui/lab/Alert";
+import { CircularProgress } from "@material-ui/core";
+import { useTheme } from "@material-ui/core";
+
+const initialState = {
+	password: "",
+	newPassword: "",
+	confirmPassword: "",
+};
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function Profile() {
 	const history = useHistory();
+	const [user, setUser] = useState(null);
+	const dispatch = useDispatch();
+	const token = useSelector((state) => state.auth.token);
+	const [passwordReset, setPasswordReset] = useState(initialState);
+	const [msg, setMsg] = useState("");
+	const [alertOpen, setAlertOpen] = React.useState(false);
+	const [alertType, setAlertType] = React.useState("");
+	const theme = useTheme();
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleAlertOpen = () => {
+		setAlertOpen(true);
+	};
+	const handleAlertClose = () => {
+		setAlertOpen(false);
+	};
+
+	const handleChangeInput = (e) => {
+		const { name, value } = e.target;
+		setPasswordReset({ ...passwordReset, [name]: value });
+	};
+
+	React.useEffect(() => {
+		const loadUser = async () => {
+			dispatch(dispatchUserLoading());
+
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
+
+			await axios
+				.get("/users/load_User", config)
+				.then((res) => {
+					dispatch(dispatchUserLoaded(res));
+					setUser(res.data.user);
+				})
+				.catch((err) => {
+					dispatch(dispatchUserError());
+					dispatch(returnErrors(err.response.data.msg, err.response.status));
+				});
+		};
+		loadUser();
+	}, [dispatch, token]);
+
+	const resetPassword = () => {
+		const { password, newPassword, confirmPassword } = passwordReset;
+		setIsLoading(true);
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		axios
+			.post(
+				"/users/password",
+				{ password, newPassword, confirmPassword },
+				config
+			)
+			.then((res) => {
+				setUser(res.data.user);
+				setMsg(res.data.msg);
+				handleAlertOpen();
+				setAlertType("success");
+				setIsLoading(false);
+				setPasswordReset(initialState);
+			})
+			.catch((err) => {
+				setMsg(err.response.data);
+				setIsLoading(false);
+			});
+	};
 
 	return (
 		<div>
 			<div className="profile_body">
 				<CssBaseline />
-				<MyAppBar />
+				<MyAppBar cartLength={user ? user.cart.length : 0} />
+				<Snackbar
+					open={alertOpen}
+					autoHideDuration={3000}
+					onClose={handleAlertClose}
+				>
+					<Alert severity={alertType}>
+						<Typography>{msg}</Typography>
+					</Alert>
+				</Snackbar>
 				<Container
 					maxWidth="lg"
 					style={{
@@ -164,6 +271,9 @@ export default function Profile() {
 							</Typography>
 							<Divider style={{ marginBottom: 50 }} />
 							<TextField
+								name="password"
+								type="password"
+								value={passwordReset.password}
 								label="Mot de pass actuel"
 								variant="outlined"
 								style={{
@@ -171,8 +281,14 @@ export default function Profile() {
 									marginBottom: 50,
 									alignSelf: "center",
 								}}
+								onChange={handleChangeInput}
+								helperText={msg.id === 0 && msg.msg}
+								error={msg.id === 0}
 							/>
 							<TextField
+								name="newPassword"
+								type="password"
+								value={passwordReset.newPassword}
 								label="Nouveau mot de passe"
 								variant="outlined"
 								style={{
@@ -180,8 +296,14 @@ export default function Profile() {
 									marginBottom: 50,
 									alignSelf: "center",
 								}}
+								onChange={handleChangeInput}
+								helperText={msg.id === 1 && msg.msg}
+								error={msg.id === 1}
 							/>
 							<TextField
+								name="confirmPassword"
+								type="password"
+								value={passwordReset.confirmPassword}
 								label="confirmer votre mot de passe"
 								variant="outlined"
 								style={{
@@ -189,20 +311,41 @@ export default function Profile() {
 									marginBottom: 50,
 									alignSelf: "center",
 								}}
+								onChange={handleChangeInput}
+								helperText={msg.id === 2 && msg.msg}
+								error={msg.id === 2}
 							/>
-							<Button
-								variant="contained"
-								color="primary"
-								style={{
-									color: "white",
-									textTransform: "none",
-									width: 400,
-									alignSelf: "center",
-								}}
-								size="large"
+							<div
+								style={{ margin: 0, position: "relative", alignSelf: "center" }}
 							>
-								Enregistrer
-							</Button>
+								<Button
+									variant="contained"
+									color="primary"
+									style={{
+										color: "white",
+										textTransform: "none",
+										width: 400,
+									}}
+									size="large"
+									onClick={resetPassword}
+									disabled={isLoading}
+								>
+									Enregistrer
+								</Button>
+								{isLoading && (
+									<CircularProgress
+										size={24}
+										style={{
+											color: theme.palette.primary,
+											position: "absolute",
+											top: "25%",
+											left: "50%",
+											marginTop: -1,
+											marginLeft: -12,
+										}}
+									/>
+								)}
+							</div>
 						</div>
 					</div>
 				</Container>

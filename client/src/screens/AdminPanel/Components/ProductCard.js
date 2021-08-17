@@ -21,13 +21,14 @@ import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
 import clsx from "clsx";
 import "../adminPanel.css";
 import { useStyles } from "../useStyles";
-
+import TrendingDownRoundedIcon from "@material-ui/icons/TrendingDownRounded";
 export default function ProductCard({
 	product,
 	handleClickEditOpen,
 	handleDelete,
 	handleArchive,
 	handleReveal,
+	handleClickPromotionOpen,
 }) {
 	const classes = useStyles();
 	const [expanded, setExpanded] = React.useState(false);
@@ -122,6 +123,18 @@ export default function ProductCard({
 									className={classes.MenuIcon}
 								/>
 								Modifier
+							</MenuItem>
+							<MenuItem
+								onClick={() => {
+									handleMenuClose();
+									handleClickPromotionOpen(product._id);
+								}}
+							>
+								<TrendingDownRoundedIcon
+									fontSize="small"
+									className={classes.MenuIcon}
+								/>
+								Promotion
 							</MenuItem>
 						</Menu>
 					</div>
