@@ -287,19 +287,24 @@ export default function ProductDetails(props) {
 			await axios
 				.get(`/products/get_product_by_id?id=${product_Id}&type=single`)
 				.then((res) => {
-					const rating = res.data.product[0].rating;
 					setProduct(res.data.product[0]);
 					console.log(res.data.product[0]);
 					setProductImages(res.data.product[0].productImages);
 					setIsLoading(false);
+
 					setRatingValue(
-						(5 * rating[4] +
-							4 * rating[3] +
-							3 * rating[2] +
-							2 * rating[1] +
-							1 * rating[0]) /
-							(rating[0] + rating[1] + rating[2] + rating[3] + rating[4])
+						(5 * res.data.rating[4] +
+							4 * res.data.rating[3] +
+							3 * res.data.rating[2] +
+							2 * res.data.rating[1] +
+							1 * res.data.rating[0]) /
+							(res.data.rating[0] +
+								res.data.rating[1] +
+								res.data.rating[2] +
+								res.data.rating[3] +
+								res.data.rating[4])
 					);
+
 					setComments(res.data.product[0].comments);
 					setRatingsNumber(res.data.product[0].ratingsNumber);
 				})
@@ -823,7 +828,12 @@ export default function ProductDetails(props) {
 									color="primary"
 									style={{ fontSize: 25, fontWeight: 500, marginBottom: 5 }}
 								>
-									{ratingValue.toFixed(2)}/5
+									{ratingValue === undefined ||
+									ratingValue === NaN ||
+									ratingValue === null
+										? ratingValue.toFixed(2)
+										: ratingValue.toFixed(2)}
+									/5
 								</Typography>
 								<Rating
 									style={{ marginRight: 10 }}
