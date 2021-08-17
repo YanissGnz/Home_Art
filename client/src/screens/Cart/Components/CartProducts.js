@@ -1,11 +1,11 @@
 import { Typography, IconButton } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import RemoveIcon from "@material-ui/icons/Remove";
-import ClearIcon from "@material-ui/icons/Clear";
 import React, { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
-
+import DeleteOutlineOutlinedIcon from "@material-ui/icons/DeleteOutlineOutlined";
+import { Tooltip } from "@material-ui/core";
 export default function UserCard({
 	item,
 	handleRemoveItem,
@@ -63,8 +63,8 @@ export default function UserCard({
 				.then((res) => {
 					if (res.data.msg === "La quantity de produit a été décrémenter.") {
 						setState(res.data.quantity);
+						handleTotalPriceReduce(item.product.price);
 					}
-					handleTotalPriceReduce(item.product.price);
 					setLoading(false);
 				})
 				.catch((err) => {
@@ -90,16 +90,23 @@ export default function UserCard({
 				position: "relative",
 			}}
 		>
-			<IconButton
-				style={{ position: "absolute", left: "95.4%", top: 10 }}
-				onClick={() => {
-					handleRemoveItem(item);
-					setLoading(true);
-				}}
-				disabled={loading}
+			<Tooltip
+				title="Retirer du panier"
+				aria-label="delete"
+				placement="left-center"
 			>
-				<ClearIcon />
-			</IconButton>
+				<IconButton
+					style={{ position: "absolute", left: "95.4%", top: 10 }}
+					onClick={() => {
+						handleRemoveItem(item);
+						setLoading(true);
+					}}
+					disabled={loading}
+					size="medium"
+				>
+					<DeleteOutlineOutlinedIcon />
+				</IconButton>
+			</Tooltip>
 			<div
 				style={{
 					display: "flex",
@@ -120,7 +127,11 @@ export default function UserCard({
 				/>
 				<a
 					href={`/product/${product._id}`}
-					style={{ color: "black", fontWeight: 450 }}
+					style={{
+						color: "black",
+						fontWeight: 450,
+						overflow: "hidden",
+					}}
 					className="fotter_links"
 				>
 					<Typography variant="h6">{product.name}</Typography>
