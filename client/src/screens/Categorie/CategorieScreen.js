@@ -15,7 +15,6 @@ import {
 	Button,
 	FormControl,
 } from "@material-ui/core";
-import { Skeleton } from "@material-ui/lab";
 import Masonry from "react-masonry-css";
 import { useDispatch, useSelector } from "react-redux";
 
