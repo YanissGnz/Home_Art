@@ -83,7 +83,6 @@ export default function ProductDetails(props) {
 
 	const productBreakpoints = {
 		default: 5,
-		1600: 4,
 		1000: 3,
 		600: 2,
 	};
@@ -318,8 +317,8 @@ export default function ProductDetails(props) {
 
 	React.useEffect(() => {
 		const loadSimilaireProducts = async () => {
-			const skip = Math.floor(Math.random() * 5);
-			const limit = 5;
+			const skip = 0; // Math.floor(Math.random() * 5) in the final version;
+			const limit = 6;
 			console.log("i did this");
 			await axios
 				.post(
@@ -529,34 +528,20 @@ export default function ProductDetails(props) {
 								<Typography
 									style={{ marginBottom: 10, fontWeight: 550, fontSize: 20 }}
 									color="primary"
+									className={product.promoted === true ? "old-price" : null}
 								>
 									{isLoading ? (
 										<Skeleton width="50%" />
 									) : (
-										[
-											product.newPrice.slice(0, product.price.length - 3),
-											" ",
-											product.newPrice.slice(product.price.length - 3),
-											" Da",
-										]
+										[product.oldPrice, " Da"]
 									)}
 								</Typography>
 							)}
 							<Typography
 								style={{ marginBottom: 10, fontWeight: 550, fontSize: 20 }}
 								color="primary"
-								className={product.promoted === true ? "old-price" : null}
 							>
-								{isLoading ? (
-									<Skeleton width="50%" />
-								) : (
-									[
-										product.price.slice(0, product.price.length - 3),
-										" ",
-										product.price.slice(product.price.length - 3),
-										" Da",
-									]
-								)}
+								{isLoading ? <Skeleton width="50%" /> : [product.price, " Da"]}
 							</Typography>
 							<div
 								style={{
@@ -773,15 +758,7 @@ export default function ProductDetails(props) {
 															gutterBottom
 															color="primary"
 														>
-															{[
-																element.price.slice(
-																	0,
-																	element.price.length - 3
-																),
-																" ",
-																element.price.slice(element.price.length - 3),
-															]}{" "}
-															Da
+															{[element.price]} Da
 														</Typography>
 													</CardContent>
 												</CardActionArea>
@@ -828,9 +805,7 @@ export default function ProductDetails(props) {
 									color="primary"
 									style={{ fontSize: 25, fontWeight: 500, marginBottom: 5 }}
 								>
-									{ratingValue === undefined ||
-									ratingValue === NaN ||
-									ratingValue === null
+									{ratingValue === undefined || ratingValue === null
 										? ratingValue.toFixed(2)
 										: ratingValue.toFixed(2)}
 									/5

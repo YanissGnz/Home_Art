@@ -22,6 +22,7 @@ import ProfileAddresses from "./screens/Profile/ProfileAddresses";
 import ProfileCommande from "./screens/Profile/ProfileCommande";
 import ProfileFavoris from "./screens/Profile/ProfileFavoris";
 import ProfilePassword from "./screens/Profile/ProfilePassword";
+import SearchScreen from "./screens/SearchScreen/SearchScreen";
 
 const theme = createMuiTheme({
 	palette: {
@@ -46,6 +47,7 @@ export default function App() {
 							path="/product/:productId"
 							component={ProductDetails}
 						/>
+						<Route exact path="/search/:searchTerm" component={SearchScreen} />
 						<Route
 							exact
 							path="/categorie/:categorie"

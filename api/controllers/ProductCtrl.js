@@ -13,7 +13,7 @@ const productCtrl = {
 					.status(400)
 					.json({ msg: "Enter la marque de produit.", id: 1 });
 			}
-			if (req.body.price == "") {
+			if (req.body.price == 0 || !req.body.price) {
 				return res
 					.status(400)
 					.json({ msg: "Enter le prix de produit.", id: 2 });
@@ -28,15 +28,20 @@ const productCtrl = {
 					.status(400)
 					.json({ msg: "Enter la categorie de produit.", id: 4 });
 			}
+			if (req.body.subCategorie == "") {
+				return res
+					.status(400)
+					.json({ msg: "Enter la sous-categorie de produit.", id: 5 });
+			}
 			if (req.body.description == "") {
 				return res
 					.status(400)
-					.json({ msg: "Enter une description sur produit.", id: 5 });
+					.json({ msg: "Enter une description sur produit.", id: 6 });
 			}
 			if (req.files.length == 0) {
 				return res
 					.status(400)
-					.json({ msg: "Choisir des images pour le produit", id: 6 });
+					.json({ msg: "Choisir des images pour le produit", id: 7 });
 			} else {
 				const productImages = [];
 				for (var i = 0; i < req.files.length; i++) {
@@ -48,9 +53,12 @@ const productCtrl = {
 					price: req.body.price,
 					stock: req.body.stock,
 					categorie: req.body.categorie,
+					subCategorie: req.body.subCategorie,
 					description: req.body.description,
 					productImages: productImages,
 					archived: false,
+					promoted: false,
+					newPrice: 0,
 				});
 
 				newProduct
@@ -86,22 +94,6 @@ const productCtrl = {
 			res.status(400).json({ msg: e.message });
 		}
 	},
-	getProductNames: async (req, res) => {
-		const sortBy = "name";
-		const order = "desc";
-
-		try {
-			const productsNames = await Product.find()
-				.select("name")
-				.sort([[sortBy, order]]);
-
-			res.status(200).json({
-				productsNames,
-			});
-		} catch (e) {
-			res.status(400).json({ msg: e.message });
-		}
-	},
 	getProductById: async (req, res) => {
 		let type = req.query.type;
 		let product_id = req.query.id;
@@ -116,19 +108,170 @@ const productCtrl = {
 		}
 	},
 	getProductsByCategorie: async (req, res) => {
-		let type = req.query.type;
 		let categorie = req.query.categorie;
 		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
 		const skip = req.body.skip ? parseInt(req.body.skip) : 0;
+		const subCategorie = req.body.checkedCategorie
+			? req.body.checkedCategorie
+			: null;
+		const price = req.body.priceRange
+			? {
+					$gte: req.body.priceRange[0],
+					$lte: req.body.priceRange[1],
+			  }
+			: {
+					$gte: 0,
+					$lte: 9000000,
+			  };
+
+		const promoted = req.body.selectPromotion
+			? req.body.selectPromotion
+			: false;
 
 		try {
-			const products = await Product.find({ categorie: categorie })
-				.skip(skip)
-				.limit(limit);
+			if (subCategorie) {
+				if (promoted) {
+					const products = await Product.find({
+						categorie,
+						price,
+						promoted,
+						subCategorie,
+					})
+						.skip(skip)
+						.limit(limit)
+						.select("-rating")
+						.select("-ratingNumber")
+						.select("-brand")
+						.select("-comments")
+						.select("-ratingsNumber")
+						.select("-description")
+						.select("-archived")
+						.select("-__v");
+					res.status(200).json({
+						products,
+					});
+				} else {
+					const products = await Product.find({
+						categorie,
+						price,
+						subCategorie,
+					})
+						.skip(skip)
+						.limit(limit)
+						.select("-rating")
+						.select("-ratingNumber")
+						.select("-brand")
+						.select("-comments")
+						.select("-ratingsNumber")
+						.select("-description")
+						.select("-archived")
+						.select("-__v");
+					res.status(200).json({
+						products,
+					});
+				}
+			} else {
+				if (promoted) {
+					const products = await Product.find({
+						categorie,
+						price,
+						promoted,
+					})
+						.skip(skip)
+						.limit(limit)
+						.select("-rating")
+						.select("-ratingNumber")
+						.select("-brand")
+						.select("-comments")
+						.select("-ratingsNumber")
+						.select("-description")
+						.select("-archived")
+						.select("-__v");
+					res.status(200).json({
+						products,
+					});
+				} else {
+					const products = await Product.find({
+						categorie,
+						price,
+					})
+						.skip(skip)
+						.limit(limit)
+						.select("-rating")
+						.select("-ratingNumber")
+						.select("-brand")
+						.select("-comments")
+						.select("-ratingsNumber")
+						.select("-description")
+						.select("-archived")
+						.select("-__v");
+					res.status(200).json({
+						products,
+					});
+				}
+			}
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
+	searchProduct: async (req, res) => {
+		const searchTerm = req.query.searchTerm;
 
-			res.status(200).json({
-				products,
-			});
+		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
+		const skip = req.body.skip ? parseInt(req.body.skip) : 0;
+		const categorie = req.body.categorie
+			? req.body.categorie
+			: [
+					"Meuble",
+					"Vaisselle",
+					"Literie",
+					"Décoration",
+					"Electroménager",
+					"Autre",
+			  ];
+		const price = req.body.priceRange
+			? {
+					$gte: req.body.priceRange[0],
+					$lte: req.body.priceRange[1],
+			  }
+			: {
+					$gte: 0,
+					$lte: 9000000,
+			  };
+		const promoted = req.body.selectPromotion
+			? req.body.selectPromotion
+			: false;
+
+		try {
+			if (promoted) {
+				const products = await Product.find({
+					$text: { $search: searchTerm },
+				})
+					.find({
+						price,
+						categorie,
+						promoted,
+					})
+					.skip(skip)
+					.limit(limit);
+
+				res.status(200).json({
+					products,
+				});
+			} else {
+				const products = await Product.find({
+					$text: { $search: searchTerm },
+				})
+					.find({
+						price,
+						categorie,
+					})
+					.skip(skip)
+					.limit(limit);
+				res.status(200).json({
+					products,
+				});
+			}
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
@@ -199,7 +342,17 @@ const productCtrl = {
 
 	editProduct: async (req, res) => {
 		const product_id = req.params.product_id;
-		const { name, brand, price, stock, categorie, description } = req.body;
+		const {
+			name,
+			brand,
+			price,
+			stock,
+			categorie,
+			subCategorie,
+			description,
+			newPrice,
+			promoted,
+		} = req.body;
 
 		try {
 			if (name == "") {
@@ -225,19 +378,34 @@ const productCtrl = {
 					.status(400)
 					.json({ msg: "Enter la categorie de produit.", id: 4 });
 			}
+			if (subCategorie == "") {
+				return res
+					.status(400)
+					.json({ msg: "Enter la categorie de produit.", id: 5 });
+			}
 			if (description == "") {
 				return res
 					.status(400)
-					.json({ msg: "Enter une description sur produit.", id: 5 });
+					.json({ msg: "Enter une description sur produit.", id: 6 });
 			}
 			const check = await Product.findOne({ _id: product_id });
 			if (!check) {
-				return res.status(400).json({ msg: "Produit n'exist pas.", id: 5 });
+				return res.status(400).json({ msg: "Produit n'exist pas.", id: 6 });
 			}
 			if (req.files.length == 0) {
 				const editedProduct = await Product.updateOne(
 					{ _id: product_id },
-					{ name, brand, price, stock, categorie, description }
+					{
+						name,
+						brand,
+						price,
+						stock,
+						categorie,
+						subCategorie,
+						description,
+						newPrice,
+						promoted,
+					}
 				);
 			} else {
 				const productImages = [];
@@ -253,8 +421,11 @@ const productCtrl = {
 						price,
 						stock,
 						categorie,
+						subCategorie,
 						description,
 						productImages,
+						promoted,
+						newPrice,
 					}
 				);
 			}
@@ -269,16 +440,17 @@ const productCtrl = {
 		const product_id = req.params.product_id;
 		const { newPrice } = req.body;
 		try {
-			const check = await Product.findOne({ _id: product_id });
-			if (!check) {
+			const product = await Product.findOne({ _id: product_id });
+			if (!product) {
 				return res.status(400).json({ msg: "Produit n'exist pas." });
 			}
 			if (newPrice === "" || newPrice === 0) {
 				return res.status(400).json({ msg: "Enter le nouveau prix.", id: 6 });
 			}
+			const oldPrice = product.price;
 			const archivedProduct = await Product.updateOne(
 				{ _id: product_id },
-				{ newPrice: newPrice, promoted: true }
+				{ price: newPrice, oldPrice: oldPrice, promoted: true }
 			);
 			return res.status(200).json({
 				msg: "Le produit a été promoter.",

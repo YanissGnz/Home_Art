@@ -78,34 +78,60 @@ function StockFormat(props) {
 }
 
 const categories = [
-	{
-		value: "Robots",
-	},
-	{
-		value: "Meuble",
-	},
-	{
-		value: "Vaisselle",
-	},
-	{
-		value: "Décoration",
-	},
-	{
-		value: "Literie",
-	},
-	{
-		value: "Autre",
-	},
+	"",
+	"Meuble",
+	"Vaisselle",
+	"Literie",
+	"Décoration",
+	"Electroménager",
+	"Autre",
+];
+
+const subCategories = [
+	[""],
+	[
+		"Meuble de chambre à coucher",
+		"Meuble de salon",
+		"Meuble de cuisine",
+		"Meuble d'entrée",
+		"Autre",
+	],
+	[
+		"Art de table",
+		"Casseroles, cocottes, poêles & faitouts",
+		"Ustensiles & accessoires de cuisine",
+		"Autre",
+	],
+	["Matelas", "Couvre-lits et draps", "Couette et housse", "Autre"],
+	[
+		"Moquettes et tapis",
+		"Horloges",
+		"Plantes et vases",
+		"Lustres",
+		"Miroire",
+		"Figurines & accessoires",
+		"Autre",
+	],
+	[
+		"Blenders, mixeurs et robots de cuisine",
+		"Appareils de cuisson à induction",
+		"Grills, friteuses & plaques de cuissons",
+		"Cafetières et moulins électriques",
+		"Autre",
+	],
+	["Autre"],
 ];
 
 const initialState = {
 	name: "",
 	brand: "",
-	price: "",
+	price: 0,
 	stock: 0,
 	categorie: "",
+	subCategorie: "",
 	description: "",
-	newPrice: "",
+	newPrice: 0,
+	promoted: false,
 };
 
 export default function ProductsScreen() {
@@ -114,6 +140,7 @@ export default function ProductsScreen() {
 
 	const [product, setProduct] = React.useState(initialState);
 	const [categorie, setCategorie] = React.useState("");
+	const [subCategorie, setSubCategorie] = React.useState("");
 	var images = [];
 	const [imageSlide, setImageSlide] = React.useState("");
 	const [productImage, setProductImage] = React.useState("");
@@ -160,6 +187,8 @@ export default function ProductsScreen() {
 		setImageSlide("");
 		dispatch(clearErrors());
 		setMsg("");
+		setCategorie("");
+		setSubCategorie("");
 	};
 	/*______________________*/
 
@@ -174,8 +203,11 @@ export default function ProductsScreen() {
 			price: editedProduct.price,
 			stock: editedProduct.stock,
 			description: editedProduct.description,
+			newPrice: editedProduct.newPrice ? editedProduct.newPrice : 0,
+			promoted: editedProduct.promoted ? editedProduct.promoted : false,
 		});
 		setCategorie(editedProduct.categorie);
+		setSubCategorie(editedProduct.subCategorie);
 		setEditedProductId(editedProduct._id);
 	};
 	const handleClickPromotionOpen = (PromotedProduct) => {
@@ -189,6 +221,8 @@ export default function ProductsScreen() {
 		setImageSlide("");
 		dispatch(clearErrors());
 		setMsg("");
+		setCategorie("");
+		setSubCategorie("");
 	};
 	const handlePromotionClose = () => {
 		setPromotionOpen(false);
@@ -217,10 +251,17 @@ export default function ProductsScreen() {
 		const { name, value } = e.target;
 		setProduct({ ...product, [name]: value });
 	};
+
 	const handleCategorieChange = (e) => {
 		setCategorie(e.target.value);
 		setProduct({ ...product, categorie: e.target.value });
 	};
+
+	const handleSubCategorieChange = (e) => {
+		setSubCategorie(e.target.value);
+		setProduct({ ...product, subCategorie: e.target.value });
+	};
+
 	const handleImageChange = (e) => {
 		for (var i = 0; i < e.target.files.length; i++) {
 			images.push(URL.createObjectURL(e.target.files[i]));
@@ -253,7 +294,10 @@ export default function ProductsScreen() {
 		formData.append("price", product.price);
 		formData.append("stock", product.stock);
 		formData.append("categorie", product.categorie);
+		formData.append("subCategorie", product.subCategorie);
 		formData.append("description", product.description);
+		formData.append("newPrice", product.description);
+		formData.append("promoted", product.promoted);
 		for (const key of Object.keys(productImage)) {
 			formData.append("productImage", productImage[key]);
 		}
@@ -300,7 +344,11 @@ export default function ProductsScreen() {
 		formData.append("price", product.price);
 		formData.append("stock", product.stock);
 		formData.append("categorie", categorie);
+		formData.append("subCategorie", product.subCategorie);
 		formData.append("description", product.description);
+		formData.append("newPrice", product.newPrice);
+		formData.append("promoted", product.promoted);
+
 		for (const key of Object.keys(productImage)) {
 			formData.append("productImage", productImage[key]);
 		}
@@ -524,11 +572,12 @@ export default function ProductsScreen() {
 								InputProps={{
 									inputComponent: StockFormat,
 								}}
-								className={classes.productInput}
 								fullWidth
 								helperText={stockMsg.id === 3 ? stockMsg.msg : null}
 								error={stockMsg.id === 3 ? true : false}
 							/>
+						</div>
+						<div className={classes.productInputContainer}>
 							<TextField
 								select
 								label="Categories"
@@ -539,10 +588,28 @@ export default function ProductsScreen() {
 								className={classes.lastProductInput}
 								helperText={categorieMsg.id === 4 ? categorieMsg.msg : null}
 								error={categorieMsg.id === 4 ? true : false}
+								style={{ marginRight: 15 }}
 							>
 								{categories.map((option) => (
-									<MenuItem key={option.value} value={option.value}>
-										{option.value}
+									<MenuItem key={option} value={option}>
+										{option}
+									</MenuItem>
+								))}
+							</TextField>
+							<TextField
+								select
+								label="Categories"
+								value={subCategorie}
+								onChange={handleSubCategorieChange}
+								variant="outlined"
+								fullWidth
+								className={classes.lastProductInput}
+								helperText={categorieMsg.id === 5 ? categorieMsg.msg : null}
+								error={categorieMsg.id === 5 ? true : false}
+							>
+								{subCategories[categories.indexOf(categorie)].map((option) => (
+									<MenuItem key={option} value={option}>
+										{option}
 									</MenuItem>
 								))}
 							</TextField>
@@ -556,8 +623,8 @@ export default function ProductsScreen() {
 							multiline
 							rowsMax={20}
 							className={classes.descriptionInput}
-							helperText={descriptionMsg.id === 5 ? descriptionMsg.msg : null}
-							error={descriptionMsg.id === 5 ? true : false}
+							helperText={descriptionMsg.id === 6 ? descriptionMsg.msg : null}
+							error={descriptionMsg.id === 6 ? true : false}
 						/>
 
 						<Container className={classes.imageInputContainer}>
@@ -583,7 +650,7 @@ export default function ProductsScreen() {
 							<Typography className={classes.imageMsgDiv} variant="body2">
 								(6 images maximum)
 							</Typography>
-							{imageMsg.id === 6 && (
+							{imageMsg.id === 7 && (
 								<Typography
 									className={classes.imageMsgDiv}
 									color="error"
@@ -714,6 +781,8 @@ export default function ProductsScreen() {
 								helperText={stockMsg.id === 3 ? stockMsg.msg : null}
 								error={stockMsg.id === 3 ? true : false}
 							/>
+						</div>
+						<div className={classes.productInputContainer}>
 							<TextField
 								select
 								label="Categories"
@@ -724,10 +793,28 @@ export default function ProductsScreen() {
 								className={classes.lastProductInput}
 								helperText={categorieMsg.id === 4 ? categorieMsg.msg : null}
 								error={categorieMsg.id === 4 ? true : false}
+								style={{ marginRight: 15 }}
 							>
 								{categories.map((option) => (
-									<MenuItem key={option.value} value={option.value}>
-										{option.value}
+									<MenuItem key={option} value={option}>
+										{option}
+									</MenuItem>
+								))}
+							</TextField>
+							<TextField
+								select
+								label="Categories"
+								value={subCategorie}
+								onChange={handleSubCategorieChange}
+								variant="outlined"
+								fullWidth
+								className={classes.lastProductInput}
+								helperText={categorieMsg.id === 4 ? categorieMsg.msg : null}
+								error={categorieMsg.id === 4 ? true : false}
+							>
+								{subCategories[categories.indexOf(categorie)].map((option) => (
+									<MenuItem key={option} value={option}>
+										{option}
 									</MenuItem>
 								))}
 							</TextField>

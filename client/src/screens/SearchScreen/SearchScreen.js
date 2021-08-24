@@ -45,43 +45,9 @@ const categories = [
 	"Autre",
 ];
 
-const subCategories = [
-	[
-		"Meuble de chambre à coucher",
-		"Meuble de salon",
-		"Meuble de cuisine",
-		"Meuble d'entrée",
-		"Autre",
-	],
-	[
-		"Art de table",
-		"Casseroles, cocottes, poêles & faitouts",
-		"Ustensiles & accessoires de cuisine",
-		"Autre",
-	],
-	["Matelas", "Couvre-lits et draps", "Couette et housse", "Autre"],
-	[
-		"Moquettes et tapis",
-		"Horloges",
-		"Plantes et vases",
-		"Lustres",
-		"Miroire",
-		"Figurines & accessoires",
-		"Autre",
-	],
-	[
-		"Blenders, mixeurs et robots de cuisine",
-		"Appareils de cuisson à induction",
-		"Grills, friteuses & plaques de cuissons",
-		"Cafetières et moulins électriques",
-		"Autre",
-	],
-	["Autre"],
-];
-
-export default function CategorieScreen(props) {
+export default function SearchScreen(props) {
 	const classes = useStyles();
-	const categorie = props.match.params.categorie;
+	const searchTerm = props.match.params.searchTerm;
 
 	const dispatch = useDispatch();
 	// Get token from localstorage
@@ -94,7 +60,7 @@ export default function CategorieScreen(props) {
 	const [priceRange, setPriceRange] = React.useState([0, 1000000]);
 	const [selectedCategories, setSelectedCategories] = React.useState([]);
 	const [selectPromotion, setselectPromotion] = useState(false);
-	const [productLoading, setProductLoading] = useState(true);
+	const [productLoading, setProductLoading] = useState(false);
 
 	const handleCategorieChange = (categorie) => {
 		var checkedCategorie = selectedCategories;
@@ -108,48 +74,37 @@ export default function CategorieScreen(props) {
 
 	const applyFilters = async () => {
 		setProductLoading(true);
+		var categorie;
 		setSkip(0);
 		setLimit(8);
-		var checkedCategorie;
-
 		if (
-			selectedCategories.indexOf("Meuble de chambre à coucher") === -1 &&
-			selectedCategories.indexOf("Meuble de salon") === -1 &&
-			selectedCategories.indexOf("Meuble de cuisine") === -1 &&
-			selectedCategories.indexOf("Meuble d'entrée") === -1 &&
-			selectedCategories.indexOf("Art de table") === -1 &&
-			selectedCategories.indexOf("Casseroles, cocottes, poêles & faitouts") ===
-				-1 &&
-			selectedCategories.indexOf("Ustensiles & accessoires de cuisine") ===
-				-1 &&
-			selectedCategories.indexOf("Ustensiles & accessoires de cuisine") ===
-				-1 &&
-			selectedCategories.indexOf("Matelas") === -1 &&
-			selectedCategories.indexOf("Couvre-lits et draps") === -1 &&
-			selectedCategories.indexOf("Couette et housse") === -1 &&
-			selectedCategories.indexOf("Moquettes et tapis") === -1 &&
-			selectedCategories.indexOf("Horloges") === -1 &&
-			selectedCategories.indexOf("Plantes et vases") === -1 &&
-			selectedCategories.indexOf("Lustres") === -1 &&
-			selectedCategories.indexOf("Miroire") === -1 &&
-			selectedCategories.indexOf("Figurines & accessoires") === -1 &&
-			selectedCategories.indexOf("Blenders, mixeurs et robots de cuisine") ===
-				-1 &&
-			selectedCategories.indexOf("Appareils de cuisson à induction") === -1 &&
-			selectedCategories.indexOf("Grills, friteuses & plaques de cuissons") ===
-				-1 &&
-			selectedCategories.indexOf("Cafetières et moulins électriques") === -1 &&
+			selectedCategories.indexOf("Meuble") === -1 &&
+			selectedCategories.indexOf("Vaisselle") === -1 &&
+			selectedCategories.indexOf("Literie") === -1 &&
+			selectedCategories.indexOf("Décoration") === -1 &&
+			selectedCategories.indexOf("Electroménager") === -1 &&
 			selectedCategories.indexOf("Autre") === -1
 		) {
-			checkedCategorie = subCategories[categories.indexOf(categorie)];
+			categorie = [
+				"Meuble",
+				"Vaisselle",
+				"Literie",
+				"Décoration",
+				"Electroménager",
+				"Autre",
+			];
 		} else {
-			checkedCategorie = selectedCategories;
+			categorie = selectedCategories;
 		}
+
 		await axios
-			.post(
-				`/products/get_products_by_categorie?categorie=${categorie}&type=single`,
-				{ skip: 0, limit: 8, priceRange, checkedCategorie, selectPromotion }
-			)
+			.post(`/products/search_products?searchTerm=${searchTerm}&type=single`, {
+				skip: 0,
+				limit: 8,
+				priceRange,
+				categorie,
+				selectPromotion,
+			})
 			.then((res) => {
 				setProductLoading(false);
 				setProducts(res.data.products);
@@ -162,49 +117,29 @@ export default function CategorieScreen(props) {
 	};
 
 	const handleLoadMore = async () => {
-		var checkedCategorie;
 		var Skip = skip + limit;
+		var categorie;
 		setSkip(Skip);
-
 		if (
-			selectedCategories.indexOf("Meuble de chambre à coucher") === -1 &&
-			selectedCategories.indexOf("Meuble de salon") === -1 &&
-			selectedCategories.indexOf("Meuble de cuisine") === -1 &&
-			selectedCategories.indexOf("Meuble d'entrée") === -1 &&
-			selectedCategories.indexOf("Art de table") === -1 &&
-			selectedCategories.indexOf("Casseroles, cocottes, poêles & faitouts") ===
-				-1 &&
-			selectedCategories.indexOf("Ustensiles & accessoires de cuisine") ===
-				-1 &&
-			selectedCategories.indexOf("Ustensiles & accessoires de cuisine") ===
-				-1 &&
-			selectedCategories.indexOf("Matelas") === -1 &&
-			selectedCategories.indexOf("Couvre-lits et draps") === -1 &&
-			selectedCategories.indexOf("Couette et housse") === -1 &&
-			selectedCategories.indexOf("Moquettes et tapis") === -1 &&
-			selectedCategories.indexOf("Horloges") === -1 &&
-			selectedCategories.indexOf("Plantes et vases") === -1 &&
-			selectedCategories.indexOf("Lustres") === -1 &&
-			selectedCategories.indexOf("Miroire") === -1 &&
-			selectedCategories.indexOf("Figurines & accessoires") === -1 &&
-			selectedCategories.indexOf("Blenders, mixeurs et robots de cuisine") ===
-				-1 &&
-			selectedCategories.indexOf("Appareils de cuisson à induction") === -1 &&
-			selectedCategories.indexOf("Grills, friteuses & plaques de cuissons") ===
-				-1 &&
-			selectedCategories.indexOf("Cafetières et moulins électriques") === -1 &&
+			selectedCategories.indexOf("Meuble") === -1 &&
+			selectedCategories.indexOf("Vaisselle") === -1 &&
+			selectedCategories.indexOf("Literie") === -1 &&
+			selectedCategories.indexOf("Décoration") === -1 &&
+			selectedCategories.indexOf("Electroménager") === -1 &&
 			selectedCategories.indexOf("Autre") === -1
 		) {
-			checkedCategorie = subCategories[categories.indexOf(categorie)];
+			categorie = null;
 		} else {
-			checkedCategorie = selectedCategories;
+			categorie = selectedCategories;
 		}
-
 		await axios
-			.post(
-				`/products/get_products_by_categorie?categorie=${categorie}&type=single`,
-				{ skip: Skip, limit, priceRange, checkedCategorie, selectPromotion }
-			)
+			.post(`/products/search_products?searchTerm=${searchTerm}&type=single`, {
+				skip: Skip,
+				limit,
+				priceRange,
+				categorie,
+				selectPromotion,
+			})
 			.then((res) => {
 				setProducts([...products, ...res.data.products]);
 			})
@@ -264,7 +199,7 @@ export default function CategorieScreen(props) {
 
 			await axios
 				.post(
-					`/products/get_products_by_categorie?categorie=${categorie}&type=single`,
+					`/products/search_products?searchTerm=${searchTerm}&type=single`,
 					{ skip: 0, limit: 8 }
 				)
 				.then((res) => {
@@ -278,7 +213,7 @@ export default function CategorieScreen(props) {
 				});
 		};
 		loadProducts();
-	}, [categorie, dispatch]);
+	}, [searchTerm, dispatch]);
 
 	return (
 		<div>
@@ -338,26 +273,24 @@ export default function CategorieScreen(props) {
 							</div>
 							<FormControl component="fieldset" className={classes.formControl}>
 								<FormGroup>
-									{subCategories[categories.indexOf(categorie)].map(
-										(categorie) => (
-											<FormControlLabel
-												control={
-													<Checkbox
-														color="primary"
-														name={categorie}
-														size="small"
-														disableRipple
-														onChange={() => handleCategorieChange(categorie)}
-													/>
-												}
-												label={categorie}
-												classes={{
-													root: classes.formControlRoot,
-													label: classes.formControlLable,
-												}}
-											/>
-										)
-									)}
+									{categories.map((categorie) => (
+										<FormControlLabel
+											control={
+												<Checkbox
+													color="primary"
+													name={categorie}
+													size="small"
+													disableRipple
+													onChange={() => handleCategorieChange(categorie)}
+												/>
+											}
+											label={categorie}
+											classes={{
+												root: classes.formControlRoot,
+												label: classes.formControlLable,
+											}}
+										/>
+									))}
 								</FormGroup>
 							</FormControl>
 							<Divider style={{ marginBottom: 10 }} />
@@ -477,7 +410,7 @@ export default function CategorieScreen(props) {
 								style={{ marginBottom: 10, fontWeight: 500, flexGrow: 1 }}
 								variant="h5"
 							>
-								{categorie}
+								Resultat
 							</Typography>
 
 							<Divider style={{ marginBottom: 10 }} />
@@ -526,16 +459,7 @@ export default function CategorieScreen(props) {
 												color: "#424242",
 											}}
 										>
-											Désolé, il n'y a pas de produits avec cette spécification
-										</Typography>
-										<Typography
-											variant="h6"
-											style={{
-												marginTop: 5,
-												color: "#424242",
-											}}
-										>
-											choisissez d'autres spécifications
+											Désolé, il n'y a pas de produits
 										</Typography>
 									</div>
 								)}

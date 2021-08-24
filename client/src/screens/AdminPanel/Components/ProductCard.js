@@ -140,7 +140,7 @@ export default function ProductCard({
 					</div>
 				}
 				title={product.name}
-				subheader={product.categorie}
+				subheader={product.subCategorie}
 			/>
 
 			<CardContent className={classes.productCardContent}>

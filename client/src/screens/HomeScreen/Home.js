@@ -475,12 +475,7 @@ export default function Home(props) {
 														gutterBottom
 														color="primary"
 													>
-														{[
-															product.price.slice(0, product.price.length - 3),
-															" ",
-															product.price.slice(product.price.length - 3),
-														]}{" "}
-														Da
+														{[product.price]} Da
 													</Typography>
 												</CardContent>
 											</CardActionArea>

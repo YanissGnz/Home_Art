@@ -44,27 +44,17 @@ export default function ProductCard({ product }) {
 									style={{ fontSize: 18, fontWeight: 600, marginRight: 10 }}
 									gutterBottom
 									color="primary"
+									className={product.promoted === true ? "old-price" : null}
 								>
-									{[
-										product.newPrice.slice(0, product.price.length - 3),
-										" ",
-										product.newPrice.slice(product.price.length - 3),
-									]}{" "}
-									Da
+									{[product.oldPrice]} Da
 								</Typography>
 							)}
 							<Typography
 								style={{ fontSize: 18, fontWeight: 600 }}
 								gutterBottom
 								color="primary"
-								className={product.promoted === true ? "old-price" : null}
 							>
-								{[
-									product.price.slice(0, product.price.length - 3),
-									" ",
-									product.price.slice(product.price.length - 3),
-								]}{" "}
-								Da
+								{[product.price]} Da
 							</Typography>
 						</div>
 					</CardContent>

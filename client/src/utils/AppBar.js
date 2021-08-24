@@ -111,11 +111,21 @@ export default function MyAppBar(props) {
 	const [cart, setCart] = React.useState(0);
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [notificationAnchorEl, setNotificationAnchorEl] = React.useState(null);
+	const [searchTerm, setSearchTerm] = React.useState("");
 
 	const open = Boolean(anchorEl);
 	const openNotificaion = Boolean(notificationAnchorEl);
 
-	const handleSearch = (event) => event.preventDefault();
+	const handleChange = (e) => {
+		setSearchTerm(e.target.value);
+	};
+
+	const handleSearch = (event) => {
+		event.preventDefault();
+		if (searchTerm !== "") {
+			history.push(`/search/${searchTerm}`);
+		}
+	};
 
 	const handleMenu = (event) => {
 		setAnchorEl(event.currentTarget);
@@ -161,6 +171,8 @@ export default function MyAppBar(props) {
 							className={classes.input}
 							placeholder="Rechercher"
 							inputProps={{ "aria-label": "search" }}
+							value={searchTerm}
+							onChange={handleChange}
 						/>
 						<IconButton
 							type="submit"

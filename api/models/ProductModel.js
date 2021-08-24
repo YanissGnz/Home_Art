@@ -1,46 +1,37 @@
-const { Double } = require("mongodb");
 const mongoose = require("mongoose");
 
-const productSchema = new mongoose.Schema({
+const productSchema = mongoose.Schema({
 	name: {
 		type: String,
-		required: [true, "Entrer le nom de produit"],
 		trim: true,
 	},
 	brand: {
 		type: String,
-		required: [true, "Entrer la marque de produit"],
 		trim: true,
 	},
 	price: {
-		type: String,
-		required: [true, "Entrer le prix de produit"],
-		trim: true,
+		type: Number,
 	},
-	newPrice: {
-		type: String,
-		trim: true,
+	oldPrice: {
+		type: Number,
 	},
 	promoted: {
 		type: Boolean,
 	},
 	stock: {
 		type: Number,
-		required: [true, "Entrer le nombre de stock"],
 	},
 	categorie: {
 		type: String,
-		required: [true, "Choisir la categorie"],
-		trim: true,
+	},
+	subCategorie: {
+		type: String,
 	},
 	description: {
 		type: String,
-		required: [true, "Entrer un description"],
-		trim: true,
 	},
 	productImages: {
 		type: Array,
-		required: [true, "Ajouter une image"],
 	},
 	archived: {
 		type: Boolean,
@@ -57,6 +48,10 @@ const productSchema = new mongoose.Schema({
 		type: Number,
 		default: 0,
 	},
+});
+
+productSchema.index({
+	"$**": "text",
 });
 
 module.exports = mongoose.model("Product", productSchema);
