@@ -42,6 +42,7 @@ import AddShoppingCartIcon from "@material-ui/icons/AddShoppingCart";
 import CheckBoxOutlinedIcon from "@material-ui/icons/CheckBoxOutlined";
 import IndeterminateCheckBoxOutlinedIcon from "@material-ui/icons/IndeterminateCheckBoxOutlined";
 import Masonry from "react-masonry-css";
+import ProductCard from "../../utils/ProductCard";
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -317,8 +318,8 @@ export default function ProductDetails(props) {
 
 	React.useEffect(() => {
 		const loadSimilaireProducts = async () => {
-			const skip = 0; // Math.floor(Math.random() * 5) in the final version;
-			const limit = 6;
+			const skip = Math.floor(Math.random() * 5);
+			const limit = 5;
 			console.log("i did this");
 			await axios
 				.post(
@@ -384,6 +385,12 @@ export default function ProductDetails(props) {
 						href={`/categorie/${product.categorie}`}
 					>
 						{product.categorie}
+					</a>
+					<a
+						style={{ textDecoration: "none", color: "black", fontWeight: 450 }}
+						href={`/categorie/${product.categorie}`}
+					>
+						{product.subCategorie}
 					</a>
 					<Typography color="textSecondary">{product.name}</Typography>
 				</Breadcrumbs>
@@ -524,10 +531,16 @@ export default function ProductDetails(props) {
 								</Typography>
 							</div>
 							<Divider style={{ marginBottom: 10 }} />
+							<Typography
+								style={{ marginBottom: 10, fontWeight: 550, fontSize: 20 }}
+								color="primary"
+							>
+								{isLoading ? <Skeleton width="50%" /> : [product.price, " Da"]}
+							</Typography>
 							{product.promoted === true && (
 								<Typography
 									style={{ marginBottom: 10, fontWeight: 550, fontSize: 20 }}
-									color="primary"
+									color="textSecondary"
 									className={product.promoted === true ? "old-price" : null}
 								>
 									{isLoading ? (
@@ -537,12 +550,6 @@ export default function ProductDetails(props) {
 									)}
 								</Typography>
 							)}
-							<Typography
-								style={{ marginBottom: 10, fontWeight: 550, fontSize: 20 }}
-								color="primary"
-							>
-								{isLoading ? <Skeleton width="50%" /> : [product.price, " Da"]}
-							</Typography>
 							<div
 								style={{
 									margin: 0,
@@ -705,68 +712,14 @@ export default function ProductDetails(props) {
 						</Masonry>
 					)}
 					{similaireProducts.length > 0 && (
-						<Masonry
-							breakpointCols={productBreakpoints}
-							className="my-masonry-grid"
-							columnClassName="my-masonry-grid_column"
-							style={{ width: "100%", height: "100%" }}
-						>
+						<div style={{ width: "100%", height: "100%", display: "flex" }}>
 							{similaireProducts.map(
 								(element) =>
 									product._id !== element._id && (
-										<a
-											href={`/product/${element._id}`}
-											style={{
-												width: "19%",
-												textDecoration: "none",
-												marginRight: 15,
-											}}
-										>
-											<Card
-												style={{
-													width: "100%",
-													height: 300,
-													marginRight: 30,
-												}}
-											>
-												<CardActionArea
-													disableRipple
-													style={{ width: "100%", height: "100%" }}
-												>
-													<img
-														style={{
-															width: "100%",
-															maxHeight: "200px",
-															objectFit: "contain",
-														}}
-														src={`/uploads/${element.productImages[0]}`}
-														alt="Product"
-													/>
-
-													<CardContent>
-														<Typography
-															gutterBottom
-															style={{ fontSize: 18, fontWeight: 500 }}
-															variant="h6"
-															component="h2"
-															noWrap={true}
-														>
-															{element.name}
-														</Typography>
-														<Typography
-															style={{ fontSize: 18, fontWeight: 600 }}
-															gutterBottom
-															color="primary"
-														>
-															{[element.price]} Da
-														</Typography>
-													</CardContent>
-												</CardActionArea>
-											</Card>
-										</a>
+										<ProductCard product={element} />
 									)
 							)}
-						</Masonry>
+						</div>
 					)}
 				</Container>
 

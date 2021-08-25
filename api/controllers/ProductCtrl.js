@@ -139,11 +139,8 @@ const productCtrl = {
 					})
 						.skip(skip)
 						.limit(limit)
-						.select("-rating")
-						.select("-ratingNumber")
 						.select("-brand")
 						.select("-comments")
-						.select("-ratingsNumber")
 						.select("-description")
 						.select("-archived")
 						.select("-__v");
@@ -158,11 +155,8 @@ const productCtrl = {
 					})
 						.skip(skip)
 						.limit(limit)
-						.select("-rating")
-						.select("-ratingNumber")
 						.select("-brand")
 						.select("-comments")
-						.select("-ratingsNumber")
 						.select("-description")
 						.select("-archived")
 						.select("-__v");
@@ -179,11 +173,8 @@ const productCtrl = {
 					})
 						.skip(skip)
 						.limit(limit)
-						.select("-rating")
-						.select("-ratingNumber")
 						.select("-brand")
 						.select("-comments")
-						.select("-ratingsNumber")
 						.select("-description")
 						.select("-archived")
 						.select("-__v");
@@ -197,11 +188,8 @@ const productCtrl = {
 					})
 						.skip(skip)
 						.limit(limit)
-						.select("-rating")
-						.select("-ratingNumber")
 						.select("-brand")
 						.select("-comments")
-						.select("-ratingsNumber")
 						.select("-description")
 						.select("-archived")
 						.select("-__v");
@@ -272,6 +260,45 @@ const productCtrl = {
 					products,
 				});
 			}
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
+	getPromotedProducts: async (req, res) => {
+		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
+		const skip = req.body.skip ? parseInt(req.body.skip) : 0;
+		const categorie = req.body.categorie
+			? req.body.categorie
+			: [
+					"Meuble",
+					"Vaisselle",
+					"Literie",
+					"Décoration",
+					"Electroménager",
+					"Autre",
+			  ];
+		const price = req.body.priceRange
+			? {
+					$gte: req.body.priceRange[0],
+					$lte: req.body.priceRange[1],
+			  }
+			: {
+					$gte: 0,
+					$lte: 9000000,
+			  };
+
+		try {
+			const products = await Product.find({
+				price,
+				categorie,
+				promoted: true,
+			})
+				.skip(skip)
+				.limit(limit);
+
+			res.status(200).json({
+				products,
+			});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
@@ -381,7 +408,7 @@ const productCtrl = {
 			if (subCategorie == "") {
 				return res
 					.status(400)
-					.json({ msg: "Enter la categorie de produit.", id: 5 });
+					.json({ msg: "Enter la sous-categorie de produit.", id: 5 });
 			}
 			if (description == "") {
 				return res

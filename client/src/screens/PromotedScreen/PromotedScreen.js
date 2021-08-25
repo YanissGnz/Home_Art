@@ -43,9 +43,8 @@ const categories = [
 	"Autre",
 ];
 
-export default function SearchScreen(props) {
+export default function PromotedScreen() {
 	const classes = useStyles();
-	const searchTerm = props.match.params.searchTerm;
 
 	const dispatch = useDispatch();
 	// Get token from localstorage
@@ -96,12 +95,13 @@ export default function SearchScreen(props) {
 		}
 
 		await axios
-			.post(`/products/search_products?searchTerm=${searchTerm}&type=single`, {
+
+			.post(`/products/get_promoted_products`, {
 				skip: 0,
 				limit: 8,
 				priceRange,
 				categorie,
-				selectPromotion,
+				selectPromotion: true,
 			})
 			.then((res) => {
 				setProductLoading(false);
@@ -131,12 +131,11 @@ export default function SearchScreen(props) {
 			categorie = selectedCategories;
 		}
 		await axios
-			.post(`/products/search_products?searchTerm=${searchTerm}&type=single`, {
+			.post(`/products/get_promoted_products`, {
 				skip: Skip,
 				limit,
 				priceRange,
 				categorie,
-				selectPromotion,
 			})
 			.then((res) => {
 				setProducts([...products, ...res.data.products]);
@@ -196,10 +195,7 @@ export default function SearchScreen(props) {
 			setProductLoading(true);
 
 			await axios
-				.post(
-					`/products/search_products?searchTerm=${searchTerm}&type=single`,
-					{ skip: 0, limit: 8 }
-				)
+				.post(`/products/get_promoted_products`, { skip: 0, limit: 8 })
 				.then((res) => {
 					setProductLoading(false);
 					setProducts(res.data.products);
@@ -211,7 +207,7 @@ export default function SearchScreen(props) {
 				});
 		};
 		loadProducts();
-	}, [searchTerm, dispatch]);
+	}, [dispatch]);
 
 	return (
 		<div>
@@ -357,43 +353,6 @@ export default function SearchScreen(props) {
 									/>
 								</Paper>
 							</div>
-							<Divider style={{ marginBottom: 10 }} />
-							<div
-								style={{
-									display: "flex",
-									alignItems: "center",
-									marginBottom: 10,
-								}}
-							>
-								<Typography style={{ fontWeight: 450, flexGrow: 1 }}>
-									Offre et Promotion
-								</Typography>
-								<Button
-									color="primary"
-									size="small"
-									style={{ textTransform: "none", fontSize: 12 }}
-									onClick={applyFilters}
-								>
-									Appliquer
-								</Button>
-							</div>
-							<FormControl component="fieldset">
-								<FormGroup>
-									<FormControlLabel
-										control={
-											<Checkbox
-												color="primary"
-												name="Promotion"
-												size="small"
-												disableRipple
-												checked={selectPromotion}
-												onChange={() => setselectPromotion(!selectPromotion)}
-											/>
-										}
-										label="Promotion"
-									/>
-								</FormGroup>
-							</FormControl>
 						</Container>
 						<Container
 							style={{

@@ -24,8 +24,7 @@ import {
 import MuiAlert from "@material-ui/lab/Alert";
 
 import { useStyles } from "../useStyles";
-import AddIcon from "@material-ui/icons/Add";
-
+import AddRoundedIcon from "@material-ui/icons/AddRounded";
 import Masonry from "react-masonry-css";
 
 import "../adminPanel.css";
@@ -57,6 +56,7 @@ function PriceFormat(props) {
 		/>
 	);
 }
+
 function StockFormat(props) {
 	const { inputRef, onChange, ...other } = props;
 
@@ -344,7 +344,7 @@ export default function ProductsScreen() {
 		formData.append("price", product.price);
 		formData.append("stock", product.stock);
 		formData.append("categorie", categorie);
-		formData.append("subCategorie", product.subCategorie);
+		formData.append("subCategorie", subCategorie);
 		formData.append("description", product.description);
 		formData.append("newPrice", product.newPrice);
 		formData.append("promoted", product.promoted);
@@ -504,7 +504,7 @@ export default function ProductsScreen() {
 				onClick={handleAddOpen}
 				className={classes.addProductFab}
 			>
-				<AddIcon className={classes.fabIcon} />
+				<AddRoundedIcon className={classes.fabIcon} />
 				Ajouter un produit
 			</Fab>
 
@@ -598,7 +598,7 @@ export default function ProductsScreen() {
 							</TextField>
 							<TextField
 								select
-								label="Categories"
+								label="Sous-categories"
 								value={subCategorie}
 								onChange={handleSubCategorieChange}
 								variant="outlined"

@@ -9,6 +9,22 @@
 	height: 100vh;
 	background-color: #f1f1f1;
 }
+.my-masonry-grid {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	margin-left: -30px;
+	width: auto;
+}
+.my-masonry-grid_column {
+	padding-left: 20px;
+	background-clip: padding-box;
+}
+
+/* Style your items */
+.my-masonry-grid_column > div {
+	margin-bottom: 30px;
+}
 
 .fotter_links {
 	text-decoration: none;
@@ -21,4 +37,53 @@
 
 .old-price {
 	text-decoration: line-through;
+}
+.ribbon {
+	position: absolute;
+	left: -5px;
+	top: -5px;
+	z-index: 1;
+	overflow: hidden;
+	width: 75px;
+	height: 75px;
+}
+
+.ribbon span {
+	color: #fff;
+	text-align: center;
+	transform: rotate(-45deg);
+	-webkit-transform: rotate(-45deg);
+	width: 100px;
+	display: block;
+	background: #ff4136;
+	background: linear-gradient(#f58634 0%, #fd9245 100%);
+	box-shadow: 0 3px 10px -5px #000;
+	position: absolute;
+	top: 19px;
+	left: -21px;
+	font-weight: 500;
+}
+
+.ribbon span:before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 100%;
+	z-index: -1;
+	border-left: 3px solid #f57b24;
+	border-right: 3px solid transparent;
+	border-bottom: 3px solid transparent;
+	border-top: 3px solid #f57b24;
+}
+
+.ribbon span:after {
+	content: "";
+	position: absolute;
+	right: 0%;
+	top: 100%;
+	z-index: -1;
+	border-right: 3px solid #f57b24;
+	border-left: 3px solid transparent;
+	border-bottom: 3px solid transparent;
+	border-top: 3px solid #f57b24;
 }

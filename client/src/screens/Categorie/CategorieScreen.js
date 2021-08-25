@@ -17,7 +17,6 @@ import {
 } from "@material-ui/core";
 import Masonry from "react-masonry-css";
 import { useDispatch, useSelector } from "react-redux";
-
 import {
 	dispatchUserError,
 	dispatchUserLoaded,

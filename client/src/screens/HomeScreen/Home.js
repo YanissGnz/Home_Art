@@ -501,7 +501,7 @@ export default function Home(props) {
 								Offre et Promotion
 							</Typography>
 							<a
-								href="/categorie/Meuble"
+								href="/promotion"
 								style={{
 									textDecoration: "none",
 									display: "flex",
