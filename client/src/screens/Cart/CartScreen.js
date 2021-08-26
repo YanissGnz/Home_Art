@@ -294,12 +294,7 @@ export default function CartScreen() {
 									style={{ fontSize: 28, fontWeight: 550 }}
 									color="primary"
 								>
-									{[
-										totalPrice.slice(0, totalPrice.length - 3),
-										" ",
-										totalPrice.slice(totalPrice.length - 3),
-										" Da",
-									]}
+									{[totalPrice, " Da"]}
 								</Typography>
 							</div>
 						</Card>
@@ -314,6 +309,9 @@ export default function CartScreen() {
 							color: "white",
 							textTransform: "none",
 							fontSize: 16,
+						}}
+						onClick={() => {
+							history.push("/commande");
 						}}
 					>
 						Valider vos achats
@@ -425,12 +423,7 @@ export default function CartScreen() {
 													gutterBottom
 													color="primary"
 												>
-													{[
-														element.price.slice(0, element.price.length - 3),
-														" ",
-														element.price.slice(element.price.length - 3),
-													]}{" "}
-													Da
+													{[element.price]} Da
 												</Typography>
 											</CardContent>
 										</CardActionArea>

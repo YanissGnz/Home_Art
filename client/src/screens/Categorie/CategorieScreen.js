@@ -521,16 +521,15 @@ export default function CategorieScreen(props) {
 											color="textSecondary"
 											style={{
 												marginTop: 10,
-												color: "#424242",
 											}}
 										>
-											Désolé, il n'y a pas de produits avec cette spécification
+											Désolé, il n'y a pas de produits avec ces spécification
 										</Typography>
 										<Typography
 											variant="h6"
+											color="textSecondary"
 											style={{
 												marginTop: 5,
-												color: "#424242",
 											}}
 										>
 											choisissez d'autres spécifications
