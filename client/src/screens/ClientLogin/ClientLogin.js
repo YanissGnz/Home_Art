@@ -135,7 +135,7 @@ export default function ClientLogin() {
 	const classes = useStyles();
 	const [user, setUser] = useState(initialState);
 	const [isLoading, setIsLoading] = useState(false);
-
+	const [googleLoading, setGoogleLoading] = useState(false);
 	const dispatch = useDispatch();
 	const history = useHistory();
 
@@ -169,6 +169,7 @@ export default function ClientLogin() {
 			.then((res) => {
 				dispatch(dispatchLogin2(res));
 				dispatch(clearErrors());
+				setIsLoading(false);
 				history.push("/");
 			})
 			.catch((err) => {
@@ -184,16 +185,17 @@ export default function ClientLogin() {
 	};
 
 	const responseGoogle = async (response) => {
+		setGoogleLoading(true);
 		axios
 			.post("/users/google_login", { tokenId: response.tokenId })
 			.then((res) => {
-				setIsLoading(true);
+				setGoogleLoading(false);
 				dispatch(dispatchLogin2(res));
 				dispatch(clearErrors());
 				history.push("/");
 			})
 			.catch((err) => {
-				setIsLoading(false);
+				setGoogleLoading(false);
 				dispatch(
 					returnErrors(
 						err.response.data.msg,
@@ -292,6 +294,7 @@ export default function ClientLogin() {
 								<GoogleLogin
 									clientId="664430788321-7nplkv1bhj864bcedgirrug2vdtf0e4g.apps.googleusercontent.com"
 									onSuccess={responseGoogle}
+									disabled={googleLoading}
 									render={(renderProps) => (
 										<Button
 											onClick={renderProps.onClick}
@@ -306,7 +309,7 @@ export default function ClientLogin() {
 									)}
 									cookiePolicy={"single_host_origin"}
 								/>
-								{isLoading && (
+								{googleLoading && (
 									<CircularProgress
 										size={24}
 										className={classes.buttonProgress}

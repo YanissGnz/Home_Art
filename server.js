@@ -10,6 +10,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 const adminRoutes = require("./api/routes/userRouter");
 const productRoutes = require("./api/routes/productRouter");
+const giftCardRoutes = require("./api/routes/giftCardRouter");
 
 //BodyParser Middleware
 app.use(express.json());
@@ -34,6 +35,7 @@ app.use(express.static("public"));
 // For accepting post form data
 app.use("/users", adminRoutes);
 app.use("/products", productRoutes);
+app.use("/gift_card", giftCardRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port: ${PORT}`));

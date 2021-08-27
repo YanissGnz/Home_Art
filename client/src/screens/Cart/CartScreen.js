@@ -30,6 +30,10 @@ const useStyles = makeStyles((theme) => ({
 		zIndex: theme.zIndex.drawer + 1,
 		color: "#fff",
 	},
+	loader: {
+		marginTop: "22%",
+		marginLeft: "49%",
+	},
 }));
 
 export default function CartScreen() {
@@ -39,6 +43,7 @@ export default function CartScreen() {
 	const token = useSelector((state) => state.auth.token);
 	const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 	const [user, setUser] = React.useState(null);
+	const isLoading = useSelector((state) => state.auth.isLoading);
 
 	const [cart, setCart] = useState([]);
 	const [totalPrice, setTotalPrice] = useState("");
@@ -143,298 +148,314 @@ export default function CartScreen() {
 	}, []);
 
 	return (
-		<div style={{ background: "#f1f1f1" }}>
-			<MyAppBar cartLength={cartLength} />
-			<Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
-				<CircularProgress color="primary" />
-			</Backdrop>
-			{cart.length === 0 ? (
-				<Container
-					maxWidth="xl"
-					style={{
-						marginTop: 50,
-						display: "flex",
-						flexDirection: "column",
-						alignItems: "center",
-						justifyContent: "center",
-						padding: 80,
-					}}
-				>
-					<ShoppingCartOutlinedIcon style={{ fontSize: 100 }} />
-					<Typography
-						variant="h5"
-						style={{
-							marginTop: 20,
-							fontSize: 28,
-							fontWeight: 550,
-						}}
+		<div>
+			{isLoading && (
+				<CircularProgress size={80} thickness={5} className={classes.loader} />
+			)}
+			{!isLoading && (
+				<div style={{ background: "#f1f1f1" }}>
+					<MyAppBar cartLength={cartLength} />
+					<Backdrop
+						className={classes.backdrop}
+						open={open}
+						onClick={handleClose}
 					>
-						Votre panier est vide!
-					</Typography>
-					{isAuthenticated === "false" && (
-						<div>
+						<CircularProgress color="primary" />
+					</Backdrop>
+					{cart.length === 0 ? (
+						<Container
+							maxWidth="xl"
+							style={{
+								marginTop: 50,
+								display: "flex",
+								flexDirection: "column",
+								alignItems: "center",
+								justifyContent: "center",
+								padding: 80,
+							}}
+						>
+							<ShoppingCartOutlinedIcon style={{ fontSize: 100 }} />
 							<Typography
+								variant="h5"
 								style={{
 									marginTop: 20,
-									fontSize: 25,
-									fontWeight: 400,
+									fontSize: 28,
+									fontWeight: 550,
 								}}
 							>
-								Vous avez déjà un compte?{" "}
-								<a
-									href="/login"
-									title="Connecter vous"
-									style={{ color: "#F58634" }}
-								>
-									Connecter vous
-								</a>{" "}
-								pour voir votre panier
+								Votre panier est vide!
 							</Typography>
-						</div>
-					)}
-					<Button
-						variant="contained"
-						color="primary"
-						size="large"
-						style={{
-							marginTop: 30,
-							width: 300,
-							color: "white",
-							textTransform: "none",
-							fontSize: 16,
-						}}
-						onClick={() => history.push("/")}
-					>
-						Commancer vos achats
-					</Button>
-				</Container>
-			) : (
-				<Container
-					maxWidth="xl"
-					style={{
-						marginTop: 50,
-						display: "flex",
-						flexDirection: "column",
-						alignItems: "center",
-						justifyContent: "center",
-						padding: 80,
-					}}
-				>
-					<Container maxWidth="xl" style={{ display: "flex" }}>
-						<Card
-							style={{
-								width: "100%",
-								margin: 0,
-							}}
-							variant="outlined"
-						>
-							<CardContent
+							{isAuthenticated === "false" && (
+								<div>
+									<Typography
+										style={{
+											marginTop: 20,
+											fontSize: 25,
+											fontWeight: 400,
+										}}
+									>
+										Vous avez déjà un compte?{" "}
+										<a
+											href="/login"
+											title="Connecter vous"
+											style={{ color: "#F58634" }}
+										>
+											Connecter vous
+										</a>{" "}
+										pour voir votre panier
+									</Typography>
+								</div>
+							)}
+							<Button
+								variant="contained"
+								color="primary"
+								size="large"
 								style={{
-									display: "flex",
-									flexDirection: "row",
-									position: "relative",
-									height: 20,
+									marginTop: 30,
+									width: 300,
+									color: "white",
+									textTransform: "none",
+									fontSize: 16,
+								}}
+								onClick={() => history.push("/")}
+							>
+								Commancer vos achats
+							</Button>
+						</Container>
+					) : (
+						<Container
+							maxWidth="xl"
+							style={{
+								marginTop: 50,
+								display: "flex",
+								flexDirection: "column",
+								alignItems: "center",
+								justifyContent: "center",
+								padding: 80,
+							}}
+						>
+							<Container maxWidth="xl" style={{ display: "flex" }}>
+								<Card
+									style={{
+										width: "100%",
+										margin: 0,
+									}}
+									variant="outlined"
+								>
+									<CardContent
+										style={{
+											display: "flex",
+											flexDirection: "row",
+											position: "relative",
+											height: 20,
+										}}
+									>
+										<Typography
+											style={{ width: "30%", fontSize: 22, fontWeight: 400 }}
+											variant="h5"
+										>
+											Produit
+										</Typography>
+										<Typography
+											style={{ width: "23%", fontSize: 22, fontWeight: 400 }}
+											variant="h5"
+										>
+											Quantité
+										</Typography>
+										<Typography
+											style={{ width: "23%", fontSize: 22, fontWeight: 400 }}
+											variant="h5"
+										>
+											Prix unitaire
+										</Typography>
+										<Typography
+											style={{
+												width: "23%",
+												fontSize: 22,
+												fontWeight: 400,
+											}}
+											variant="h5"
+										>
+											Sous-total
+										</Typography>
+									</CardContent>
+									{cart.length > 0 &&
+										cart.map((item) => (
+											<CartProducts
+												item={item}
+												handleRemoveItem={handleRemoveItem}
+												handleTotalPriceIncrease={handleTotalPriceIncrease}
+												handleTotalPriceReduce={handleTotalPriceReduce}
+											/>
+										))}
+									<div
+										style={{
+											display: "flex",
+											borderTop: "1px solid grey",
+											borderBottom: "1px solid grey",
+											alignItems: "center",
+											padding: 10,
+											position: "relative",
+											justifyContent: "flex-end",
+										}}
+									>
+										<Typography
+											style={{ fontSize: 28, fontWeight: 400, marginRight: 10 }}
+										>
+											Prix Total:{" "}
+										</Typography>
+										<Typography
+											style={{ fontSize: 28, fontWeight: 550 }}
+											color="primary"
+										>
+											{[totalPrice, " Da"]}
+										</Typography>
+									</div>
+								</Card>
+							</Container>
+							<Button
+								variant="contained"
+								color="primary"
+								size="large"
+								style={{
+									marginTop: 20,
+									width: 300,
+									color: "white",
+									textTransform: "none",
+									fontSize: 16,
+								}}
+								onClick={() => {
+									history.push("/commande");
 								}}
 							>
-								<Typography
-									style={{ width: "30%", fontSize: 22, fontWeight: 400 }}
-									variant="h5"
-								>
-									Produit
-								</Typography>
-								<Typography
-									style={{ width: "23%", fontSize: 22, fontWeight: 400 }}
-									variant="h5"
-								>
-									Quantité
-								</Typography>
-								<Typography
-									style={{ width: "23%", fontSize: 22, fontWeight: 400 }}
-									variant="h5"
-								>
-									Prix unitaire
-								</Typography>
-								<Typography
-									style={{
-										width: "23%",
-										fontSize: 22,
-										fontWeight: 400,
-									}}
-									variant="h5"
-								>
-									Sous-total
-								</Typography>
-							</CardContent>
-							{cart.length > 0 &&
-								cart.map((item) => (
-									<CartProducts
-										item={item}
-										handleRemoveItem={handleRemoveItem}
-										handleTotalPriceIncrease={handleTotalPriceIncrease}
-										handleTotalPriceReduce={handleTotalPriceReduce}
-									/>
-								))}
+								Valider vos achats
+							</Button>
+						</Container>
+					)}
+					<Container
+						maxWidth="xl"
+						style={{
+							backgroundColor: "white",
+							borderRadius: 20,
+							padding: 20,
+							marginTop: 50,
+							width: "85%",
+						}}
+					>
+						<Typography
+							style={{ marginBottom: 10, fontWeight: 500 }}
+							variant="h5"
+						>
+							Voir aussi
+						</Typography>
+						<Divider style={{ marginBottom: 10 }} />
+						{someProducts.length === 0 && (
 							<div
 								style={{
 									display: "flex",
-									borderTop: "1px solid grey",
-									borderBottom: "1px solid grey",
-									alignItems: "center",
-									padding: 10,
-									position: "relative",
-									justifyContent: "flex-end",
+									width: "100%",
+									height: 400,
 								}}
 							>
-								<Typography
-									style={{ fontSize: 28, fontWeight: 400, marginRight: 10 }}
-								>
-									Prix Total:{" "}
-								</Typography>
-								<Typography
-									style={{ fontSize: 28, fontWeight: 550 }}
-									color="primary"
-								>
-									{[totalPrice, " Da"]}
-								</Typography>
-							</div>
-						</Card>
-					</Container>
-					<Button
-						variant="contained"
-						color="primary"
-						size="large"
-						style={{
-							marginTop: 20,
-							width: 300,
-							color: "white",
-							textTransform: "none",
-							fontSize: 16,
-						}}
-						onClick={() => {
-							history.push("/commande");
-						}}
-					>
-						Valider vos achats
-					</Button>
-				</Container>
-			)}
-			<Container
-				maxWidth="xl"
-				style={{
-					backgroundColor: "white",
-					borderRadius: 20,
-					padding: 20,
-					marginTop: 50,
-					width: "85%",
-				}}
-			>
-				<Typography style={{ marginBottom: 10, fontWeight: 500 }} variant="h5">
-					Voir aussi
-				</Typography>
-				<Divider style={{ marginBottom: 10 }} />
-				{someProducts.length === 0 && (
-					<div
-						style={{
-							display: "flex",
-							width: "100%",
-							height: 400,
-						}}
-					>
-						<Skeleton
-							height="100%"
-							width="19%"
-							style={{
-								marginRight: 15,
-								marginTop: 0,
-							}}
-						/>
-						<Skeleton
-							height="100%"
-							width="19%"
-							style={{
-								marginRight: 15,
-								marginTop: 0,
-							}}
-						/>
-						<Skeleton
-							height="100%"
-							width="19%"
-							style={{
-								marginRight: 15,
-								marginTop: 0,
-							}}
-						/>
-						<Skeleton
-							height="100%"
-							width="19%"
-							style={{
-								marginRight: 15,
-								marginTop: 0,
-							}}
-						/>
-						<Skeleton height="100%" width="19%" />
-					</div>
-				)}
-
-				{someProducts.length > 0 && (
-					<div
-						style={{
-							display: "flex",
-							width: "100%",
-						}}
-					>
-						{someProducts.length > 0 &&
-							someProducts.map((element) => (
-								<a
-									href={`/product/${element._id}`}
+								<Skeleton
+									height="100%"
+									width="19%"
 									style={{
-										width: "19%",
-										textDecoration: "none",
-										marginRight: 20,
+										marginRight: 15,
+										marginTop: 0,
 									}}
-								>
-									<Card style={{ width: "100%", height: 300, marginRight: 30 }}>
-										<CardActionArea
-											disableRipple
-											style={{ width: "100%", height: "100%" }}
+								/>
+								<Skeleton
+									height="100%"
+									width="19%"
+									style={{
+										marginRight: 15,
+										marginTop: 0,
+									}}
+								/>
+								<Skeleton
+									height="100%"
+									width="19%"
+									style={{
+										marginRight: 15,
+										marginTop: 0,
+									}}
+								/>
+								<Skeleton
+									height="100%"
+									width="19%"
+									style={{
+										marginRight: 15,
+										marginTop: 0,
+									}}
+								/>
+								<Skeleton height="100%" width="19%" />
+							</div>
+						)}
+
+						{someProducts.length > 0 && (
+							<div
+								style={{
+									display: "flex",
+									width: "100%",
+								}}
+							>
+								{someProducts.length > 0 &&
+									someProducts.map((element) => (
+										<a
+											href={`/product/${element._id}`}
+											style={{
+												width: "19%",
+												textDecoration: "none",
+												marginRight: 20,
+											}}
 										>
-											<img
-												style={{
-													width: "100%",
-													maxHeight: "200px",
-													objectFit: "contain",
-												}}
-												src={`/uploads/${element.productImages[0]}`}
-												alt="Product"
-											/>
-
-											<CardContent>
-												<Typography
-													gutterBottom
-													style={{ fontSize: 18, fontWeight: 500 }}
-													variant="h6"
-													component="h2"
-													noWrap={true}
+											<Card
+												style={{ width: "100%", height: 300, marginRight: 30 }}
+											>
+												<CardActionArea
+													disableRipple
+													style={{ width: "100%", height: "100%" }}
 												>
-													{element.name}
-												</Typography>
-												<Typography
-													style={{ fontSize: 18, fontWeight: 600 }}
-													gutterBottom
-													color="primary"
-												>
-													{[element.price]} Da
-												</Typography>
-											</CardContent>
-										</CardActionArea>
-									</Card>
-								</a>
-							))}
-					</div>
-				)}
-			</Container>
+													<img
+														style={{
+															width: "100%",
+															maxHeight: "200px",
+															objectFit: "contain",
+														}}
+														src={`/uploads/${element.productImages[0]}`}
+														alt="Product"
+													/>
 
-			<Fotter />
+													<CardContent>
+														<Typography
+															gutterBottom
+															style={{ fontSize: 18, fontWeight: 500 }}
+															variant="h6"
+															component="h2"
+															noWrap={true}
+														>
+															{element.name}
+														</Typography>
+														<Typography
+															style={{ fontSize: 18, fontWeight: 600 }}
+															gutterBottom
+															color="primary"
+														>
+															{[element.price]} Da
+														</Typography>
+													</CardContent>
+												</CardActionArea>
+											</Card>
+										</a>
+									))}
+							</div>
+						)}
+					</Container>
+
+					<Fotter />
+				</div>
+			)}
 		</div>
 	);
 }

@@ -57,7 +57,7 @@ export default function ProductCard({ product }) {
 						src={`/uploads/${product.productImages[0]}`}
 						alt="Product"
 					/>
-					<CardContent>
+					<CardContent style={{ padding: 10 }}>
 						<Typography
 							gutterBottom
 							style={{ fontSize: 18, fontWeight: 500 }}

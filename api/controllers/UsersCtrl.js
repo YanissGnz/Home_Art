@@ -67,6 +67,7 @@ const userCtrl2 = {
 				dateOfBirth: null,
 				phoneNumber: "",
 				gender: "",
+				addresses: [],
 			};
 
 			const access_token = createActivationToken(newUser);
@@ -390,13 +391,13 @@ const userCtrl2 = {
 			} else {
 				const newUser = new Users2({
 					name,
-					last_name,
+					last_name: name,
 					email,
-					dateOfBirth,
-					phoneNumber,
-					genders,
-					addresses,
+					addresses: [],
 					password: passwordHash,
+					dateOfBirth: null,
+					phoneNumber: "",
+					gender: "",
 				});
 
 				await newUser.save();

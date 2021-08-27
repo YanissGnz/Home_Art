@@ -2,7 +2,6 @@ const router = require("express").Router();
 const ProductCtrl = require("../controllers/ProductCtrl");
 const multer = require("multer");
 const auth = require("../middleware/auth");
-const { post } = require("./userRouter");
 
 //multer Configuration
 const storage = multer.diskStorage({

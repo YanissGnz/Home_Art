@@ -21,5 +21,8 @@ export const useStyles = makeStyles((theme) => {
 		resetContainer: {
 			padding: theme.spacing(3),
 		},
+		connectorLine: {
+			flex: "0 1 auto",
+		},
 	};
 });
