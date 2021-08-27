@@ -46,6 +46,7 @@ import { Tooltip } from "@material-ui/core";
 import Cards from "react-credit-cards";
 import "react-credit-cards/es/styles-compiled.css";
 import validator from "validator";
+import Paypal from "../../utils/Paypal";
 
 function PhoneNumberFormat(props) {
 	const { inputRef, onChange, ...other } = props;
@@ -989,6 +990,11 @@ export default function CommandeScreen() {
 														/>
 													</div>
 												</Collapse>
+												<Collapse in={commande.paimentMethod === "Paypal"}>
+													<div style={{ marginTop: 20, width: "92%" }}>
+														<Paypal />
+													</div>
+												</Collapse>
 											</div>
 										</div>
 										<div>
@@ -1045,6 +1051,8 @@ export default function CommandeScreen() {
 									</StepContent>
 								</Step>
 							</Stepper>
+
+							{/*Card Products */}
 							<div style={{ width: "30%", marginTop: 20 }}>
 								<Card
 									style={{
