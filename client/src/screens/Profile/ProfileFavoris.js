@@ -26,12 +26,14 @@ import {
 import axios from "axios";
 import FavoritesProductContainer from "../../utils/FavoritesProductContainer";
 import Masonry from "react-masonry-css";
+import { CircularProgress } from "@material-ui/core";
 
 export default function Profile() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
 	const [user, setUser] = React.useState(null);
+	const [isLoading, setIsLoading] = React.useState(false);
 	const [favorites, setFavorites] = React.useState([]);
 
 	/*For The Masonary Container*/
@@ -43,6 +45,7 @@ export default function Profile() {
 
 	React.useEffect(() => {
 		const loadUser = async () => {
+			setIsLoading(true);
 			// Headers
 			const config = {
 				headers: {
@@ -56,8 +59,10 @@ export default function Profile() {
 					dispatch(dispatchUserLoaded(res));
 					setFavorites(res.data.user.favoriteProducts);
 					setUser(res.data.user);
+					setIsLoading(false);
 				})
 				.catch((err) => {
+					setIsLoading(false);
 					dispatch(dispatchUserError());
 				});
 		};
@@ -84,186 +89,198 @@ export default function Profile() {
 
 	return (
 		<div>
-			<div className="profile_body">
-				<CssBaseline />
-				<MyAppBar cartLength={user ? user.cart.length : 0} />
-				<Container
-					maxWidth="lg"
+			{isLoading && (
+				<CircularProgress
+					size={80}
+					thickness={5}
 					style={{
-						backgroundColor: "white",
-						borderRadius: 20,
-						height: 700,
-						marginTop: 20,
-						display: "flex",
-						flexDirection: "row",
-						padding: 0,
-						overflow: "hidden",
+						marginTop: "22%",
+						marginLeft: "49%",
 					}}
-					className="main"
-				>
-					<div
+				/>
+			)}
+			{!isLoading && (
+				<div className="profile_body">
+					<CssBaseline />
+					<MyAppBar cartLength={user ? user.cart.length : 0} />
+					<Container
+						maxWidth="lg"
 						style={{
-							width: "25%",
-							marginRight: 10,
-							borderRight: "1px solid #acacac",
+							backgroundColor: "white",
+							borderRadius: 20,
+							height: 700,
+							marginTop: 20,
 							display: "flex",
-							alignItems: "flex-start",
-							justifyContent: "center",
+							flexDirection: "row",
+							padding: 0,
+							overflow: "hidden",
 						}}
-					>
-						<ButtonGroup
-							orientation="vertical"
-							variant="text"
-							size="large"
-							fullWidth
-							disableRipple
-						>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 17,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<InfoOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/info")}
-							>
-								Informations personnelles
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								color="primary"
-								startIcon={
-									<FavoriteBorderOutlinedIcon
-										style={{ fontSize: 30 }}
-										color="primary"
-									/>
-								}
-							>
-								Produit favoris
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<CheckBoxOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/commandes")}
-							>
-								Commandes
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<PinDropOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/addresses")}
-							>
-								Addresses
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<VpnKeyOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/password")}
-							>
-								Modifier le mot de passe
-							</Button>
-						</ButtonGroup>
-					</div>
-					<div
-						style={{
-							width: "75%",
-							margin: 0,
-							position: "relative",
-							padding: 30,
-						}}
+						className="main"
 					>
 						<div
 							style={{
-								width: "99%",
-								height: "100%",
+								width: "25%",
+								marginRight: 10,
+								borderRight: "1px solid #acacac",
 								display: "flex",
-								flexDirection: "column",
-								marginTop: 50,
+								alignItems: "flex-start",
+								justifyContent: "center",
 							}}
 						>
-							<Typography variant="h5" style={{ marginBottom: 20 }}>
-								Vos produit favoris
-							</Typography>
-							<Divider style={{ marginBottom: 50 }} />
-							{favorites.length === 0 ? (
-								<div
+							<ButtonGroup
+								orientation="vertical"
+								variant="text"
+								size="large"
+								fullWidth
+								disableRipple
+							>
+								<Button
 									style={{
+										textTransform: "none",
+										fontSize: 17,
+										fontWeight: 450,
+										height: 80,
 										display: "flex",
-										flexDirection: "column",
-										height: "70%",
-										alignItems: "center",
-										justifyContent: "center",
+										justifyContent: "flex-start",
+										padding: 20,
 									}}
+									startIcon={<InfoOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/info")}
 								>
-									<FavoriteOutlinedIcon
-										style={{
-											fontSize: 100,
-											marginBottom: 20,
-										}}
-										color="disabled"
-									/>
-									<Typography variant="h5" color="textSecondary">
-										Vous n'avez pas des produit favoris
-									</Typography>
-								</div>
-							) : (
-								<Masonry
-									breakpointCols={breakpoints}
-									className="my-masonry-grid"
-									columnClassName="my-masonry-grid_column"
-									style={{ width: "100%", overflow: "auto", height: "70%" }}
+									Informations personnelles
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									color="primary"
+									startIcon={
+										<FavoriteBorderOutlinedIcon
+											style={{ fontSize: 30 }}
+											color="primary"
+										/>
+									}
 								>
-									{favorites.map((product_id) => (
-										<div>
-											<FavoritesProductContainer
-												product_id={product_id}
-												handleDelete={handleDelete}
-											/>
-										</div>
-									))}
-								</Masonry>
-							)}
+									Produit favoris
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={<CheckBoxOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/commandes")}
+								>
+									Commandes
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={<PinDropOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/addresses")}
+								>
+									Addresses
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={<VpnKeyOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/password")}
+								>
+									Modifier le mot de passe
+								</Button>
+							</ButtonGroup>
 						</div>
-					</div>
-				</Container>
-				<Fotter />
-			</div>
+						<div
+							style={{
+								width: "75%",
+								margin: 0,
+								position: "relative",
+								padding: 30,
+							}}
+						>
+							<div
+								style={{
+									width: "99%",
+									height: "100%",
+									display: "flex",
+									flexDirection: "column",
+									marginTop: 50,
+								}}
+							>
+								<Typography variant="h5" style={{ marginBottom: 20 }}>
+									Vos produit favoris
+								</Typography>
+								<Divider style={{ marginBottom: 50 }} />
+								{favorites.length === 0 ? (
+									<div
+										style={{
+											display: "flex",
+											flexDirection: "column",
+											height: "70%",
+											alignItems: "center",
+											justifyContent: "center",
+										}}
+									>
+										<FavoriteOutlinedIcon
+											style={{
+												fontSize: 100,
+												marginBottom: 20,
+											}}
+											color="disabled"
+										/>
+										<Typography variant="h5" color="textSecondary">
+											Vous n'avez pas des produit favoris
+										</Typography>
+									</div>
+								) : (
+									<Masonry
+										breakpointCols={breakpoints}
+										className="my-masonry-grid"
+										columnClassName="my-masonry-grid_column"
+										style={{ width: "100%", overflow: "auto", height: "70%" }}
+									>
+										{favorites.map((product_id) => (
+											<div>
+												<FavoritesProductContainer
+													product_id={product_id}
+													handleDelete={handleDelete}
+												/>
+											</div>
+										))}
+									</Masonry>
+								)}
+							</div>
+						</div>
+					</Container>
+					<Fotter />
+				</div>
+			)}
 		</div>
 	);
 }

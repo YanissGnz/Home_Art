@@ -9,6 +9,7 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	background-color: #f1f1f1;
 }
 .mdps_oblier {
 	display: flex;

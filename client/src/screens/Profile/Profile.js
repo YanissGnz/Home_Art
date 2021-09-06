@@ -92,6 +92,7 @@ export default function Profile() {
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
+	const [editLoading, setEditLoading] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [alertOpen, setAlertOpen] = React.useState(false);
 	const [alertType, setAlertType] = React.useState("");
@@ -122,6 +123,7 @@ export default function Profile() {
 	React.useEffect(() => {
 		const loadUser = async () => {
 			dispatch(dispatchUserLoading());
+			setIsLoading(true);
 
 			// Headers
 			const config = {
@@ -135,8 +137,10 @@ export default function Profile() {
 				.then((res) => {
 					dispatch(dispatchUserLoaded(res));
 					setUser(res.data.user);
+					setIsLoading(false);
 				})
 				.catch((err) => {
+					setIsLoading(false);
 					dispatch(dispatchUserError());
 					dispatch(returnErrors(err.response.data.msg, err.response.status));
 				});
@@ -145,7 +149,7 @@ export default function Profile() {
 	}, [dispatch, token]);
 
 	const handleEdit = () => {
-		setIsLoading(true);
+		setEditLoading(true);
 
 		// Headers
 		const config = {
@@ -165,319 +169,334 @@ export default function Profile() {
 				setEnableEdit(!enableEdit);
 				handleAlertOpen();
 				setAlertType("success");
-				setIsLoading(false);
+				setEditLoading(false);
 			})
 			.catch((err) => {
 				setMsg(err.response.data);
-				setIsLoading(false);
+				setEditLoading(false);
 			});
 	};
 
 	return (
 		<div>
-			<div className="profile_body">
-				<CssBaseline />
-				<MyAppBar cartLength={user ? user.cart.length : 0} />
-				<Snackbar
-					open={alertOpen}
-					autoHideDuration={3000}
-					onClose={handleAlertClose}
-				>
-					<Alert severity={alertType}>
-						<Typography>{msg}</Typography>
-					</Alert>
-				</Snackbar>
-				<Container
-					maxWidth="lg"
+			{isLoading && (
+				<CircularProgress
+					size={80}
+					thickness={5}
 					style={{
-						backgroundColor: "white",
-						borderRadius: 20,
-						height: 700,
-						marginTop: 20,
-						display: "flex",
-						flexDirection: "row",
-						padding: 0,
-						overflow: "hidden",
+						marginTop: "22%",
+						marginLeft: "49%",
 					}}
-					className="main"
-				>
-					<div
+				/>
+			)}
+			{!isLoading && (
+				<div className="profile_body">
+					<CssBaseline />
+					<MyAppBar cartLength={user ? user.cart.length : 0} />
+					<Snackbar
+						open={alertOpen}
+						autoHideDuration={3000}
+						onClose={handleAlertClose}
+					>
+						<Alert severity={alertType}>
+							<Typography>{msg}</Typography>
+						</Alert>
+					</Snackbar>
+					<Container
+						maxWidth="lg"
 						style={{
-							width: "25%",
-							marginRight: 10,
-							borderRight: "1px solid #acacac",
+							backgroundColor: "white",
+							borderRadius: 20,
+							height: 700,
+							marginTop: 20,
 							display: "flex",
-							alignItems: "flex-start",
-							justifyContent: "center",
+							flexDirection: "row",
+							padding: 0,
+							overflow: "hidden",
 						}}
+						className="main"
 					>
-						<ButtonGroup
-							orientation="vertical"
-							variant="text"
-							size="large"
-							fullWidth
-							disableRipple
-						>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 17,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								color="primary"
-								startIcon={
-									<InfoOutlinedIcon color="primary" style={{ fontSize: 30 }} />
-								}
-							>
-								Informations personnelles
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={
-									<FavoriteBorderOutlinedIcon style={{ fontSize: 30 }} />
-								}
-								onClick={() => history.push("/profile/favorites")}
-							>
-								Produit favoris
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<CheckBoxOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/commandes")}
-							>
-								Commandes
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<PinDropOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/addresses")}
-							>
-								Addresses
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<VpnKeyOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/password")}
-							>
-								Modifier le mot de passe
-							</Button>
-						</ButtonGroup>
-					</div>
-					<div
-						style={{
-							width: "75%",
-							margin: 0,
-							position: "relative",
-							padding: 30,
-						}}
-					>
-						{enableEdit ? (
-							<div style={{ position: "absolute", right: 20, top: 10 }}>
-								<div
-									style={{
-										margin: 0,
-										position: "relative",
-										alignSelf: "center",
-									}}
-								>
-									<Tooltip
-										title="Enregistrer"
-										aria-label="save"
-										placement="left-center"
-									>
-										<IconButton
-											color="primary"
-											aria-label="upload picture"
-											component="span"
-											size="large"
-											disableRipple
-											onClick={handleEdit}
-											disabled={isLoading}
-										>
-											<DoneOutlineRoundedIcon style={{ fontSize: 30 }} />
-										</IconButton>
-									</Tooltip>
-									{isLoading && (
-										<CircularProgress
-											size={24}
-											style={{
-												color: theme.palette.primary,
-												position: "absolute",
-												top: "25%",
-												left: "50%",
-												marginTop: -1,
-												marginLeft: -12,
-											}}
-										/>
-									)}
-								</div>
-							</div>
-						) : (
-							<Tooltip
-								title="Modifier"
-								aria-label="edit"
-								placement="left-center"
-							>
-								<IconButton
-									color="primary"
-									aria-label="upload picture"
-									component="span"
-									size="large"
-									style={{ position: "absolute", right: 20, top: 10 }}
-									disableRipple
-									onClick={() => setEnableEdit(!enableEdit)}
-								>
-									<EditOutlinedIcon style={{ fontSize: 30 }} />
-								</IconButton>
-							</Tooltip>
-						)}
-
 						<div
 							style={{
-								width: "99%",
-								height: "100%",
+								width: "25%",
+								marginRight: 10,
+								borderRight: "1px solid #acacac",
 								display: "flex",
-								flexDirection: "column",
-								marginTop: 50,
+								alignItems: "flex-start",
+								justifyContent: "center",
 							}}
 						>
-							<Typography variant="h5" style={{ marginBottom: 20 }}>
-								Informations Personnelles
-							</Typography>
-							<Divider style={{ marginBottom: 50 }} />
-							<div style={{ marginBottom: 50 }}>
-								<TextField
-									name="name"
-									value={name}
-									label="Nom"
-									variant="outlined"
+							<ButtonGroup
+								orientation="vertical"
+								variant="text"
+								size="large"
+								fullWidth
+								disableRipple
+							>
+								<Button
 									style={{
-										marginRight: "2%",
-										width: "49%",
+										textTransform: "none",
+										fontSize: 17,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
 									}}
-									readOnly={!enableEdit}
-									onChange={handleChangeInput}
-									disabled={!enableEdit}
-								/>
-								<TextField
-									name="last_name"
-									value={last_name}
-									label="Prénom"
-									size="medium"
-									variant="outlined"
-									style={{
-										width: "49%",
-									}}
-									disabled={!enableEdit}
-									onChange={handleChangeInput}
-								/>
-							</div>
-							<div style={{ marginBottom: 50 }}>
-								<TextField
-									name="email"
-									value={email}
-									label="Email"
-									variant="outlined"
-									style={{
-										width: "49%",
-										marginRight: "2%",
-									}}
-									disabled={true}
-									onChange={handleChangeInput}
-								/>
-
-								<TextField
-									name="phoneNumber"
-									label="Numéro de téléphone"
-									value={phoneNumber}
-									onChange={handleChangeInput}
-									variant="outlined"
-									InputProps={{
-										inputComponent: PhoneNumberFormat,
-									}}
-									style={{
-										width: "49%",
-									}}
-									disabled={!enableEdit}
-								/>
-							</div>
-							<div style={{ marginBottom: 50 }}>
-								<TextField
-									name="gender"
-									select
-									label="Genre"
-									value={user.gender}
-									onChange={handleGenderChange}
-									variant="outlined"
-									style={{
-										width: "49%",
-										marginRight: "2%",
-									}}
-									disabled={!enableEdit}
+									color="primary"
+									startIcon={
+										<InfoOutlinedIcon
+											color="primary"
+											style={{ fontSize: 30 }}
+										/>
+									}
 								>
-									{genders.map((option) => (
-										<MenuItem key={option.value} value={option.value}>
-											{option.value}
-										</MenuItem>
-									))}
-								</TextField>
-								<MuiPickersUtilsProvider utils={DateFnsUtils}>
-									<KeyboardDatePicker
-										autoOk
-										variant="inline"
-										inputVariant="outlined"
-										label="Date de naissance"
-										format="MM/dd/yyyy"
-										value={user.dateOfBirth}
-										onChange={(date) => handleDateChange(date)}
+									Informations personnelles
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={
+										<FavoriteBorderOutlinedIcon style={{ fontSize: 30 }} />
+									}
+									onClick={() => history.push("/profile/favorites")}
+								>
+									Produit favoris
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={<CheckBoxOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/commandes")}
+								>
+									Commandes
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={<PinDropOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/addresses")}
+								>
+									Addresses
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={<VpnKeyOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/password")}
+								>
+									Modifier le mot de passe
+								</Button>
+							</ButtonGroup>
+						</div>
+						<div
+							style={{
+								width: "75%",
+								margin: 0,
+								position: "relative",
+								padding: 30,
+							}}
+						>
+							{enableEdit ? (
+								<div style={{ position: "absolute", right: 20, top: 10 }}>
+									<div
+										style={{
+											margin: 0,
+											position: "relative",
+											alignSelf: "center",
+										}}
+									>
+										<Tooltip
+											title="Enregistrer"
+											aria-label="save"
+											placement="left-center"
+										>
+											<IconButton
+												color="primary"
+												aria-label="upload picture"
+												component="span"
+												size="large"
+												disableRipple
+												onClick={handleEdit}
+												disabled={editLoading}
+											>
+												<DoneOutlineRoundedIcon style={{ fontSize: 30 }} />
+											</IconButton>
+										</Tooltip>
+										{editLoading && (
+											<CircularProgress
+												size={24}
+												style={{
+													color: theme.palette.primary,
+													position: "absolute",
+													top: "25%",
+													left: "50%",
+													marginTop: -1,
+													marginLeft: -12,
+												}}
+											/>
+										)}
+									</div>
+								</div>
+							) : (
+								<Tooltip
+									title="Modifier"
+									aria-label="edit"
+									placement="left-center"
+								>
+									<IconButton
+										color="primary"
+										aria-label="upload picture"
+										component="span"
+										size="large"
+										style={{ position: "absolute", right: 20, top: 10 }}
+										disableRipple
+										onClick={() => setEnableEdit(!enableEdit)}
+									>
+										<EditOutlinedIcon style={{ fontSize: 30 }} />
+									</IconButton>
+								</Tooltip>
+							)}
+
+							<div
+								style={{
+									width: "99%",
+									height: "100%",
+									display: "flex",
+									flexDirection: "column",
+									marginTop: 50,
+								}}
+							>
+								<Typography variant="h5" style={{ marginBottom: 20 }}>
+									Informations Personnelles
+								</Typography>
+								<Divider style={{ marginBottom: 50 }} />
+								<div style={{ marginBottom: 50 }}>
+									<TextField
+										name="name"
+										value={name}
+										label="Nom"
+										variant="outlined"
+										style={{
+											marginRight: "2%",
+											width: "49%",
+										}}
+										readOnly={!enableEdit}
+										onChange={handleChangeInput}
+										disabled={!enableEdit}
+									/>
+									<TextField
+										name="last_name"
+										value={last_name}
+										label="Prénom"
+										size="medium"
+										variant="outlined"
+										style={{
+											width: "49%",
+										}}
+										disabled={!enableEdit}
+										onChange={handleChangeInput}
+									/>
+								</div>
+								<div style={{ marginBottom: 50 }}>
+									<TextField
+										name="email"
+										value={email}
+										label="Email"
+										variant="outlined"
+										style={{
+											width: "49%",
+											marginRight: "2%",
+										}}
+										disabled={true}
+										onChange={handleChangeInput}
+									/>
+
+									<TextField
+										name="phoneNumber"
+										label="Numéro de téléphone"
+										value={phoneNumber}
+										onChange={handleChangeInput}
+										variant="outlined"
+										InputProps={{
+											inputComponent: PhoneNumberFormat,
+										}}
 										style={{
 											width: "49%",
 										}}
 										disabled={!enableEdit}
 									/>
-								</MuiPickersUtilsProvider>
+								</div>
+								<div style={{ marginBottom: 50 }}>
+									<TextField
+										name="gender"
+										select
+										label="Genre"
+										value={user.gender}
+										onChange={handleGenderChange}
+										variant="outlined"
+										style={{
+											width: "49%",
+											marginRight: "2%",
+										}}
+										disabled={!enableEdit}
+									>
+										{genders.map((option) => (
+											<MenuItem key={option.value} value={option.value}>
+												{option.value}
+											</MenuItem>
+										))}
+									</TextField>
+									<MuiPickersUtilsProvider utils={DateFnsUtils}>
+										<KeyboardDatePicker
+											autoOk
+											variant="inline"
+											inputVariant="outlined"
+											label="Date de naissance"
+											format="MM/dd/yyyy"
+											value={user.dateOfBirth}
+											onChange={(date) => handleDateChange(date)}
+											style={{
+												width: "49%",
+											}}
+											disabled={!enableEdit}
+										/>
+									</MuiPickersUtilsProvider>
+								</div>
 							</div>
 						</div>
-					</div>
-				</Container>
-				<Fotter />
-			</div>
+					</Container>
+					<Fotter />
+				</div>
+			)}
 		</div>
 	);
 }

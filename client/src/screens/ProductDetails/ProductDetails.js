@@ -9,9 +9,6 @@ import {
 	IconButton,
 	Typography,
 	Divider,
-	Card,
-	CardActionArea,
-	CardContent,
 	Button,
 	Tooltip,
 	Snackbar,
@@ -320,14 +317,12 @@ export default function ProductDetails(props) {
 		const loadSimilaireProducts = async () => {
 			const skip = Math.floor(Math.random() * 5);
 			const limit = 5;
-			console.log("i did this");
 			await axios
 				.post(
 					`/products/get_products_by_categorie?categorie=${product.categorie}&type=single`,
 					{ skip, limit }
 				)
 				.then((res) => {
-					console.log(res.data.products);
 					setSimilaireProducts(res.data.products);
 				})
 				.catch((err) => {
@@ -666,49 +661,33 @@ export default function ProductDetails(props) {
 							breakpointCols={productBreakpoints}
 							className="my-masonry-grid"
 							columnClassName="my-masonry-grid_column"
-							style={{ width: "100%", height: "100%" }}
+							style={{ width: "100%", height: 250, paddingLeft: 30 }}
 						>
 							<Skeleton
 								height="100%"
-								width="19%"
 								style={{
-									marginRight: 15,
-									marginTop: 0,
 									transform: "none",
 								}}
 							/>
 							<Skeleton
 								height="100%"
-								width="19%"
 								style={{
-									marginRight: 15,
-									marginTop: 0,
 									transform: "none",
 								}}
 							/>
 							<Skeleton
 								height="100%"
-								width="19%"
 								style={{
-									marginRight: 15,
-									marginTop: 0,
 									transform: "none",
 								}}
 							/>
 							<Skeleton
 								height="100%"
-								width="19%"
 								style={{
-									marginRight: 15,
-									marginTop: 0,
 									transform: "none",
 								}}
 							/>
-							<Skeleton
-								height="100%"
-								width="19%"
-								style={{ transform: "none" }}
-							/>
+							<Skeleton height="100%" style={{ transform: "none" }} />
 						</Masonry>
 					)}
 					{similaireProducts.length > 0 && (

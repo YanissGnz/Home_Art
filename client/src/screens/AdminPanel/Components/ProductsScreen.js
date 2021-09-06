@@ -268,7 +268,6 @@ export default function ProductsScreen() {
 		}
 
 		setImageSlide(images.reverse());
-		console.log(imageSlide);
 		setProductImage(e.target.files);
 	};
 

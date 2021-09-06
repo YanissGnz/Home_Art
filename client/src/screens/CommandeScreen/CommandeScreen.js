@@ -34,6 +34,7 @@ import LocationOnRoundedIcon from "@material-ui/icons/LocationOnRounded";
 import CreditCardRoundedIcon from "@material-ui/icons/CreditCardRounded";
 import AssignmentTurnedInRoundedIcon from "@material-ui/icons/AssignmentTurnedInRounded";
 import DeleteOutlineOutlinedIcon from "@material-ui/icons/DeleteOutlineOutlined";
+import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import PropTypes from "prop-types";
 import { Card } from "@material-ui/core";
 import { CardContent } from "@material-ui/core";
@@ -47,6 +48,12 @@ import Cards from "react-credit-cards";
 import "react-credit-cards/es/styles-compiled.css";
 import validator from "validator";
 import Paypal from "../../utils/Paypal";
+import { Snackbar } from "@material-ui/core";
+import MuiAlert from "@material-ui/lab/Alert";
+
+function Alert(props) {
+	return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function PhoneNumberFormat(props) {
 	const { inputRef, onChange, ...other } = props;
@@ -234,7 +241,7 @@ var commandeInfo = {
 	region: "",
 	ville: "",
 	deliveryMode: "",
-	paimentMethod: "",
+	paymentMethod: "",
 };
 
 const deliveryModes = [
@@ -243,7 +250,13 @@ const deliveryModes = [
 	"Magasin de la boutique",
 ];
 
-const paimentMethods = ["Carte bancaire", "Facture", "Carte cadeau", "Paypal"];
+const paymentMethods = [
+	"Carte bancaire",
+	"Facture",
+	"Carte cadeau",
+	"Paypal",
+	"Paiement à la livraison",
+];
 
 const creditCartInfo = {
 	number: "",
@@ -304,10 +317,21 @@ export default function CommandeScreen() {
 	const isLoading = useSelector((state) => state.auth.isLoading);
 	const [activeStep, setActiveStep] = React.useState(0);
 	const [cart, setCart] = React.useState([]);
-	const [totalPrice, setTotalPrice] = React.useState("0");
+	const [subTotalPrice, setSubTotalPrice] = React.useState(0);
+	const [totalPrice, setTotalPrice] = useState(0);
 	const [open, setOpen] = React.useState(false);
 	const [msg, setMsg] = useState({});
 	const [focused, setFocused] = useState("");
+	const [alertOpen, setAlertOpen] = React.useState(false);
+	const [alertType, setAlertType] = React.useState("");
+	const [disabled, setDisabled] = useState(false);
+
+	const handleAlertOpen = () => {
+		setAlertOpen(true);
+	};
+	const handleAlertClose = () => {
+		setAlertOpen(false);
+	};
 
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
@@ -318,8 +342,8 @@ export default function CommandeScreen() {
 		setCommande({ ...commande, deliveryMode: e.target.value });
 	};
 
-	const handlePaimentMethodChange = (e) => {
-		setCommande({ ...commande, paimentMethod: e.target.value });
+	const handlepaymentMethodChange = (e) => {
+		setCommande({ ...commande, paymentMethod: e.target.value });
 		setMsg({});
 		setGiftCardCode("");
 	};
@@ -354,7 +378,7 @@ export default function CommandeScreen() {
 		} else if (commande.phoneNumber === "") {
 			setMsg({ id: 2, msg: "Entrer votre numéro de téléphone" });
 		} else if (commande.address === "") {
-			setMsg({ id: 3, msg: "Entrer votre address" });
+			setMsg({ id: 3, msg: "Entrer votre adresse" });
 		} else if (commande.region === "") {
 			setMsg({ id: 4, msg: "Entrer votre région" });
 		} else if (commande.ville === "") {
@@ -368,7 +392,7 @@ export default function CommandeScreen() {
 	};
 
 	const handleStepTwoNext = async () => {
-		if (commande.paimentMethod === "Carte bancaire") {
+		if (commande.paymentMethod === "Carte bancaire") {
 			if (creditCard.number === "") {
 				setMsg({ id: 0, msg: "Entrer le numéro de carte" });
 			} else if (!validator.isCreditCard(creditCard.number)) {
@@ -381,18 +405,20 @@ export default function CommandeScreen() {
 				setMsg({ id: 3, msg: "Entrer le cvc" });
 			} else {
 				setMsg({});
-				setActiveStep((prevActiveStep) => prevActiveStep + 1);
+				setActiveStep(2);
 			}
-		} else if (commande.paimentMethod === "Carte cadeau") {
+		} else if (commande.paymentMethod === "Carte cadeau") {
 			if (giftCardCode === "") {
 				setMsg({ id: 0, msg: "Entrer  le code" });
 			} else {
 				await axios
-					.post("/gift_card/verify_gift_card", { giftCardCode, totalPrice })
+					.post("/gift_card/verify_gift_card", {
+						giftCardCode,
+						totalPrice: subTotalPrice,
+					})
 					.then((res) => {
 						if (res.data.isValid) {
 							setActiveStep(2);
-
 							setMsg({});
 						} else {
 							setMsg(res.data.msg);
@@ -402,10 +428,72 @@ export default function CommandeScreen() {
 						console.log(e);
 					});
 			}
+		} else if (commande.paymentMethod === "Paiement à la livraison") {
+			setActiveStep(2);
 		}
 	};
 
-	const handleCommande = () => {};
+	const handleCommande = () => {
+		const {
+			name,
+			last_name,
+			phoneNumber,
+			address,
+			region,
+			ville,
+			deliveryMode,
+			paymentMethod,
+		} = commande;
+		const products = cart;
+		var paymentInfo;
+		if (commande.paymentMethod === "Carte bancaire") {
+			paymentInfo = creditCard;
+		} else if (commande.paymentMethod === "Carte cadeau") {
+			paymentInfo = giftCardCode;
+		} else if (commande.paymentMethod === "Paypal") {
+			paymentInfo = {};
+		} else if (commande.paymentMethod === "Paiement à la livraison") {
+			paymentInfo = "Paiement à la livraison";
+		} else if (commande.paymentMethod === "Facture") {
+			paymentInfo = "Facture";
+		}
+
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		axios
+			.post(
+				"/users/confirm_order",
+				{
+					name,
+					last_name,
+					phoneNumber,
+					address,
+					region,
+					ville,
+					products,
+					deliveryMode,
+					paymentMethod,
+					paymentInfo,
+					totalPrice,
+				},
+				config
+			)
+			.then((res) => {
+				setMsg(res.data.msg);
+				setAlertType("success");
+				handleAlertOpen();
+				setDisabled(true);
+				setCart([]);
+			})
+			.catch((e) => {
+				console.log(e.response.data);
+			});
+	};
 
 	const handleBack = () => {
 		setActiveStep((prevActiveStep) => prevActiveStep - 1);
@@ -434,7 +522,6 @@ export default function CommandeScreen() {
 						phoneNumber: res.data.user.phoneNumber,
 					});
 					setAddresses(res.data.user.addresses);
-					console.log(res.data.user.addresses);
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
@@ -452,15 +539,17 @@ export default function CommandeScreen() {
 	}, [user]);
 
 	React.useEffect(() => {
-		var totalPrice = 0;
+		var subTotalPrice = 0;
 		if (cart.length !== 0) {
 			// eslint-disable-next-line array-callback-return
 			cart.map((item) => {
-				totalPrice = totalPrice + parseInt(item.product.price) * item.quantity;
+				subTotalPrice =
+					subTotalPrice + parseInt(item.product.price) * item.quantity;
 			});
-			setTotalPrice(totalPrice.toString());
+			setSubTotalPrice(subTotalPrice);
+			setTotalPrice(subTotalPrice + 600);
 		} else {
-			setTotalPrice(0);
+			setSubTotalPrice(0);
 		}
 	}, [cart]);
 	const handleClose = () => {
@@ -510,6 +599,15 @@ export default function CommandeScreen() {
 					>
 						<CircularProgress color="primary" />
 					</Backdrop>
+					<Snackbar
+						open={alertOpen}
+						autoHideDuration={3000}
+						onClose={handleAlertClose}
+					>
+						<Alert severity={alertType}>
+							<Typography>{msg}</Typography>
+						</Alert>
+					</Snackbar>
 					<Container
 						maxWidth="lg"
 						style={{
@@ -733,7 +831,7 @@ export default function CommandeScreen() {
 												<TextField
 													name="address"
 													value={commande.address}
-													label="Address"
+													label="Adresse"
 													variant="outlined"
 													size="small"
 													required
@@ -846,11 +944,11 @@ export default function CommandeScreen() {
 											</div>
 											<div style={{ marginTop: 30 }}>
 												<TextField
-													name="paimentMethod"
+													name="paymentMethod"
 													select
 													label="Mode de paiment"
-													value={commande.paimentMethod}
-													onChange={handlePaimentMethodChange}
+													value={commande.paymentMethod}
+													onChange={handlepaymentMethodChange}
 													variant="outlined"
 													size="small"
 													required
@@ -860,7 +958,7 @@ export default function CommandeScreen() {
 														width: "92%",
 													}}
 												>
-													{paimentMethods.map((option) => (
+													{paymentMethods.map((option) => (
 														<MenuItem key={option} value={option}>
 															{option}
 														</MenuItem>
@@ -875,7 +973,7 @@ export default function CommandeScreen() {
 													Informations de paiment
 												</Typography>
 												<Collapse
-													in={commande.paimentMethod === "Carte bancaire"}
+													in={commande.paymentMethod === "Carte bancaire"}
 												>
 													<div style={{ marginTop: 20 }}>
 														<Cards
@@ -885,89 +983,92 @@ export default function CommandeScreen() {
 															name={creditCard.name}
 															number={creditCard.number}
 														/>
-														<TextField
-															name="number"
-															label="Numéro de carte"
-															value={creditCard.number}
-															variant="outlined"
-															size="small"
-															required
-															InputProps={{
-																inputComponent: creditCardFormat,
-															}}
-															helperText={msg.id === 0 && msg.msg}
-															error={msg.id === 0}
-															style={{
-																width: "92%",
-																marginTop: 20,
-															}}
-															onChange={HandleCreditCartChange}
-															onFocus={handleInputFocus}
-														/>
-														<TextField
-															name="name"
-															label="Nom de cart"
-															value={creditCard.name}
-															variant="outlined"
-															size="small"
-															required
-															helperText={msg.id === 1 && msg.msg}
-															error={msg.id === 1}
-															style={{
-																width: "92%",
-																marginTop: 20,
-															}}
-															onChange={HandleCreditCartChange}
-															onFocus={handleInputFocus}
-														/>
-														<div>
+														<form autoComplete>
 															<TextField
-																name="expiry"
-																label="Date Expiration"
-																value={creditCard.expiry}
+																name="number"
+																label="Numéro de carte"
+																value={creditCard.number}
 																variant="outlined"
 																size="small"
 																required
-																helperText={msg.id === 2 && msg.msg}
-																error={msg.id === 2}
+																autoComplete
 																InputProps={{
-																	inputComponent: cardExpiryFormat,
+																	inputComponent: creditCardFormat,
 																}}
+																helperText={msg.id === 0 && msg.msg}
+																error={msg.id === 0}
 																style={{
-																	width: "45%",
-																	marginTop: 20,
-																	marginRight: "2%",
-																}}
-																onChange={HandleCreditCartChange}
-																onFocus={handleInputFocus}
-															/>
-															<TextField
-																name="cvc"
-																label="CVC"
-																value={creditCard.cvc}
-																variant="outlined"
-																size="small"
-																required
-																helperText={msg.id === 3 && msg.msg}
-																error={msg.id === 3}
-																InputProps={{
-																	inputComponent: cardCvcFormat,
-																}}
-																style={{
-																	width: "45%",
+																	width: "92%",
 																	marginTop: 20,
 																}}
 																onChange={HandleCreditCartChange}
 																onFocus={handleInputFocus}
 															/>
-														</div>
+															<TextField
+																name="name"
+																label="Nom de cart"
+																value={creditCard.name}
+																variant="outlined"
+																size="small"
+																required
+																helperText={msg.id === 1 && msg.msg}
+																error={msg.id === 1}
+																style={{
+																	width: "92%",
+																	marginTop: 20,
+																}}
+																onChange={HandleCreditCartChange}
+																onFocus={handleInputFocus}
+															/>
+															<div>
+																<TextField
+																	name="expiry"
+																	label="Date Expiration"
+																	value={creditCard.expiry}
+																	variant="outlined"
+																	size="small"
+																	required
+																	helperText={msg.id === 2 && msg.msg}
+																	error={msg.id === 2}
+																	InputProps={{
+																		inputComponent: cardExpiryFormat,
+																	}}
+																	style={{
+																		width: "45%",
+																		marginTop: 20,
+																		marginRight: "2%",
+																	}}
+																	onChange={HandleCreditCartChange}
+																	onFocus={handleInputFocus}
+																/>
+																<TextField
+																	name="cvc"
+																	label="CVC"
+																	value={creditCard.cvc}
+																	variant="outlined"
+																	size="small"
+																	required
+																	helperText={msg.id === 3 && msg.msg}
+																	error={msg.id === 3}
+																	InputProps={{
+																		inputComponent: cardCvcFormat,
+																	}}
+																	style={{
+																		width: "45%",
+																		marginTop: 20,
+																	}}
+																	onChange={HandleCreditCartChange}
+																	onFocus={handleInputFocus}
+																/>
+															</div>
+														</form>
 													</div>
 												</Collapse>
-												<Collapse in={commande.paimentMethod === "Facture"}>
+												<Collapse in={commande.paymentMethod === "Facture"}>
 													<div style={{ marginTop: 20 }}></div>
 												</Collapse>
 												<Collapse
-													in={commande.paimentMethod === "Carte cadeau"}
+													in={commande.paymentMethod === "Carte cadeau"}
 												>
 													<div style={{ marginTop: 20 }}>
 														<TextField
@@ -990,10 +1091,45 @@ export default function CommandeScreen() {
 														/>
 													</div>
 												</Collapse>
-												<Collapse in={commande.paimentMethod === "Paypal"}>
+												<Collapse in={commande.paymentMethod === "Paypal"}>
 													<div style={{ marginTop: 20, width: "92%" }}>
 														<Paypal />
 													</div>
+												</Collapse>
+												<Collapse
+													in={
+														commande.paymentMethod === "Paiement à la livraison"
+													}
+												>
+													<Typography
+														style={{
+															marginTop: 10,
+															fontSize: 16,
+															fontWeight: 450,
+														}}
+													>
+														Payez pour votre commande à la livraison:
+													</Typography>
+													<ul
+														style={{
+															marginTop: 10,
+															marginLeft: 50,
+														}}
+													>
+														<li>
+															<Typography>
+																En espèce, soyez certain d'avoir le montant
+																exact du paiement. Nos livreurs ne sont pas
+																munis de monnaie.
+															</Typography>
+														</li>
+														<li>
+															<Typography>
+																Le paiement se fera directement auprès du
+																prestataire de livraison.
+															</Typography>
+														</li>
+													</ul>
 												</Collapse>
 											</div>
 										</div>
@@ -1028,8 +1164,201 @@ export default function CommandeScreen() {
 										Finalisation
 									</StepLabel>
 									<StepContent>
-										<Typography>Finalisation</Typography>
-										<div className={classes.actionsContainer}>
+										<div
+											style={{
+												width: "100%",
+											}}
+										>
+											<div style={{ marginTop: 10 }}>
+												<Typography
+													color="primary"
+													style={{ fontSize: 16, fontWeight: 450 }}
+												>
+													Finalisation de commande
+												</Typography>
+												<div
+													style={{
+														marginTop: 20,
+														border: "1px #cfcfcf solid",
+														borderRadius: 10,
+														padding: 20,
+													}}
+												>
+													<div
+														style={{
+															display: "flex",
+															flexDirection: "row",
+															justifyContent: "space-between",
+															alignItems: "center",
+														}}
+													>
+														<Typography
+															color="primary"
+															style={{ fontSize: 18, fontWeight: 450 }}
+														>
+															Informations de livraison
+														</Typography>
+														<IconButton
+															color="primary"
+															aria-label="edit"
+															size="medium"
+															onClick={() => setActiveStep(0)}
+														>
+															<EditOutlinedIcon fontSize="inherit" />
+														</IconButton>
+													</div>
+													<div style={{ display: "flex" }}>
+														<div
+															style={{
+																display: "flex",
+																flexDirection: "column",
+																marginRight: 20,
+															}}
+														>
+															<Typography
+																style={{
+																	fontSize: 18,
+																	fontWeight: 450,
+																}}
+															>
+																{commande.name} {commande.last_name}
+															</Typography>
+															<Typography
+																style={{ fontSize: 18, marginTop: 5 }}
+															>
+																+213 {commande.phoneNumber}
+															</Typography>
+
+															<Typography
+																style={{ fontSize: 18, marginTop: 5 }}
+															>
+																{commande.address}, {commande.ville},{" "}
+																{commande.region}, {commande.deliveryMode}
+															</Typography>
+														</div>
+													</div>
+
+													<div
+														style={{
+															display: "flex",
+															flexDirection: "row",
+															justifyContent: "space-between",
+															alignItems: "center",
+														}}
+													>
+														<Typography
+															color="primary"
+															style={{
+																fontSize: 16,
+																fontWeight: 450,
+																marginTop: 20,
+															}}
+														>
+															Informations de paiment
+														</Typography>
+														<IconButton
+															color="primary"
+															aria-label="edit"
+															size="medium"
+															onClick={() => setActiveStep(1)}
+														>
+															<EditOutlinedIcon fontSize="inherit" />
+														</IconButton>
+													</div>
+													<div
+														style={{ display: "flex", flexDirection: "column" }}
+													>
+														<div
+															style={{
+																display: "inline-flex",
+																marginRight: 20,
+																marginTop: 10,
+															}}
+														>
+															<Typography
+																style={{
+																	fontSize: 18,
+																	fontWeight: 450,
+																	marginRight: 5,
+																}}
+															>
+																Mode de paiment :
+															</Typography>
+															<Typography
+																style={{
+																	fontSize: 18,
+																}}
+															>
+																{commande.paymentMethod}
+															</Typography>
+														</div>
+														<div
+															style={{ display: "inline-flex", marginTop: 5 }}
+														>
+															<Typography
+																style={{
+																	fontSize: 18,
+																	fontWeight: 450,
+																	marginRight: 5,
+																}}
+															>
+																Sous-total :
+															</Typography>
+															<Typography
+																style={{
+																	fontSize: 18,
+																}}
+															>
+																{subTotalPrice} Da
+															</Typography>
+														</div>
+														<div
+															style={{ display: "inline-flex", marginTop: 5 }}
+														>
+															<Typography
+																style={{
+																	fontSize: 18,
+																	fontWeight: 450,
+																	marginRight: 5,
+																}}
+															>
+																Montant de livraison :
+															</Typography>
+															<Typography
+																style={{
+																	fontSize: 18,
+																}}
+															>
+																600 Da
+															</Typography>
+														</div>
+														<div
+															style={{ display: "inline-flex", marginTop: 5 }}
+														>
+															<Typography
+																style={{
+																	fontSize: 18,
+																	fontWeight: 450,
+																	marginRight: 5,
+																}}
+															>
+																Total :
+															</Typography>
+															<Typography
+																color="primary"
+																style={{
+																	fontSize: 20,
+																	fontWeight: 500,
+																}}
+															>
+																{totalPrice} Da
+															</Typography>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div style={{ marginTop: 30 }}>
 											<div>
 												<Button
 													disabled={activeStep === 0}
@@ -1043,6 +1372,7 @@ export default function CommandeScreen() {
 													color="primary"
 													onClick={handleCommande}
 													style={{ textTransform: "none", color: "white" }}
+													disabled={disabled}
 												>
 													Commander
 												</Button>
@@ -1156,13 +1486,52 @@ export default function CommandeScreen() {
 														padding: 10,
 													}}
 												>
-													<Typography variant="h6" style={{ marginRight: 5 }}>
-														Prix Total :{" "}
-													</Typography>
-													<Typography variant="h6" color="primary">
-														{" "}
-														{totalPrice} Da
-													</Typography>
+													<div
+														style={{
+															display: "flex",
+															flexDirection: "column",
+															width: "100%",
+														}}
+													>
+														<div
+															style={{
+																display: "inline-flex",
+															}}
+														>
+															<Typography
+																variant="h6"
+																style={{ marginRight: 5 }}
+															>
+																Sous-Total :{" "}
+															</Typography>
+															<Typography variant="h6" color="primary">
+																{" "}
+																{subTotalPrice} Da
+															</Typography>
+														</div>
+														<Divider
+															style={{
+																marginTop: 10,
+															}}
+														/>
+														<div
+															style={{
+																display: "inline-flex",
+																marginTop: 10,
+															}}
+														>
+															<Typography
+																variant="h6"
+																style={{ marginRight: 5 }}
+															>
+																Prix Total :{" "}
+															</Typography>
+															<Typography variant="h6" color="primary">
+																{" "}
+																{totalPrice} Da
+															</Typography>
+														</div>
+													</div>
 												</CardContent>
 											</Card>
 										</Scrollbars>

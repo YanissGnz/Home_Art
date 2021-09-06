@@ -240,7 +240,10 @@ export default function Home(props) {
 			{!isLoading && (
 				<div className="home_body">
 					<CssBaseline />
-					<MyAppBar cartLength={user ? user.cart.length : 0} />
+					<MyAppBar
+						cartLength={user ? user.cart.length : 0}
+						notification={user ? user.notifications : []}
+					/>
 					<Container
 						maxWidth="lg"
 						style={{

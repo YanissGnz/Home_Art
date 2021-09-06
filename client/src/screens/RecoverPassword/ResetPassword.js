@@ -129,7 +129,6 @@ export default function ResetPassword() {
 				"Content-Type": "application/json",
 			},
 		};
-		console.log(password);
 		// Request body
 		const body = JSON.stringify({ password, cf_password });
 

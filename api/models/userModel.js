@@ -1,3 +1,4 @@
+const { Timestamp } = require("mongodb");
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -43,6 +44,16 @@ const userSchema = new mongoose.Schema(
 			default: 0, // 0 = user, 1 = admin
 		},
 		favoriteProducts: {
+			type: Array,
+			default: [],
+		},
+		notifications: [
+			{
+				value: { type: String },
+				date: { type: String },
+			},
+		],
+		orders: {
 			type: Array,
 			default: [],
 		},

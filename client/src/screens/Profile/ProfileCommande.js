@@ -1,14 +1,22 @@
 import React from "react";
 import MyAppBar from "../../utils/AppBar";
 import Fotter from "../../utils/Footer";
-import { Container, CssBaseline, ButtonGroup, Button } from "@material-ui/core";
+import {
+	Container,
+	CssBaseline,
+	ButtonGroup,
+	Button,
+	Typography,
+	Divider,
+} from "@material-ui/core";
 
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import CheckBoxOutlinedIcon from "@material-ui/icons/CheckBoxOutlined";
 import FavoriteBorderOutlinedIcon from "@material-ui/icons/FavoriteBorderOutlined";
 import PinDropOutlinedIcon from "@material-ui/icons/PinDropOutlined";
 import VpnKeyOutlinedIcon from "@material-ui/icons/VpnKeyOutlined";
-
+import NoOrdersIcon from "../../Icons/NoOrdersIcon";
+import OrderContainer from "../../utils/OrderContainer";
 import { useState } from "react";
 import { useHistory } from "react-router";
 import {
@@ -19,6 +27,8 @@ import {
 import { returnErrors } from "../../redux/actions/errAction";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import Scrollbars from "react-custom-scrollbars";
+import { CircularProgress } from "@material-ui/core";
 
 export default function Profile() {
 	const token = useSelector((state) => state.auth.token);
@@ -26,11 +36,13 @@ export default function Profile() {
 	const [user, setUser] = useState(null);
 	const history = useHistory();
 	const dispatch = useDispatch();
+	const [isLoading, setIsLoading] = useState(false);
+	const [orders, setOrders] = useState([]);
 
 	React.useEffect(() => {
 		const loadUser = async () => {
 			dispatch(dispatchUserLoading());
-
+			setIsLoading(true);
 			// Headers
 			const config = {
 				headers: {
@@ -43,8 +55,11 @@ export default function Profile() {
 				.then((res) => {
 					dispatch(dispatchUserLoaded(res));
 					setUser(res.data.user);
+					setOrders(res.data.user.orders);
+					setIsLoading(false);
 				})
 				.catch((err) => {
+					setIsLoading(false);
 					dispatch(dispatchUserError());
 					dispatch(returnErrors(err.response.data.msg, err.response.status));
 				});
@@ -52,137 +67,203 @@ export default function Profile() {
 		loadUser();
 	}, [dispatch, token]);
 
+	const handleCancelOrder = async (deletedOrder) => {
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		await axios
+			.delete(`users/delete_order`, { deletedOrder }, config)
+			.then((res) => {
+				setOrders(res.data.orders);
+			})
+			.catch((e) => {
+				console.log(e);
+			});
+	};
+
 	return (
 		<div>
-			<div className="profile_body">
-				<CssBaseline />
-				<MyAppBar cartLength={user ? user.cart.length : 0} />
-				<Container
-					maxWidth="lg"
+			{isLoading && (
+				<CircularProgress
+					size={80}
+					thickness={5}
 					style={{
-						backgroundColor: "white",
-						borderRadius: 20,
-						height: 700,
-						marginTop: 20,
-						display: "flex",
-						flexDirection: "row",
-						padding: 0,
-						overflow: "hidden",
+						marginTop: "22%",
+						marginLeft: "49%",
 					}}
-					className="main"
-				>
-					<div
+				/>
+			)}
+			{!isLoading && (
+				<div className="profile_body">
+					<CssBaseline />
+					<MyAppBar cartLength={user ? user.cart.length : 0} />
+					<Container
+						maxWidth="lg"
 						style={{
-							width: "25%",
-							marginRight: 10,
-							borderRight: "1px solid #acacac",
+							backgroundColor: "white",
+							borderRadius: 20,
+							height: 700,
+							marginTop: 20,
 							display: "flex",
-							alignItems: "flex-start",
-							justifyContent: "center",
+							flexDirection: "row",
+							padding: 0,
+							overflow: "hidden",
 						}}
+						className="main"
 					>
-						<ButtonGroup
-							orientation="vertical"
-							variant="text"
-							size="large"
-							fullWidth
-							disableRipple
+						<div
+							style={{
+								width: "25%",
+								marginRight: 10,
+								borderRight: "1px solid #acacac",
+								display: "flex",
+								alignItems: "flex-start",
+								justifyContent: "center",
+							}}
 						>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 17,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<InfoOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/info")}
+							<ButtonGroup
+								orientation="vertical"
+								variant="text"
+								size="large"
+								fullWidth
+								disableRipple
 							>
-								Informations personnelles
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={
-									<FavoriteBorderOutlinedIcon style={{ fontSize: 30 }} />
-								}
-								onClick={() => history.push("/profile/favorites")}
-							>
-								Produit favoris
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={
-									<CheckBoxOutlinedIcon
-										style={{ fontSize: 30 }}
-										color="primary"
-									/>
-								}
-								color="primary"
-							>
-								Commandes
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<PinDropOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/addresses")}
-							>
-								Addresses
-							</Button>
-							<Button
-								style={{
-									textTransform: "none",
-									fontSize: 18,
-									fontWeight: 450,
-									height: 80,
-									display: "flex",
-									justifyContent: "flex-start",
-									padding: 20,
-								}}
-								startIcon={<VpnKeyOutlinedIcon style={{ fontSize: 30 }} />}
-								onClick={() => history.push("/profile/password")}
-							>
-								Modifier le mot de passe
-							</Button>
-						</ButtonGroup>
-					</div>
-					<div
-						style={{
-							width: "75%",
-							margin: 0,
-							position: "relative",
-							padding: 30,
-						}}
-					></div>
-				</Container>
-				<Fotter />
-			</div>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 17,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={<InfoOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/info")}
+								>
+									Informations personnelles
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={
+										<FavoriteBorderOutlinedIcon style={{ fontSize: 30 }} />
+									}
+									onClick={() => history.push("/profile/favorites")}
+								>
+									Produit favoris
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={
+										<CheckBoxOutlinedIcon
+											style={{ fontSize: 30 }}
+											color="primary"
+										/>
+									}
+									color="primary"
+								>
+									Commandes
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={<PinDropOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/addresses")}
+								>
+									Addresses
+								</Button>
+								<Button
+									style={{
+										textTransform: "none",
+										fontSize: 18,
+										fontWeight: 450,
+										height: 80,
+										display: "flex",
+										justifyContent: "flex-start",
+										padding: 20,
+									}}
+									startIcon={<VpnKeyOutlinedIcon style={{ fontSize: 30 }} />}
+									onClick={() => history.push("/profile/password")}
+								>
+									Modifier le mot de passe
+								</Button>
+							</ButtonGroup>
+						</div>
+						<div
+							style={{
+								width: "75%",
+								margin: 0,
+								position: "relative",
+								padding: 30,
+							}}
+						>
+							<Typography variant="h5" style={{ marginBottom: 20 }}>
+								Vos commandes
+							</Typography>
+							<Divider style={{ marginBottom: 50 }} />
+							{orders.length === 0 ? (
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column",
+										height: "70%",
+										alignItems: "center",
+										justifyContent: "center",
+									}}
+								>
+									<NoOrdersIcon />
+									<Typography
+										variant="h5"
+										color="textSecondary"
+										style={{ marginTop: 20 }}
+									>
+										Vous n'avez pas des commandes
+									</Typography>
+								</div>
+							) : (
+								<Scrollbars autoHide style={{ width: "100%", height: 520 }}>
+									{orders.map((order) => (
+										<div style={{ padding: 10 }}>
+											<OrderContainer
+												order={order}
+												handleCancelOrder={handleCancelOrder}
+											/>
+										</div>
+									))}
+								</Scrollbars>
+							)}
+						</div>
+					</Container>
+					<Fotter />
+				</div>
+			)}
 		</div>
 	);
 }

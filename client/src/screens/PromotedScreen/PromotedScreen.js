@@ -56,7 +56,6 @@ export default function PromotedScreen() {
 	const [limit, setLimit] = useState(8);
 	const [priceRange, setPriceRange] = React.useState([0, 1000000]);
 	const [selectedCategories, setSelectedCategories] = React.useState([]);
-	const [selectPromotion, setselectPromotion] = useState(false);
 	const [productLoading, setProductLoading] = useState(false);
 
 	const handleCategorieChange = (categorie) => {

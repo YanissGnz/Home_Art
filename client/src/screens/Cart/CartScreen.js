@@ -191,14 +191,14 @@ export default function CartScreen() {
 										style={{
 											marginTop: 20,
 											fontSize: 25,
-											fontWeight: 400,
+											fontWeight: 450,
 										}}
 									>
 										Vous avez déjà un compte?{" "}
 										<a
 											href="/login"
 											title="Connecter vous"
-											style={{ color: "#F58634" }}
+											style={{ color: "#F58634", fontWeight: 450 }}
 										>
 											Connecter vous
 										</a>{" "}
@@ -216,6 +216,7 @@ export default function CartScreen() {
 									color: "white",
 									textTransform: "none",
 									fontSize: 16,
+									fontWeight: 450,
 								}}
 								onClick={() => history.push("/")}
 							>

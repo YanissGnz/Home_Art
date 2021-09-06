@@ -1,4 +1,5 @@
 const Users2 = require("../models/userModel");
+const Order = require("../models/OrderModel");
 const Product = require("../models/ProductModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -336,13 +337,10 @@ const userCtrl2 = {
 			const user = await Users2.findById(req.user.id);
 			if (!user) return res.status(404).json({ msg: "User does not exist." });
 			const cart = user.cart;
-			console.log(cart);
-			console.log(item.product._id);
 
 			const newCart = cart.filter(
 				(product) => product.product._id != item.product._id
 			);
-			console.log(newCart);
 
 			const newUser = await Users2.findOneAndUpdate(
 				{ _id: req.user.id },
@@ -499,8 +497,6 @@ const userCtrl2 = {
 			const user = await Users2.findOne({ _id: user_id });
 			var addresses = user.addresses;
 
-			console.log(user.addresses);
-
 			const newAddress = {
 				address: address,
 				ville: ville,
@@ -511,7 +507,6 @@ const userCtrl2 = {
 				ville: ville,
 				region: region,
 			});
-			console.log(addresses);
 			await Users2.updateOne(
 				{ _id: user_id },
 				{
@@ -605,6 +600,166 @@ const userCtrl2 = {
 			);
 
 			res.status(200).json({ msg: "Le mot de passe a été changer" });
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	confirmOrder: async (req, res) => {
+		const id = req.user.id;
+		const {
+			name,
+			last_name,
+			phoneNumber,
+			address,
+			region,
+			ville,
+			deliveryMode,
+			paymentMethod,
+			totalPrice,
+			products,
+			paymentInfo,
+		} = req.body;
+
+		try {
+			const newOrder = new Order({
+				user: { id, name, last_name, phoneNumber },
+				deliveryAddress: { address, region, ville },
+				products,
+				deliveryMode,
+				paymentMethod,
+				paymentInfo,
+				totalPrice,
+			});
+			await newOrder.save();
+
+			for (let index = 0; index < products.length; index++) {
+				const product = products[0];
+
+				const stock = await Product.findOne({
+					_id: { $in: product.product._id },
+				}).select("stock");
+				const newProduct = await Product.findOneAndUpdate(
+					{
+						_id: { $in: product.product._id },
+					},
+					{
+						stock: stock.stock - 1,
+					}
+				);
+			}
+
+			const user = await Users2.findOne({
+				_id: { $in: id },
+			}).select("orders");
+
+			var newOrders = user.orders;
+			newOrders.push(newOrder);
+			const newUser = await Users2.findOneAndUpdate(
+				{
+					_id: { $in: id },
+				},
+				{
+					cart: [],
+					orders: newOrders,
+				}
+			);
+
+			res.status(200).json({ msg: "La commande à été effectuer" });
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	validateOrder: async (req, res) => {
+		const { user_id, order_id } = req.body;
+
+		try {
+			const validOrders = await Order.findOneAndUpdate(
+				{ _id: { $in: order_id } },
+				{ isValidated: true }
+			);
+
+			const orders = await Order.find();
+
+			const user = await Users2.findOne({
+				_id: { $in: user_id },
+			}).select("orders");
+
+			var userOrders = user.orders;
+
+			const newOrders = userOrders.filter((order) => order._id != order_id);
+			newOrders.push(validOrders);
+
+			var notifications = user.notifications;
+			const notification = {
+				value: `Votre commande a été valider /n ID : ${order_id}`,
+				date: new Date(),
+			};
+			notifications.push(notification);
+
+			const newUser = await Users2.findOneAndUpdate(
+				{
+					_id: { $in: user_id },
+				},
+				{
+					orders: newOrders,
+					notifications,
+				}
+			);
+
+			res.status(200).json({ orders });
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	deleteOrder: async (req, res) => {
+		const id = req.user.id;
+		const { deletedOrder } = req.body;
+		try {
+			const user = await Users2.findOne({
+				_id: { $in: id },
+			});
+
+			var orders = user.orders;
+
+			orders.splice(orders.indexOf(deletedOrder), 1);
+
+			const newUser = await Users2.findOneAndUpdate(
+				{
+					_id: { $in: id },
+				},
+				{
+					orders,
+				}
+			);
+
+			res.status(200).json({ orders });
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	deleteNotification: async (req, res) => {
+		const id = req.user.id;
+		const { notification } = req.body;
+
+		try {
+			const user = await Users2.findOne({
+				_id: { $in: id },
+			});
+
+			var notifications = user.notifications;
+
+			notifications.splice(notifications.indexOf(notification), 1);
+
+			const newUser = await Users2.findOneAndUpdate(
+				{
+					_id: { $in: id },
+				},
+				{
+					notifications,
+				}
+			);
+
+			res.status(200).json({ notifications });
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
 		}

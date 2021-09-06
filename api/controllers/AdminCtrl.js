@@ -1,5 +1,6 @@
 const Admins = require("../models/AdminModel");
 const Users = require("../models/userModel");
+const Order = require("../models/OrderModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -52,7 +53,8 @@ const userCtrl = {
 			const user = await Admins.findById(req.user.id)
 				.select("-password")
 				.select("-register_date");
-			if (!user) return res.status(400).json({ msg: "User does not exist." });
+			if (!user)
+				return res.status(400).json({ msg: "Utilisateur n'éxist pas." });
 			if (user.role !== 1) {
 				return res.status(400).json({ msg: "Vous etes pas un admin." });
 			}
@@ -70,6 +72,16 @@ const userCtrl = {
 				.sort({ createdAt: -1 });
 			res.status(200).json({
 				users,
+			});
+		} catch (err) {
+			return res.status(500).json({ msg: err.message });
+		}
+	},
+	getOrders: async (req, res) => {
+		try {
+			const orders = await Order.find();
+			res.status(200).json({
+				orders,
 			});
 		} catch (err) {
 			return res.status(500).json({ msg: err.message });

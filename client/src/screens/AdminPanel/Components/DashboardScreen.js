@@ -1,4 +1,5 @@
 import { Container, Toolbar, Typography, Divider } from "@material-ui/core";
+import axios from "axios";
 import React from "react";
 import { useSelector } from "react-redux";
 import { Bar, Line } from "react-chartjs-2";
@@ -6,10 +7,33 @@ import ClientIcon from "../../../Icons/ClientsIcon";
 import CommandesIcon from "../../../Icons/CommandesIcon";
 import ProductsIcon from "../../../Icons/ProductsIcon";
 import RevenueIcon from "../../../Icons/RevenueIcon";
+import { useState } from "react";
+import { useEffect } from "react";
 
 export default function DashboardScreen({ usersCount }) {
 	const productCount = useSelector((state) => state.products.products);
 	const users = useSelector((state) => state.users.slice(0, 3));
+	const token = useSelector((state) => state.auth.token);
+
+	const [orders, setOrders] = useState([]);
+
+	useEffect(() => {
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		axios
+			.get("/users/get_orders", config)
+			.then((res) => {
+				setOrders(res.data.orders.slice(0, 3));
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}, []);
 
 	const monthNames = [
 		"Janvier",
@@ -481,7 +505,7 @@ export default function DashboardScreen({ usersCount }) {
 								color="textSecondary"
 								style={{ fontSize: 20, fontWeight: 450, marginLeft: 10 }}
 							>
-								Produit
+								Montant
 							</Typography>
 						</div>
 						<div
@@ -495,10 +519,70 @@ export default function DashboardScreen({ usersCount }) {
 								color="textSecondary"
 								style={{ fontSize: 20, fontWeight: 450, marginLeft: 10 }}
 							>
-								Date
+								Status
 							</Typography>
 						</div>
 					</div>
+					{orders.map((order) => (
+						<div
+							style={{
+								display: "flex",
+								width: "100%",
+								marginBottom: 10,
+								borderRadius: 20,
+								border: "1px solid rgb(217 217 217)",
+							}}
+							className="recent_client_div"
+						>
+							<div
+								style={{
+									width: "25%",
+									display: "flex",
+									padding: 20,
+								}}
+							>
+								<Typography
+									color="textPrimary"
+									style={{
+										fontSize: 18,
+										fontWeight: 450,
+										marginLeft: 10,
+										textTransform: "capitalize",
+									}}
+								>
+									{order.user.name}
+								</Typography>
+							</div>
+							<div
+								style={{
+									width: "50%",
+									display: "flex",
+									padding: 20,
+								}}
+							>
+								<Typography
+									color="primary"
+									style={{ fontSize: 18, fontWeight: 500, marginLeft: 10 }}
+								>
+									{order.totalPrice} Da
+								</Typography>
+							</div>
+							<div
+								style={{
+									width: "25%",
+									display: "flex",
+									padding: 20,
+								}}
+							>
+								<Typography
+									color={order.isValidated ? "primary" : "error"}
+									style={{ fontSize: 18, fontWeight: 500, marginLeft: 10 }}
+								>
+									{order.isValidated ? "Valider" : "Non valider"}
+								</Typography>
+							</div>
+						</div>
+					))}
 				</Container>
 			</div>
 		</Container>
