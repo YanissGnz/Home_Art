@@ -1,5 +1,5 @@
 const Admins = require("../models/AdminModel");
-const Users = require("../models/userModel");
+const Clients = require("../models/userModel");
 const Order = require("../models/OrderModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -67,7 +67,7 @@ const userCtrl = {
 	},
 	getUsers: async (req, res) => {
 		try {
-			const users = await Users.find()
+			const users = await Clients.find()
 				.select("-password")
 				.sort({ createdAt: -1 });
 			res.status(200).json({
@@ -90,12 +90,57 @@ const userCtrl = {
 	deleteUser: async (req, res) => {
 		const user_Id = req.params.user_Id;
 		try {
-			const check = await Users.findOne({ _id: user_Id });
+			const check = await Clients.findOne({ _id: user_Id });
 			if (!check) {
 				return res.status(400).json({ msg: "Utilisateur n'exist pas." });
 			}
-			await Users.deleteOne({ _id: user_Id });
+			await Clients.deleteOne({ _id: user_Id });
 			res.json({ msg: "L'utilisateur a été supprimé" });
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	validateOrder: async (req, res) => {
+		const { user_id, order_id } = req.body;
+
+		try {
+			const validOrders = await Order.findOneAndUpdate(
+				{ _id: { $in: order_id } },
+				{ isValidated: true }
+			);
+
+			const orders = await Order.find();
+
+			const user = await Clients.findOne({
+				_id: { $in: user_id },
+			})
+				.select("orders")
+				.select("notifications");
+
+			const userOrders = user.orders;
+
+			const newOrders = userOrders.filter((order) => order._id != order_id);
+			newOrders.push(validOrders);
+
+			var notifications = user.notifications;
+
+			const notification = {
+				value: `Votre commande a été valider, il sera livré sous 48h`,
+				date: new Date(),
+			};
+			notifications.push(notification);
+
+			const newUser = await Clients.findOneAndUpdate(
+				{
+					_id: { $in: user_id },
+				},
+				{
+					orders: newOrders,
+					notifications,
+				}
+			);
+
+			res.status(200).json({ orders });
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
 		}

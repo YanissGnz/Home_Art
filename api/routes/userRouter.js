@@ -10,6 +10,7 @@ router.get("/load_admin", auth, userCtrl.loadAdmin);
 router.get("/get_users", auth, userCtrl.getUsers);
 router.get("/get_orders", auth, userCtrl.getOrders);
 router.delete("/delete_user/:user_Id", auth, userCtrl.deleteUser);
+router.post("/validate_order", auth, userCtrl.validateOrder);
 
 //Client Routes
 router.post("/login", userCtrl2.login);
@@ -33,7 +34,6 @@ router.post("/add_Address", auth, userCtrl2.addAddress);
 router.post("/delete_address", auth, userCtrl2.retirerAddress);
 router.post("/password", auth, userCtrl2.resetPassword);
 router.post("/confirm_order", auth, userCtrl2.confirmOrder);
-router.post("/validate_order", auth, userCtrl2.validateOrder);
 router.delete("/delete_order", auth, userCtrl2.deleteOrder);
 router.post("/delete_notification", auth, userCtrl2.deleteNotification);
 

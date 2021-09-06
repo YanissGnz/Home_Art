@@ -233,7 +233,7 @@ const useColorlibStepIconStyles = makeStyles({
 	},
 });
 
-var commandeInfo = {
+const commandeInfo = {
 	name: "",
 	last_name: "",
 	phoneNumber: "",
@@ -446,12 +446,16 @@ export default function CommandeScreen() {
 		} = commande;
 		const products = cart;
 		var paymentInfo;
+		var isPaid = false;
 		if (commande.paymentMethod === "Carte bancaire") {
 			paymentInfo = creditCard;
+			isPaid = true;
 		} else if (commande.paymentMethod === "Carte cadeau") {
 			paymentInfo = giftCardCode;
+			isPaid = true;
 		} else if (commande.paymentMethod === "Paypal") {
 			paymentInfo = {};
+			isPaid = true;
 		} else if (commande.paymentMethod === "Paiement à la livraison") {
 			paymentInfo = "Paiement à la livraison";
 		} else if (commande.paymentMethod === "Facture") {
@@ -480,6 +484,7 @@ export default function CommandeScreen() {
 					paymentMethod,
 					paymentInfo,
 					totalPrice,
+					isPaid,
 				},
 				config
 			)

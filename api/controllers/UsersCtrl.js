@@ -1,4 +1,4 @@
-const Users2 = require("../models/userModel");
+const Clients = require("../models/userModel");
 const Order = require("../models/OrderModel");
 const Product = require("../models/ProductModel");
 const bcrypt = require("bcrypt");
@@ -43,7 +43,7 @@ const userCtrl2 = {
 			if (!validateEmail(email))
 				return res.status(400).json({ msg: "Invalid email.", id: 0 });
 
-			const user = await Users2.findOne({ email });
+			const user = await Clients.findOne({ email });
 			if (user)
 				return res
 					.status(400)
@@ -103,11 +103,11 @@ const userCtrl2 = {
 				addresses,
 			} = user;
 
-			const check = await Users2.findOne({ email });
+			const check = await Clients.findOne({ email });
 			if (check)
 				return res.status(400).json({ msg: "This email already exists." });
 
-			const newUser = new Users2({
+			const newUser = new Clients({
 				name,
 				last_name,
 				email,
@@ -137,7 +137,7 @@ const userCtrl2 = {
 					.status(400)
 					.json({ msg: "Enter votre mot de passe.", id: 1 });
 			}
-			const user = await Users2.findOne({ email });
+			const user = await Clients.findOne({ email });
 			if (!user)
 				return res.status(400).json({ msg: "Ce email n'exist pas.", id: 0 });
 
@@ -162,7 +162,7 @@ const userCtrl2 = {
 	},
 	loadUser: async (req, res) => {
 		try {
-			const user = await Users2.findById(req.user.id)
+			const user = await Clients.findById(req.user.id)
 				.select("-password")
 				.select("-register_date");
 			if (!user) return res.status(400).json({ msg: "User does not exist." });
@@ -181,7 +181,7 @@ const userCtrl2 = {
 			const { email } = req.body;
 			if (!validateEmail(email))
 				return res.status(400).json({ msg: "Invalid Emails", id: 0 });
-			const user = await Users2.findOne({ email });
+			const user = await Clients.findOne({ email });
 			if (!user)
 				return res
 					.status(400)
@@ -222,7 +222,7 @@ const userCtrl2 = {
 
 			const passwordHash = await bcrypt.hash(password, 12);
 
-			await Users2.findOneAndUpdate(
+			await Clients.findOneAndUpdate(
 				{ _id: req.user.id },
 				{
 					password: passwordHash,
@@ -237,7 +237,7 @@ const userCtrl2 = {
 
 	getUserInfo: async (req, res) => {
 		try {
-			const user = await Users2.findById(req.user.id).select("-password");
+			const user = await Clients.findById(req.user.id).select("-password");
 
 			res.json(user);
 		} catch (err) {
@@ -249,7 +249,7 @@ const userCtrl2 = {
 		let product_id = req.query.id;
 		const user_id = req.user.id;
 		try {
-			const user = await Users2.findById(req.user.id);
+			const user = await Clients.findById(req.user.id);
 			if (!user) return res.status(400).json({ msg: "User does not exist." });
 			const product = await Product.findOne({ _id: { $in: product_id } })
 				.select("-rating")
@@ -277,7 +277,7 @@ const userCtrl2 = {
 				};
 				newCart.push(newProduct);
 			}
-			const newUser = await Users2.findOneAndUpdate(
+			const newUser = await Clients.findOneAndUpdate(
 				{ _id: req.user.id },
 				{
 					cart: newCart,
@@ -299,7 +299,7 @@ const userCtrl2 = {
 		let product_id = req.query.id;
 		const user_id = req.user.id;
 		try {
-			const user = await Users2.findById(req.user.id);
+			const user = await Clients.findById(req.user.id);
 			if (!user) return res.status(400).json({ msg: "User does not exist." });
 
 			var newCart = user.cart;
@@ -315,7 +315,7 @@ const userCtrl2 = {
 				}
 			});
 
-			const newUser = await Users2.findOneAndUpdate(
+			const newUser = await Clients.findOneAndUpdate(
 				{ _id: req.user.id },
 				{
 					cart: newCart,
@@ -334,7 +334,7 @@ const userCtrl2 = {
 		const user_id = req.user.id;
 		const item = req.body.item;
 		try {
-			const user = await Users2.findById(req.user.id);
+			const user = await Clients.findById(req.user.id);
 			if (!user) return res.status(404).json({ msg: "User does not exist." });
 			const cart = user.cart;
 
@@ -342,7 +342,7 @@ const userCtrl2 = {
 				(product) => product.product._id != item.product._id
 			);
 
-			const newUser = await Users2.findOneAndUpdate(
+			const newUser = await Clients.findOneAndUpdate(
 				{ _id: req.user.id },
 				{
 					cart: newCart,
@@ -374,7 +374,7 @@ const userCtrl2 = {
 					.status(400)
 					.json({ msg: "Email verification failed.", id: 0 });
 
-			const user = await Users2.findOne({ email });
+			const user = await Clients.findOne({ email });
 
 			if (user) {
 				const isMatch = await bcrypt.compare(password, user.password);
@@ -387,7 +387,7 @@ const userCtrl2 = {
 					access_token,
 				});
 			} else {
-				const newUser = new Users2({
+				const newUser = new Clients({
 					name,
 					last_name: name,
 					email,
@@ -414,12 +414,12 @@ const userCtrl2 = {
 		try {
 			const user_Id = req.user.id;
 			const product_id = req.params.product_Id;
-			var user = await Users2.findOne({ _id: user_Id });
+			var user = await Clients.findOne({ _id: user_Id });
 			var favoriteProducts = user.favoriteProducts;
 			if (favoriteProducts.indexOf(product_id) === -1) {
 				favoriteProducts.push(product_id);
 			}
-			user = await Users2.updateOne({ _id: user_Id }, { favoriteProducts });
+			user = await Clients.updateOne({ _id: user_Id }, { favoriteProducts });
 			return res.status(200).json({ msg: "Ajouter aux favoris" });
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
@@ -429,12 +429,12 @@ const userCtrl2 = {
 		try {
 			const user_Id = req.user.id;
 			const product_id = req.params.product_Id;
-			var user = await Users2.findOne({ _id: user_Id });
+			var user = await Clients.findOne({ _id: user_Id });
 			var favoriteProducts = user.favoriteProducts;
 			if (favoriteProducts.indexOf(product_id) !== -1) {
 				favoriteProducts.splice(favoriteProducts.indexOf(product_id), 1);
 			}
-			user = await Users2.updateOne({ _id: user_Id }, { favoriteProducts });
+			user = await Clients.updateOne({ _id: user_Id }, { favoriteProducts });
 			return res
 				.status(200)
 				.json({ favoriteProducts, msg: "Supprimer des favoris" });
@@ -455,12 +455,12 @@ const userCtrl2 = {
 					.json({ msg: "Enter votre nom de famille.", id: 1 });
 			}
 
-			const check = await Users2.findOne({ _id: user_id });
+			const check = await Clients.findOne({ _id: user_id });
 			if (!check) {
 				return res.status(400).json({ msg: "client n'exist pas.", id: 5 });
 			}
 
-			const editedProfile = await Users2.updateOne(
+			const editedProfile = await Clients.updateOne(
 				{ _id: user_id },
 				{
 					name,
@@ -494,7 +494,7 @@ const userCtrl2 = {
 				return res.status(400).json({ msg: "Enter votre ville.", id: 2 });
 			}
 
-			const user = await Users2.findOne({ _id: user_id });
+			const user = await Clients.findOne({ _id: user_id });
 			var addresses = user.addresses;
 
 			const newAddress = {
@@ -507,7 +507,7 @@ const userCtrl2 = {
 				ville: ville,
 				region: region,
 			});
-			await Users2.updateOne(
+			await Clients.updateOne(
 				{ _id: user_id },
 				{
 					addresses: addresses,
@@ -526,7 +526,7 @@ const userCtrl2 = {
 		const address = req.body.address;
 
 		try {
-			const user = await Users2.findById(req.user.id);
+			const user = await Clients.findById(req.user.id);
 			if (!user) return res.status(404).json({ msg: "User does not exist." });
 			var addresses = user.addresses;
 
@@ -537,7 +537,7 @@ const userCtrl2 = {
 					item.region != address.region
 			);
 
-			const newUser = await Users2.findOneAndUpdate(
+			const newUser = await Clients.findOneAndUpdate(
 				{ _id: req.user.id },
 				{
 					addresses: newAddresses,
@@ -585,14 +585,14 @@ const userCtrl2 = {
 					id: 2,
 				});
 			}
-			const user = await Users2.findOne({ _id: user_id });
+			const user = await Clients.findOne({ _id: user_id });
 			const matchPassword = await bcrypt.compare(password, user.password);
 			if (!matchPassword)
 				return res.status(400).json({ msg: "Password is incorrect.", id: 0 });
 
 			const passwordHash = await bcrypt.hash(newPassword, 12);
 
-			await Users2.findOneAndUpdate(
+			await Clients.findOneAndUpdate(
 				{ _id: req.user.id },
 				{
 					password: passwordHash,
@@ -618,6 +618,7 @@ const userCtrl2 = {
 			totalPrice,
 			products,
 			paymentInfo,
+			isPaid,
 		} = req.body;
 
 		try {
@@ -629,32 +630,35 @@ const userCtrl2 = {
 				paymentMethod,
 				paymentInfo,
 				totalPrice,
+				isPaid,
 			});
 			await newOrder.save();
 
+			//Add Gift card code here
+
 			for (let index = 0; index < products.length; index++) {
-				const product = products[0];
+				const item = products[index];
 
 				const stock = await Product.findOne({
-					_id: { $in: product.product._id },
+					_id: { $in: item.product._id },
 				}).select("stock");
 				const newProduct = await Product.findOneAndUpdate(
 					{
-						_id: { $in: product.product._id },
+						_id: { $in: item.product._id },
 					},
 					{
-						stock: stock.stock - 1,
+						stock: stock.stock - item.quantity,
 					}
 				);
 			}
 
-			const user = await Users2.findOne({
+			const user = await Clients.findOne({
 				_id: { $in: id },
 			}).select("orders");
 
 			var newOrders = user.orders;
 			newOrders.push(newOrder);
-			const newUser = await Users2.findOneAndUpdate(
+			const newUser = await Clients.findOneAndUpdate(
 				{
 					_id: { $in: id },
 				},
@@ -669,53 +673,12 @@ const userCtrl2 = {
 			return res.status(400).json({ msg: err.message });
 		}
 	},
-	validateOrder: async (req, res) => {
-		const { user_id, order_id } = req.body;
 
-		try {
-			const validOrders = await Order.findOneAndUpdate(
-				{ _id: { $in: order_id } },
-				{ isValidated: true }
-			);
-
-			const orders = await Order.find();
-
-			const user = await Users2.findOne({
-				_id: { $in: user_id },
-			}).select("orders");
-
-			var userOrders = user.orders;
-
-			const newOrders = userOrders.filter((order) => order._id != order_id);
-			newOrders.push(validOrders);
-
-			var notifications = user.notifications;
-			const notification = {
-				value: `Votre commande a été valider /n ID : ${order_id}`,
-				date: new Date(),
-			};
-			notifications.push(notification);
-
-			const newUser = await Users2.findOneAndUpdate(
-				{
-					_id: { $in: user_id },
-				},
-				{
-					orders: newOrders,
-					notifications,
-				}
-			);
-
-			res.status(200).json({ orders });
-		} catch (err) {
-			return res.status(400).json({ msg: err.message });
-		}
-	},
 	deleteOrder: async (req, res) => {
 		const id = req.user.id;
 		const { deletedOrder } = req.body;
 		try {
-			const user = await Users2.findOne({
+			const user = await Clients.findOne({
 				_id: { $in: id },
 			});
 
@@ -723,7 +686,7 @@ const userCtrl2 = {
 
 			orders.splice(orders.indexOf(deletedOrder), 1);
 
-			const newUser = await Users2.findOneAndUpdate(
+			const newUser = await Clients.findOneAndUpdate(
 				{
 					_id: { $in: id },
 				},
@@ -742,7 +705,7 @@ const userCtrl2 = {
 		const { notification } = req.body;
 
 		try {
-			const user = await Users2.findOne({
+			const user = await Clients.findOne({
 				_id: { $in: id },
 			});
 
@@ -750,7 +713,7 @@ const userCtrl2 = {
 
 			notifications.splice(notifications.indexOf(notification), 1);
 
-			const newUser = await Users2.findOneAndUpdate(
+			const newUser = await Clients.findOneAndUpdate(
 				{
 					_id: { $in: id },
 				},
@@ -785,13 +748,13 @@ function isMatch(password, cf_password) {
 
 const createActivationToken = (payload) => {
 	return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET, {
-		expiresIn: "5m",
+		expiresIn: "20m",
 	});
 };
 
 const createAccessToken = (payload) => {
 	return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-		expiresIn: "1h",
+		expiresIn: "24h",
 	});
 };
 

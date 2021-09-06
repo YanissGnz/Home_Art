@@ -1,5 +1,5 @@
 const Product = require("../models/ProductModel");
-const Users2 = require("../models/userModel");
+const Clients = require("../models/userModel");
 const fs = require("fs");
 
 const productCtrl = {
@@ -61,14 +61,13 @@ const productCtrl = {
 					newPrice: 0,
 				});
 
-				newProduct
-					.save()
-					.then(() =>
-						res.status(200).json({
-							msg: "Le produit a été ajouté.",
-						})
-					)
-					.catch((err) => res.status(400).json({ msg: err }));
+				newProduct.save();
+
+				const products = Product.find();
+
+				return res.status(200).json({
+					products,
+				});
 			}
 		} catch (err) {
 			console.log(err.message);
@@ -456,8 +455,10 @@ const productCtrl = {
 					}
 				);
 			}
+			const products = Product.find();
+
 			return res.status(200).json({
-				msg: "Le produit a été modifier.",
+				products,
 			});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
@@ -479,8 +480,10 @@ const productCtrl = {
 				{ _id: product_id },
 				{ price: newPrice, oldPrice: oldPrice, promoted: true }
 			);
+			const products = Product.find();
+
 			return res.status(200).json({
-				msg: "Le produit a été promoter.",
+				products,
 			});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
@@ -497,8 +500,10 @@ const productCtrl = {
 				{ _id: product_id },
 				{ archived: true }
 			);
+			const products = Product.find();
+
 			return res.status(200).json({
-				msg: "Le produit a été archiver.",
+				products,
 			});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
@@ -515,8 +520,10 @@ const productCtrl = {
 				{ _id: product_id },
 				{ archived: false }
 			);
+			const products = Product.find();
+
 			return res.status(200).json({
-				msg: "Le produit a été révéler.",
+				products,
 			});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
@@ -529,8 +536,11 @@ const productCtrl = {
 			if (!check) {
 				return res.status(400).json({ msg: "Produit n'exist pas." });
 			}
-			await Product.deleteOne({ _id: product_id });
-			res.json({ msg: "Le produit a été supprimé" });
+			const products = await Product.deleteOne({ _id: product_id });
+
+			return res.status(200).json({
+				products,
+			});
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
 		}

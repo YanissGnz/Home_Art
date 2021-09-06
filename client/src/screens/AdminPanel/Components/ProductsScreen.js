@@ -309,6 +309,7 @@ export default function ProductsScreen() {
 				setMsg(res.data.msg);
 				imageMsg.msg = "";
 				handleAlertOpen();
+				setProducts(res.data.products);
 			})
 			.catch((err) => {
 				setIsLoading(false);
@@ -360,6 +361,7 @@ export default function ProductsScreen() {
 				setMsg(res.data.msg);
 				imageMsg.msg = "";
 				handleAlertOpen();
+				setProducts(res.data.products);
 			})
 			.catch((err) => {
 				setIsLoading(false);
@@ -394,6 +396,7 @@ export default function ProductsScreen() {
 			.put(`/products/promote_product/${promotedProductId}`, formData, config)
 			.then((res) => {
 				setIsLoading(false);
+				setProducts(res.data.products);
 				dispatch(clearErrors());
 				setMsg(res.data.msg);
 				handleAlertOpen();
@@ -417,10 +420,7 @@ export default function ProductsScreen() {
 			.delete(`/products/delete_product/${deletedProductId}`, config)
 			.then((res) => {
 				setMsg(res.data.msg);
-				const newProducts = products.filter(
-					(product) => product._id !== deletedProductId
-				);
-				setProducts(newProducts);
+				setProducts(res.data.products);
 				handleAlertOpen();
 				handleBackdropClose();
 			})
@@ -451,6 +451,7 @@ export default function ProductsScreen() {
 				setMsg(res.data.msg);
 				handleAlertOpen();
 				handleBackdropClose();
+				setProducts(res.data.products);
 			})
 			.catch((err) => {
 				setMsg(err.response.data.msg);
@@ -479,6 +480,7 @@ export default function ProductsScreen() {
 				setMsg(res.data.msg);
 				handleAlertOpen();
 				handleBackdropClose();
+				setProducts(res.data.products);
 			})
 			.catch((err) => {
 				setMsg(err.response.data.msg);

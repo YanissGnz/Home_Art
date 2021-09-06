@@ -246,7 +246,7 @@ export default function MyAppBar(props) {
 			await axios
 				.post("/users/delete_notification", { notification }, config)
 				.then((res) => {
-					//setNotifications(res.data.notifications);
+					setNotifications(res.data.notifications);
 				})
 				.catch((err) => {
 					dispatch(dispatchUserError());
@@ -369,25 +369,31 @@ export default function MyAppBar(props) {
 										</div>
 									)}
 									{notifications.map((notification, index) => (
-										<div style={{ display: "flex", alignItems: "flex-start" }}>
+										<div style={{ display: "flex", flexDirection: "column" }}>
 											{index !== 0 && <Divider />}
-											<div style={{ width: "100%", padding: 10 }}>
-												<Typography variant="body1">
-													{notification.value}
-												</Typography>
-												<Typography variant="caption" color="textSecondary">
-													{transformDate(notification.date)}
-												</Typography>
+											<div
+												style={{ display: "flex", alignItems: "flex-start" }}
+											>
+												<div style={{ width: "100%", padding: 10 }}>
+													<Typography variant="body1">
+														{notification.value}
+													</Typography>
+													<Typography variant="caption" color="textSecondary">
+														{transformDate(notification.date)}
+													</Typography>
+												</div>
+												<Tooltip title="Supprimer le notification">
+													<IconButton
+														size="small"
+														onClick={() =>
+															handleDeleteNotification(notification)
+														}
+														style={{ margin: 5, marginTop: 10 }}
+													>
+														<ClearRoundedIcon fontSize="small" />
+													</IconButton>
+												</Tooltip>
 											</div>
-											<Tooltip title="Supprimer le notification">
-												<IconButton
-													size="small"
-													onClick={() => handleDeleteNotification(notification)}
-													style={{ margin: 5, marginTop: 10 }}
-												>
-													<ClearRoundedIcon fontSize="small" />
-												</IconButton>
-											</Tooltip>
 										</div>
 									))}
 								</Scrollbars>

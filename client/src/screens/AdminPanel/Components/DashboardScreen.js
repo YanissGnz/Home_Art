@@ -33,7 +33,7 @@ export default function DashboardScreen({ usersCount }) {
 			.catch((err) => {
 				console.log(err);
 			});
-	}, []);
+	}, [token]);
 
 	const monthNames = [
 		"Janvier",
@@ -205,7 +205,7 @@ export default function DashboardScreen({ usersCount }) {
 							color="textPrimary"
 							style={{ fontSize: 28, fontWeight: 450, marginLeft: 10 }}
 						>
-							0
+							{orders.length}
 						</Typography>
 					</div>
 				</div>

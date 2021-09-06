@@ -47,12 +47,10 @@ const userSchema = new mongoose.Schema(
 			type: Array,
 			default: [],
 		},
-		notifications: [
-			{
-				value: { type: String },
-				date: { type: String },
-			},
-		],
+		notifications: {
+			type: Array,
+			default: [],
+		},
 		orders: {
 			type: Array,
 			default: [],
@@ -63,4 +61,4 @@ const userSchema = new mongoose.Schema(
 	}
 );
 
-module.exports = mongoose.model("Users2", userSchema);
+module.exports = mongoose.model("Clients", userSchema);
