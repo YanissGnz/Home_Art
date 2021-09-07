@@ -1,9 +1,12 @@
 const Clients = require("../models/userModel");
 const Order = require("../models/OrderModel");
+const GiftCard = require("../models/GiftCardModal");
 const Product = require("../models/ProductModel");
+const Payment = require("../models/PaypalModel")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./sendMail");
+const sendEmail2 = require("./sendMail2");
 const { google } = require("googleapis");
 const { OAuth2 } = google.auth;
 const client = new OAuth2(process.env.MAILING_SERVICE_CLIENT_ID);
@@ -633,8 +636,44 @@ const userCtrl2 = {
 				isPaid,
 			});
 			await newOrder.save();
+             
+		    if (paymentMethod === "Carte cadeau"){
+			    const giftCard = await GiftCard.findOne({ code: paymentInfo });
+				if (giftCard) {
+					if (giftCard.budget === parseInt(totalPrice)) {
+						await GiftCard.deleteOne({ code: paymentInfo });
+                     
+					}else if ( parseInt(totalPrice) < giftCard.budget ){
+                        const newGiftCard = await GiftCard.findOneAndUpdate(
+							{
+                              code : {$in : giftCard.code },
+						    },
+							{
+							  budget :  giftCard.budget - parseInt(totalPrice),
+							}
+						);
+					}
 
-			//Add Gift card code here
+				}
+			};
+
+			if (paymentMethod === "Paypal"){
+				const transactionData = {};
+
+				transactionData.user ={
+					id: id ,
+                    name: name ,
+                    lastname: last_name ,
+                    email: req.user.email ,
+				}
+
+				transactionData.data = paymentInfo;
+				transactionData.product = products
+
+				const payment = new Payment(transactionData);
+				await payment.save();
+			}
+
 
 			for (let index = 0; index < products.length; index++) {
 				const item = products[index];
@@ -667,8 +706,9 @@ const userCtrl2 = {
 					orders: newOrders,
 				}
 			);
+            sendEmail2(newUser.email);
+			res.status(200).json({ msg: "La commande à été effectuer , check your email" });
 
-			res.status(200).json({ msg: "La commande à été effectuer" });
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
 		}

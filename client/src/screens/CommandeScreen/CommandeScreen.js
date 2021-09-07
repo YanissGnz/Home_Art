@@ -428,11 +428,12 @@ export default function CommandeScreen() {
 						console.log(e);
 					});
 			}
-		} else if (commande.paymentMethod === "Paiement à la livraison") {
+		} else if (commande.paymentMethod === "Paypal") {
+			setActiveStep(2);
+		}else if (commande.paymentMethod === "Paiement à la livraison") {
 			setActiveStep(2);
 		}
 	};
-
 	const handleCommande = () => {
 		const {
 			name,
@@ -454,7 +455,7 @@ export default function CommandeScreen() {
 			paymentInfo = giftCardCode;
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paypal") {
-			paymentInfo = {};
+			paymentInfo = paymentData;
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paiement à la livraison") {
 			paymentInfo = "Paiement à la livraison";
@@ -583,6 +584,19 @@ export default function CommandeScreen() {
 				handleClose();
 			});
 	};
+
+    var paymentData;
+	const transactionSuccess = (data) => {
+        paymentData = data;
+    }
+
+	const transactionError = () => {
+        console.log('Paypal error')
+    }
+
+    const transactionCanceled = () => {
+        console.log('Transaction canceled')
+    }
 
 	return (
 		<div>
@@ -1098,7 +1112,12 @@ export default function CommandeScreen() {
 												</Collapse>
 												<Collapse in={commande.paymentMethod === "Paypal"}>
 													<div style={{ marginTop: 20, width: "92%" }}>
-														<Paypal />
+														<Paypal 
+														  toPay = {totalPrice}
+														  onSuccess={transactionSuccess} 
+                                                          transactionError={transactionError}
+                                                          transactionCanceled={transactionCanceled}					
+														/>
 													</div>
 												</Collapse>
 												<Collapse
