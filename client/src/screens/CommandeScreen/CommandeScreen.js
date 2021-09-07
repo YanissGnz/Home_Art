@@ -434,6 +434,7 @@ export default function CommandeScreen() {
 			setActiveStep(2);
 		}
 	};
+	var paymentInfo;
 	const handleCommande = () => {
 		const {
 			name,
@@ -446,7 +447,6 @@ export default function CommandeScreen() {
 			paymentMethod,
 		} = commande;
 		const products = cart;
-		var paymentInfo;
 		var isPaid = false;
 		if (commande.paymentMethod === "Carte bancaire") {
 			paymentInfo = creditCard;
@@ -455,7 +455,7 @@ export default function CommandeScreen() {
 			paymentInfo = giftCardCode;
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paypal") {
-			paymentInfo = paymentData;
+			paymentInfo = 
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paiement à la livraison") {
 			paymentInfo = "Paiement à la livraison";
@@ -585,9 +585,9 @@ export default function CommandeScreen() {
 			});
 	};
 
-    var paymentData;
-	const transactionSuccess = (data) => {
-        paymentData = data;
+	const transactionSuccess =  (data) => {
+		paymentInfo = data ;
+		axios.post(	"/users/confirm_order",	paymentInfo);
     }
 
 	const transactionError = () => {

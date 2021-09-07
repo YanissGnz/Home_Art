@@ -2,7 +2,7 @@ const Clients = require("../models/userModel");
 const Order = require("../models/OrderModel");
 const GiftCard = require("../models/GiftCardModal");
 const Product = require("../models/ProductModel");
-const Payment = require("../models/PaypalModel")
+const Paypal = require("../models/PaypalModel")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./sendMail");
@@ -664,13 +664,13 @@ const userCtrl2 = {
 					id: id ,
                     name: name ,
                     lastname: last_name ,
-                    email: req.user.email ,
+                    address: address ,
 				}
 
 				transactionData.data = paymentInfo;
 				transactionData.product = products
 
-				const payment = new Payment(transactionData);
+				const payment = new Paypal(transactionData);
 				await payment.save();
 			}
 

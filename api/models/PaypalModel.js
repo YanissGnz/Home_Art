@@ -18,5 +18,5 @@ const paypalSchema = mongoose.Schema({
 }, { timestamps: true })
 
 
-module.exports = mongoose.model('Payment', paypalSchema);
+module.exports = mongoose.model('Paypal', paypalSchema);
 
