@@ -9,6 +9,7 @@ import {
 } from "../../redux/actions/authAction";
 import {
 	AppBar,
+	Badge,
 	Button,
 	CssBaseline,
 	Divider,
@@ -19,11 +20,14 @@ import {
 	ListItem,
 	ListItemIcon,
 	ListItemText,
+	Menu,
 	Paper,
 	Toolbar,
+	Tooltip,
 	Typography,
 	useScrollTrigger,
 	useTheme,
+	withStyles,
 } from "@material-ui/core";
 import clsx from "clsx";
 import { useStyles } from "./useStyles";
@@ -33,6 +37,9 @@ import SearchIcon from "@material-ui/icons/Search";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import MenuIcon from "@material-ui/icons/Menu";
+import NotificationsOffOutlinedIcon from "@material-ui/icons/NotificationsOffOutlined";
+import NotificationsNoneOutlinedIcon from "@material-ui/icons/NotificationsNoneOutlined";
+import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
 
 import "./adminPanel.css";
 import Catalog from "../../Icons/Catalog";
@@ -52,6 +59,7 @@ import UsersScreen from "./Components/UsersScreen";
 import { dispatchGetAllUsers } from "../../redux/actions/usersAction";
 import OrdersScreen from "./Components/OrdersScreen";
 import OrdersMenuIcon from "../../Icons/OrdersMenuIcon";
+import Scrollbars from "react-custom-scrollbars";
 
 function ElevationScroll(props) {
 	const { children } = props;
@@ -66,6 +74,61 @@ function ElevationScroll(props) {
 	});
 }
 
+const StyledMenu = withStyles({
+	paper: {
+		border: "1px solid #d3d4d5",
+	},
+})((props) => (
+	<Menu
+		elevation={5}
+		getContentAnchorEl={null}
+		anchorOrigin={{
+			vertical: "bottom",
+			horizontal: "center",
+		}}
+		transformOrigin={{
+			vertical: "top",
+			horizontal: "center",
+		}}
+		{...props}
+	/>
+));
+
+const monthNames = [
+	"Janvier",
+	"Février ",
+	"Mars",
+	"Avril",
+	"Mai",
+	"Juin",
+	"Juillet",
+	"Août ",
+	"Septembre",
+	"Octobre",
+	"November",
+	"Decembre",
+];
+var weekdayNames = [
+	"Dimanche",
+	"Lundi",
+	"Mardi",
+	"Mercredi",
+	"Jeudi",
+	"Vendredi",
+	"Samedi",
+];
+
+function transformDate(date) {
+	const dateObj = new Date(date);
+
+	const weekday = weekdayNames[dateObj.getDay()];
+	const day = String(dateObj.getDate()).padStart(2, "0");
+	const month = monthNames[dateObj.getMonth()];
+	const year = dateObj.getFullYear();
+
+	return `${weekday}, ${day} ${month} ${year}`;
+}
+
 export default function AdminPanel(props) {
 	const classes = useStyles();
 	const history = useHistory();
@@ -78,6 +141,8 @@ export default function AdminPanel(props) {
 	// Get token from localstorage
 	const token = useSelector((state) => state.auth.token);
 	const [usersCount, setUsersCount] = React.useState([]);
+	const [notifications, setNotifications] = React.useState([]);
+	const [notificationAnchorEl, setNotificationAnchorEl] = React.useState(null);
 
 	React.useEffect(() => {
 		const loadAdmin = async () => {
@@ -94,6 +159,7 @@ export default function AdminPanel(props) {
 				.get("/users/load_admin", config)
 				.then((res) => {
 					dispatch(dispatchAdminLoaded(res));
+					setNotifications(res.data.user.notifications);
 				})
 				.catch((err) => {
 					dispatch(dispatchAdminError());
@@ -143,7 +209,6 @@ export default function AdminPanel(props) {
 				});
 		};
 		loadProduct();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch]);
 
 	const handleDrawerOpen = () => {
@@ -154,11 +219,41 @@ export default function AdminPanel(props) {
 		setOpen(false);
 	};
 
+	const handleNotificationOpen = (event) => {
+		setNotificationAnchorEl(event.currentTarget);
+	};
+
+	const handleClose = () => {
+		setNotificationAnchorEl(null);
+	};
+
 	const handleSearch = (event) => event.preventDefault();
 
 	const handleLogout = (event) => {
 		dispatch(dispatchLogout());
 		history.push("/admin");
+	};
+
+	const handleDeleteNotification = (notification) => {
+		const deleteNotification = async () => {
+			// Headers
+			const config = {
+				headers: {
+					"x-auth-token": token,
+				},
+			};
+
+			await axios
+				.post("/users/delete_admin_notification", { notification }, config)
+				.then((res) => {
+					setNotifications(res.data.notifications);
+				})
+				.catch((err) => {
+					dispatch(returnErrors(err.response.data.msg, err.response.status));
+				});
+		};
+
+		deleteNotification();
 	};
 
 	return (
@@ -215,6 +310,84 @@ export default function AdminPanel(props) {
 										</IconButton>
 									</Paper>
 								</div>
+								<IconButton
+									aria-label="account of current user"
+									aria-controls="menu-appbar"
+									aria-haspopup="true"
+									onClick={handleNotificationOpen}
+									color="inherit"
+									style={{ marginRight: 10 }}
+								>
+									<Badge
+										badgeContent={notifications.length}
+										color="primary"
+										classes={{ anchorOriginTopRightRectangle: classes.badge }}
+									>
+										<NotificationsNoneOutlinedIcon />
+									</Badge>
+								</IconButton>
+
+								<StyledMenu
+									id="customized-menu"
+									anchorEl={notificationAnchorEl}
+									keepMounted
+									open={Boolean(notificationAnchorEl)}
+									onClose={handleClose}
+									PaperProps={{
+										style: {
+											width: 350,
+										},
+									}}
+								>
+									<Scrollbars style={{ width: "100%", height: 320 }}>
+										{notifications.length === 0 && (
+											<div
+												style={{
+													display: "flex",
+													flexDirection: "column",
+													justifyContent: "center",
+													alignItems: "center",
+													height: "100%",
+												}}
+											>
+												<NotificationsOffOutlinedIcon
+													style={{ fontSize: 60, marginBottom: 10 }}
+												/>
+												<Typography variant="h6">
+													Pas de notification
+												</Typography>
+											</div>
+										)}
+										{notifications.map((notification, index) => (
+											<div style={{ display: "flex", flexDirection: "column" }}>
+												{index !== 0 && <Divider />}
+												<div
+													style={{ display: "flex", alignItems: "flex-start" }}
+												>
+													<div style={{ width: "100%", padding: 10 }}>
+														<Typography variant="body1">
+															{notification.value}
+														</Typography>
+														<Typography variant="caption" color="textSecondary">
+															{transformDate(notification.date)}
+														</Typography>
+													</div>
+													<Tooltip title="Supprimer la notification">
+														<IconButton
+															size="small"
+															onClick={() =>
+																handleDeleteNotification(notification)
+															}
+															style={{ margin: 5, marginTop: 10 }}
+														>
+															<ClearRoundedIcon fontSize="small" />
+														</IconButton>
+													</Tooltip>
+												</div>
+											</div>
+										))}
+									</Scrollbars>
+								</StyledMenu>
 								<Button
 									disableRipple
 									className={classes.logout_button}

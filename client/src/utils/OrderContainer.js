@@ -52,7 +52,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function OrderContainer({ order, handleCancelOrder }) {
 	const classes = useStyles();
-	const token = useSelector((state) => state.auth.token);
 
 	const [expanded, setExpanded] = React.useState(false);
 	const [anchorEl, setAnchorEl] = React.useState(null);
@@ -102,6 +101,30 @@ export default function OrderContainer({ order, handleCancelOrder }) {
 				subheader={`ID : ${order._id}`}
 			/>
 			<CardContent style={{ paddingTop: 0 }}>
+				<div
+					style={{
+						display: "inline-flex",
+						marginRight: 20,
+						marginTop: 10,
+					}}
+				>
+					<Typography
+						style={{
+							fontSize: 16,
+							fontWeight: 450,
+							marginRight: 5,
+						}}
+					>
+						Date de commande :
+					</Typography>
+					<Typography
+						style={{
+							fontSize: 16,
+						}}
+					>
+						{order.date}
+					</Typography>
+				</div>
 				<div
 					style={{
 						display: "flex",

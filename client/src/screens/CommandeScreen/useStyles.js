@@ -24,5 +24,17 @@ export const useStyles = makeStyles((theme) => {
 		connectorLine: {
 			flex: "0 1 auto",
 		},
+		wrapper: {
+			margin: 0,
+			position: "relative",
+		},
+		buttonProgress: {
+			color: theme.palette.primary,
+			position: "absolute",
+			top: "50%",
+			left: "50%",
+			marginTop: -10,
+			marginLeft: -12,
+		},
 	};
 });

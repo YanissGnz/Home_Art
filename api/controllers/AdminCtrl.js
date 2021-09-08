@@ -1,6 +1,7 @@
 const Admins = require("../models/AdminModel");
 const Clients = require("../models/userModel");
 const Order = require("../models/OrderModel");
+const Revenue = require("../models/RevenueModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -87,6 +88,16 @@ const userCtrl = {
 			return res.status(500).json({ msg: err.message });
 		}
 	},
+	getRevenue: async (req, res) => {
+		try {
+			const revenue = await Revenue.find();
+			res.status(200).json({
+				revenue,
+			});
+		} catch (err) {
+			return res.status(500).json({ msg: err.message });
+		}
+	},
 	deleteUser: async (req, res) => {
 		const user_Id = req.params.user_Id;
 		try {
@@ -141,6 +152,33 @@ const userCtrl = {
 			);
 
 			res.status(200).json({ orders });
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	deleteAdminNotification: async (req, res) => {
+		const id = req.user.id;
+		const { notification } = req.body;
+
+		try {
+			const user = await Admins.findOne({
+				_id: { $in: id },
+			});
+
+			var notifications = user.notifications;
+
+			notifications.splice(notifications.indexOf(notification), 1);
+
+			const newUser = await Admins.findOneAndUpdate(
+				{
+					_id: { $in: id },
+				},
+				{
+					notifications,
+				}
+			);
+
+			res.status(200).json({ notifications });
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
 		}

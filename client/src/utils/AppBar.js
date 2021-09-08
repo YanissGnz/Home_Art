@@ -216,7 +216,7 @@ export default function MyAppBar(props) {
 		setAnchorEl(event.currentTarget);
 	};
 
-	const handleNotification = (event) => {
+	const handleNotificationOpen = (event) => {
 		setNotificationAnchorEl(event.currentTarget);
 	};
 
@@ -317,7 +317,7 @@ export default function MyAppBar(props) {
 								aria-label="account of current user"
 								aria-controls="menu-appbar"
 								aria-haspopup="true"
-								onClick={handleNotification}
+								onClick={handleNotificationOpen}
 								color="inherit"
 							>
 								<Badge
@@ -327,16 +327,6 @@ export default function MyAppBar(props) {
 								>
 									<NotificationsNoneOutlinedIcon />
 								</Badge>
-							</IconButton>
-
-							<IconButton
-								aria-label="account of current user"
-								aria-controls="menu-appbar"
-								aria-haspopup="true"
-								onClick={handleMenu}
-								color="inherit"
-							>
-								<AccountCircleOutlinedIcon />
 							</IconButton>
 
 							<StyledMenu
@@ -398,6 +388,15 @@ export default function MyAppBar(props) {
 									))}
 								</Scrollbars>
 							</StyledMenu>
+							<IconButton
+								aria-label="account of current user"
+								aria-controls="menu-appbar"
+								aria-haspopup="true"
+								onClick={handleMenu}
+								color="inherit"
+							>
+								<AccountCircleOutlinedIcon />
+							</IconButton>
 							<Menu
 								id="menu-appbar"
 								anchorEl={anchorEl}

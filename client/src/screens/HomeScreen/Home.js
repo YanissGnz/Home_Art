@@ -262,7 +262,7 @@ export default function Home(props) {
 							maxWidth="xs"
 							style={{
 								backgroundColor: "white",
-								borderRadius: 20,
+								borderRadius: 5,
 								padding: 20,
 								width: "20%",
 								height: "100%",
@@ -491,7 +491,7 @@ export default function Home(props) {
 							maxWidth="sm"
 							style={{
 								backgroundColor: "white",
-								borderRadius: 20,
+								borderRadius: 5,
 								padding: 20,
 								width: "20%",
 								height: "100%",
