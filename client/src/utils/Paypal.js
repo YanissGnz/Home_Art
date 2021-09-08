@@ -29,7 +29,8 @@ export default class Paypal extends React.Component {
 		// Document on Paypal's currency code: https://developer.paypal.com/docs/classic/api/currency_codes/
 
 		const client = {
-			sandbox: "ATXMw2JLn6eFU4k3s2wEVj8bYXoC1wrf79EFHD7ifsP9wdttkJPK7zvEKy1_e02pNHJyMxWlA45Gb-1d",
+			sandbox:
+				"ATXMw2JLn6eFU4k3s2wEVj8bYXoC1wrf79EFHD7ifsP9wdttkJPK7zvEKy1_e02pNHJyMxWlA45Gb-1d",
 			production: "YOUR-PRODUCTION-APP-ID",
 		};
 		// In order to get production's app-ID, you will have to send your app to Paypal for approval first
@@ -50,7 +51,7 @@ export default class Paypal extends React.Component {
 				onCancel={onCancel}
 				style={{
 					size: "responsive",
-					color: "blue",
+					color: "black",
 					shape: "rect",
 					lable: "checkout",
 				}}

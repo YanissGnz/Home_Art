@@ -20,16 +20,21 @@ import {
 	Typography,
 	Divider,
 	useTheme,
+	FormControlLabel,
+	Radio,
+	FormControl,
+	FormLabel,
+	RadioGroup,
 } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
 
-import { useStyles } from "../useStyles";
+import { useStyles } from "../../useStyles";
 import AddRoundedIcon from "@material-ui/icons/AddRounded";
 import Masonry from "react-masonry-css";
 
-import "../adminPanel.css";
+import "../../adminPanel.css";
 import { useDispatch, useSelector } from "react-redux";
-import { clearErrors, returnErrors } from "../../../redux/actions/errAction";
+import { clearErrors, returnErrors } from "../../../../redux/actions/errAction";
 import ProductCard from "./ProductCard";
 
 function Alert(props) {
@@ -153,10 +158,12 @@ export default function ProductsScreen() {
 	const [promotedProductId, setPromotedProductId] = React.useState("");
 	const [alertOpen, setAlertOpen] = React.useState(false);
 	const [backdropOpen, setBackdropOpen] = React.useState(false);
+	const [isPack, setIsPack] = React.useState("non");
 
 	const [products, setProducts] = React.useState(
 		useSelector((state) => state.products.products)
 	);
+	const [packs, setPacks] = React.useState([]);
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
 	const nameMsg = useSelector((state) => state.err);
@@ -191,6 +198,20 @@ export default function ProductsScreen() {
 		setSubCategorie("");
 	};
 	/*______________________*/
+
+	React.useEffect(() => {
+		const loadPacks = async () => {
+			await axios
+				.post("/products/get_packs")
+				.then((res) => {
+					setPacks(res.data.Packs);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		};
+		loadPacks();
+	}, []);
 
 	/*          For Edit Product Dialog          */
 	const handleClickEditOpen = (editedProduct) => {
@@ -297,11 +318,16 @@ export default function ProductsScreen() {
 		formData.append("description", product.description);
 		formData.append("newPrice", product.description);
 		formData.append("promoted", product.promoted);
+		if (isPack === "oui") {
+			formData.append("pack", true);
+		} else {
+			formData.append("promoted", false);
+		}
 		for (const key of Object.keys(productImage)) {
 			formData.append("productImage", productImage[key]);
 		}
 
-		axios
+		await axios
 			.post("/products/add_product", formData, config)
 			.then((res) => {
 				setIsLoading(false);
@@ -627,6 +653,30 @@ export default function ProductsScreen() {
 							helperText={descriptionMsg.id === 6 ? descriptionMsg.msg : null}
 							error={descriptionMsg.id === 6 ? true : false}
 						/>
+						<FormControl component="fieldset">
+							<FormLabel component="legend">
+								Selectionner si ce produit est un pack
+							</FormLabel>
+							<RadioGroup
+								aria-label="pack"
+								name="pack"
+								value={isPack}
+								onChange={(event) => {
+									setIsPack(event.target.value);
+								}}
+							>
+								<FormControlLabel
+									value="oui"
+									control={<Radio color="primary" />}
+									label="Oui"
+								/>
+								<FormControlLabel
+									value="non"
+									control={<Radio color="primary" />}
+									label="Non"
+								/>
+							</RadioGroup>
+						</FormControl>
 
 						<Container className={classes.imageInputContainer}>
 							<input
@@ -1002,6 +1052,37 @@ export default function ProductsScreen() {
 				<Typography variant="h5" className={classes.dashboardText}>
 					List des produit
 				</Typography>
+				<Container
+					maxWidth="xl"
+					style={{
+						backgroundColor: "white",
+						borderRadius: 20,
+						padding: 20,
+					}}
+					className="main"
+				>
+					<Typography variant="h6" className={classes.dashboardText}>
+						Packs
+					</Typography>
+					<Divider style={{ marginBottom: 10 }} />
+					<Masonry
+						breakpointCols={breakpoints}
+						className="my-masonry-grid"
+						columnClassName="my-masonry-grid_column"
+						style={{ width: "100%" }}
+					>
+						{packs.map((product) => (
+							<ProductCard
+								product={product}
+								handleClickEditOpen={handleClickEditOpen}
+								handleDelete={handleDelete}
+								handleArchive={handleArchive}
+								handleReveal={handleReveal}
+								handleClickPromotionOpen={handleClickPromotionOpen}
+							/>
+						))}
+					</Masonry>
+				</Container>
 				<Container
 					maxWidth="xl"
 					style={{

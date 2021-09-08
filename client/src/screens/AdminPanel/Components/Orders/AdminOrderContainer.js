@@ -12,13 +12,11 @@ import {
 	Tooltip,
 	CardHeader,
 	MenuItem,
-	useTheme,
 } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Masonry from "react-masonry-css";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import DoneRoundedIcon from "@material-ui/icons/DoneRounded";
-import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
 
 /*For The Masonary Container*/
 const breakpoints = {
@@ -73,40 +71,33 @@ export default function OrderContainer({ order, handleValidateOrder }) {
 			<CardHeader
 				action={
 					<div>
-						<IconButton aria-label="settings" onClick={handleMenuClick}>
-							<MoreVertIcon />
-						</IconButton>
-						<Menu
-							id="simple-menu"
-							anchorEl={anchorEl}
-							keepMounted
-							open={Boolean(anchorEl)}
-							onClose={handleMenuClose}
-						>
-							<MenuItem
-								onClick={() => {
-									handleMenuClose();
-									handleValidateOrder(order._id, order.user.id);
-								}}
-							>
-								<DoneRoundedIcon
-									fontSize="small"
-									className={classes.MenuIcon}
-								/>
-								Valider
-							</MenuItem>
-							<MenuItem
-								onClick={() => {
-									handleMenuClose();
-								}}
-							>
-								<ClearRoundedIcon
-									fontSize="small"
-									className={classes.MenuIcon}
-								/>
-								Annuler
-							</MenuItem>
-						</Menu>
+						{!order.isValidated && (
+							<div>
+								<IconButton aria-label="settings" onClick={handleMenuClick}>
+									<MoreVertIcon />
+								</IconButton>
+								<Menu
+									id="simple-menu"
+									anchorEl={anchorEl}
+									keepMounted
+									open={Boolean(anchorEl)}
+									onClose={handleMenuClose}
+								>
+									<MenuItem
+										onClick={() => {
+											handleMenuClose();
+											handleValidateOrder(order._id, order.user.id);
+										}}
+									>
+										<DoneRoundedIcon
+											fontSize="small"
+											className={classes.MenuIcon}
+										/>
+										Valider
+									</MenuItem>
+								</Menu>
+							</div>
+						)}
 					</div>
 				}
 				subheader={`ID : ${order._id}`}

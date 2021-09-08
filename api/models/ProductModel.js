@@ -33,6 +33,10 @@ const productSchema = mongoose.Schema({
 	productImages: {
 		type: Array,
 	},
+	pack: {
+		type: Boolean,
+		default: false,
+	},
 	archived: {
 		type: Boolean,
 	},

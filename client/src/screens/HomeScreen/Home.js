@@ -82,6 +82,7 @@ export default function Home(props) {
 	// Get token from localstorage
 	const token = useSelector((state) => state.auth.token);
 	const isLoading = useSelector((state) => state.auth.isLoading);
+	const [packs, setPacks] = React.useState([]);
 	const [newProducts, setNewProducts] = React.useState([]);
 	const [meubleProducts, setMeubleProducts] = React.useState([]);
 	const [literieProducts, setLiterieProducts] = React.useState([]);
@@ -216,20 +217,20 @@ export default function Home(props) {
 	}, []);
 
 	React.useEffect(() => {
-		const loadSomeProducts = async () => {
+		const loadPacks = async () => {
 			const skip = 0;
 			const limit = 5;
 
 			await axios
-				.post("/products/get_products", { skip, limit })
+				.post("/products/get_packs", { skip, limit })
 				.then((res) => {
-					setNewProducts(res.data.Products);
+					setPacks(res.data.Packs);
 				})
 				.catch((err) => {
 					console.log(err.message);
 				});
 		};
-		loadSomeProducts();
+		loadPacks();
 	}, []);
 
 	return (
@@ -252,10 +253,9 @@ export default function Home(props) {
 							alignItems: "center",
 							paddingRight: 0,
 							paddingLeft: 0,
-							marginBottom: 10,
+							marginBottom: 30,
 							height: 400,
-							paddingTop: 15,
-							paddingBottom: 15,
+							marginTop: 20,
 						}}
 					>
 						<Container
@@ -420,7 +420,7 @@ export default function Home(props) {
 							}}
 						>
 							<Slider {...settings}>
-								{newProducts.map((product) => (
+								{packs.map((product) => (
 									<a
 										href={`/product/${product._id}`}
 										style={{
@@ -432,9 +432,10 @@ export default function Home(props) {
 										<Card
 											style={{
 												width: "100%",
-												height: "370px",
+												height: 400,
 												marginRight: 30,
 											}}
+											elevation={0}
 										>
 											<CardActionArea
 												disableRipple
@@ -453,34 +454,6 @@ export default function Home(props) {
 													src={`/uploads/${product.productImages[0]}`}
 													alt="Product"
 												/>
-
-												<CardContent
-													style={{
-														position: "absolute",
-														bottom: 0,
-														width: "100%",
-													}}
-												>
-													<Typography
-														gutterBottom
-														style={{
-															fontSize: 22,
-															fontWeight: 600,
-															textDecoration: "none",
-														}}
-														noWrap={true}
-														className="slider-txt"
-													>
-														{product.name}
-													</Typography>
-													<Typography
-														style={{ fontSize: 18, fontWeight: 600 }}
-														gutterBottom
-														color="primary"
-													>
-														{[product.price]} Da
-													</Typography>
-												</CardContent>
 											</CardActionArea>
 										</Card>
 									</a>
@@ -526,7 +499,7 @@ export default function Home(props) {
 								</Typography>
 							</a>
 							<a
-								href="/categorie/Meuble"
+								href="/packs"
 								style={{
 									textDecoration: "none",
 									display: "flex",

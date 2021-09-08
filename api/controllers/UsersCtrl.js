@@ -3,8 +3,7 @@ const Clients = require("../models/userModel");
 const Order = require("../models/OrderModel");
 const GiftCard = require("../models/GiftCardModal");
 const Product = require("../models/ProductModel");
-const Paypal = require("../models/PaypalModel");
-const Revenue = require("../models/RevenueModel")
+const Revenue = require("../models/RevenueModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./sendMail");
@@ -672,44 +671,24 @@ const userCtrl2 = {
 				date,
 			});
 			await newOrder.save();
-             
-		    if (paymentMethod === "Carte cadeau"){
-			    const giftCard = await GiftCard.findOne({ code: paymentInfo });
+
+			if (paymentMethod === "Carte cadeau") {
+				const giftCard = await GiftCard.findOne({ code: paymentInfo });
 				if (giftCard) {
 					if (giftCard.budget === parseInt(totalPrice)) {
 						await GiftCard.deleteOne({ code: paymentInfo });
-                     
-					}else if ( parseInt(totalPrice) < giftCard.budget ){
-                        const newGiftCard = await GiftCard.findOneAndUpdate(
+					} else if (parseInt(totalPrice) < giftCard.budget) {
+						const newGiftCard = await GiftCard.findOneAndUpdate(
 							{
-                              code : {$in : giftCard.code },
-						    },
+								code: { $in: giftCard.code },
+							},
 							{
-							  budget :  giftCard.budget - parseInt(totalPrice),
+								budget: giftCard.budget - parseInt(totalPrice),
 							}
 						);
 					}
-
 				}
-			};
-
-			if (paymentMethod === "Paypal"){
-				const transactionData = {};
-
-				transactionData.user ={
-					id: id ,
-                    name: name ,
-                    lastname: last_name ,
-                    address: address ,
-				}
-
-				transactionData.data = paymentInfo;
-				transactionData.product = products
-
-				const payment = new Paypal(transactionData);
-				await payment.save();
 			}
-
 
 			for (let index = 0; index < products.length; index++) {
 				const item = products[index];
@@ -742,8 +721,12 @@ const userCtrl2 = {
 					orders: newOrders,
 				}
 			);
-            sendEmail2(newUser.email);
-			res.status(200).json({ msg: "La commande a été passée, vous recevrez un mail une fois elle est validée" });
+			sendEmail2(newUser.email);
+			res
+				.status(200)
+				.json({
+					msg: "La commande a été passée, vous recevrez un mail une fois elle est validée",
+				});
 
 			const checkRevenue = await Revenue.findOne({ month: monthNumber });
 

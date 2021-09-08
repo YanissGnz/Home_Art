@@ -19,8 +19,8 @@ import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import DeleteOutlined from "@material-ui/icons/DeleteOutlined";
 
 import clsx from "clsx";
-import "../adminPanel.css";
-import { useStyles } from "../useStyles";
+import "../../adminPanel.css";
+import { useStyles } from "../../useStyles";
 import TrendingDownRoundedIcon from "@material-ui/icons/TrendingDownRounded";
 export default function ProductCard({
 	product,

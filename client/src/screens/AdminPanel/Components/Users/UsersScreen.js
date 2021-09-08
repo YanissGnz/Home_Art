@@ -11,10 +11,10 @@ import {
 import MuiAlert from "@material-ui/lab/Alert";
 import React from "react";
 import axios from "axios";
-import "../adminPanel.css";
-import { useStyles } from "../useStyles";
+import "../../adminPanel.css";
+import { useStyles } from "../../useStyles";
 import { useDispatch, useSelector } from "react-redux";
-import { returnErrors } from "../../../redux/actions/errAction";
+import { returnErrors } from "../../../../redux/actions/errAction";
 import UserCard from "./UserCard";
 
 function Alert(props) {

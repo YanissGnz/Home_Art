@@ -3,21 +3,38 @@ import axios from "axios";
 import React from "react";
 import { useSelector } from "react-redux";
 import { Bar, Line } from "react-chartjs-2";
-import ClientIcon from "../../../Icons/ClientsIcon";
-import CommandesIcon from "../../../Icons/CommandesIcon";
-import ProductsIcon from "../../../Icons/ProductsIcon";
-import RevenueIcon from "../../../Icons/RevenueIcon";
+import ClientIcon from "../../../../Icons/ClientsIcon";
+import CommandesIcon from "../../../../Icons/CommandesIcon";
+import ProductsIcon from "../../../../Icons/ProductsIcon";
+import RevenueIcon from "../../../../Icons/RevenueIcon";
 import { useState } from "react";
 import { useEffect } from "react";
 
 export default function DashboardScreen({ usersCount }) {
-	const productCount = useSelector((state) => state.products.products);
+	const [productsCount, setProductsCount] = useState(
+		useSelector((state) => state.products.products)
+	);
 	const users = useSelector((state) => state.users.slice(0, 3));
 	const token = useSelector((state) => state.auth.token);
 	const [orders, setOrders] = useState([]);
 	const [recentOrders, setRecentOrders] = useState([]);
 	const [revenueData, setRevenueData] = useState(null);
 	const [revenue, setRevenue] = useState(0);
+
+	React.useEffect(() => {
+		const loadPacks = async () => {
+			await axios
+				.post("/products/get_packs")
+				.then((res) => {
+					setProductsCount(productsCount + res.data.Packs.length);
+					console.log(productsCount + res.data.Packs.length);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		};
+		loadPacks();
+	}, []);
 
 	useEffect(() => {
 		// Headers
@@ -265,7 +282,7 @@ export default function DashboardScreen({ usersCount }) {
 							color="textPrimary"
 							style={{ fontSize: 28, fontWeight: 450, marginLeft: 10 }}
 						>
-							{productCount.length}
+							{productsCount}
 						</Typography>
 					</div>
 				</div>

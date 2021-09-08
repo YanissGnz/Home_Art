@@ -50,7 +50,8 @@ import validator from "validator";
 import Paypal from "../../utils/Paypal";
 import { Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
-import { ContactSupportOutlined } from "@material-ui/icons";
+import { green } from "@material-ui/core/colors";
+import PaypalIcon from "../../Icons/PaypalIcon";
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -236,6 +237,24 @@ const useColorlibStepIconStyles = makeStyles((theme) => {
 	};
 });
 
+const PaypalSuccesButton = withStyles((theme) => ({
+	root: {
+		height: 55,
+		width: "100%",
+		borderRadius: 3,
+		textTransform: "none",
+		color: "white",
+		backgroundColor: green[500],
+		"&:hover": {
+			backgroundColor: green[700],
+		},
+	},
+	label: {
+		fontSize: 20,
+		fontWeight: 400,
+	},
+}))(Button);
+
 const commandeInfo = {
 	name: "",
 	last_name: "",
@@ -328,8 +347,8 @@ export default function CommandeScreen() {
 	const [alertOpen, setAlertOpen] = React.useState(false);
 	const [alertType, setAlertType] = React.useState("");
 	const [disabled, setDisabled] = useState(false);
-	const [Payment , setPayment] = React.useState("");
-	const [ShowBouton, setShowBouton] = useState(true);
+	const [Payment, setPayment] = React.useState("");
+	const [paypalSuccess, setPaypalSuccess] = useState(true);
 	const [orderLoading, setOrderLoading] = useState(false);
 
 	const handleAlertOpen = () => {
@@ -375,10 +394,10 @@ export default function CommandeScreen() {
 	const HandleGiftCardCodeChange = (e) => {
 		setGiftCardCode(e.target.value.toString());
 	};
-	const transactionSuccess =  (data) => {
-		 setPayment(data);
-		 setShowBouton(false);
-    };
+	const transactionSuccess = (data) => {
+		setPayment(data);
+		setPaypalSuccess(false);
+	};
 
 	const handleStepOneNext = () => {
 		if (commande.name === "") {
@@ -439,10 +458,10 @@ export default function CommandeScreen() {
 					});
 			}
 		} else if (commande.paymentMethod === "Paypal") {
-			if (Payment){
-			setActiveStep(2);
+			if (Payment) {
+				setActiveStep(2);
 			}
-		}else if (commande.paymentMethod === "Paiement à la livraison") {
+		} else if (commande.paymentMethod === "Paiement à la livraison") {
 			setActiveStep(2);
 		}
 	};
@@ -469,7 +488,7 @@ export default function CommandeScreen() {
 			paymentInfo = giftCardCode;
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paypal") {
-			paymentInfo = Payment ; 
+			paymentInfo = Payment;
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paiement à la livraison") {
 			paymentInfo = "Paiement à la livraison";
@@ -600,14 +619,13 @@ export default function CommandeScreen() {
 			});
 	};
 
-
 	const transactionError = () => {
-        console.log('Paypal error')
-    };
+		console.log("Paypal error");
+	};
 
-    const transactionCanceled = () => {
-        console.log('Transaction canceled')
-    };
+	const transactionCanceled = () => {
+		console.log("Transaction canceled");
+	};
 
 	return (
 		<div>
@@ -1123,14 +1141,23 @@ export default function CommandeScreen() {
 												</Collapse>
 												<Collapse in={commande.paymentMethod === "Paypal"}>
 													<div style={{ marginTop: 20, width: "92%" }}>
-													 {ShowBouton &&
-														<Paypal 
-														  toPay = {totalPrice}
-														  onSuccess={transactionSuccess} 
-                                                          transactionError={transactionError}
-                                                          transactionCanceled={transactionCanceled}					
-														/>
-													 }
+														{paypalSuccess ? (
+															<Paypal
+																toPay={totalPrice}
+																onSuccess={transactionSuccess}
+																transactionError={transactionError}
+																transactionCanceled={transactionCanceled}
+															/>
+														) : (
+															<PaypalSuccesButton
+																size="large"
+																disableFocusRipple
+																disableRipple
+																startIcon={<PaypalIcon />}
+															>
+																Success
+															</PaypalSuccesButton>
+														)}
 													</div>
 												</Collapse>
 												<Collapse

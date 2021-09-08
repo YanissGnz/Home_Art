@@ -40,7 +40,7 @@ router.post("/add_Address", auth, userCtrl2.addAddress);
 router.post("/delete_address", auth, userCtrl2.retirerAddress);
 router.post("/password", auth, userCtrl2.resetPassword);
 router.post("/confirm_order", auth, userCtrl2.confirmOrder);
-router.delete("/delete_order", auth, userCtrl2.deleteOrder);
+router.post("/delete_order", auth, userCtrl2.deleteOrder);
 router.post("/delete_notification", auth, userCtrl2.deleteNotification);
 
 module.exports = router;

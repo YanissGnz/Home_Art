@@ -4,6 +4,7 @@ const Order = require("../models/OrderModel");
 const Revenue = require("../models/RevenueModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sendEmail2 = require("./sendMail2");
 
 const userCtrl = {
 	/**
@@ -151,6 +152,28 @@ const userCtrl = {
 				}
 			);
 
+			sendEmail2(newUser.email);
+
+			res.status(200).json({ orders });
+		} catch (err) {
+			return res.status(400).json({ msg: err.message });
+		}
+	},
+	deleteOrder: async (req, res) => {
+		const id = req.user.id;
+		const { deletedOrder } = req.body;
+		try {
+			const user = await Clients.findOne({ _id: { $in: id } });
+
+			var orders = user.orders;
+
+			orders.splice(orders.indexOf(deletedOrder), 1);
+
+			const newUser = await Clients.findOneAndUpdate(
+				{ _id: { $in: id } },
+				{ orders }
+			);
+
 			res.status(200).json({ orders });
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
@@ -170,12 +193,8 @@ const userCtrl = {
 			notifications.splice(notifications.indexOf(notification), 1);
 
 			const newUser = await Admins.findOneAndUpdate(
-				{
-					_id: { $in: id },
-				},
-				{
-					notifications,
-				}
+				{ _id: { $in: id } },
+				{ notifications }
 			);
 
 			res.status(200).json({ notifications });

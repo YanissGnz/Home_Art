@@ -1,5 +1,10 @@
+import clsx from "clsx";
+import axios from "axios";
 import React from "react";
 import { useHistory } from "react-router";
+import Scrollbars from "react-custom-scrollbars";
+
+//Redux imports
 import { useDispatch, useSelector } from "react-redux";
 import {
 	dispatchAdminError,
@@ -7,6 +12,15 @@ import {
 	dispatchAdminLoading,
 	dispatchLogout,
 } from "../../redux/actions/authAction";
+import { returnErrors } from "../../redux/actions/errAction";
+import {
+	productLoading,
+	productsLoaded,
+	productErrors,
+} from "../../redux/actions/productsAction";
+import { dispatchGetAllUsers } from "../../redux/actions/usersAction";
+
+//Material-ui imports
 import {
 	AppBar,
 	Badge,
@@ -29,9 +43,10 @@ import {
 	useTheme,
 	withStyles,
 } from "@material-ui/core";
-import clsx from "clsx";
 import { useStyles } from "./useStyles";
+import "./adminPanel.css";
 
+//Icons imports
 import Logo from "../../Icons/Logo";
 import SearchIcon from "@material-ui/icons/Search";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
@@ -40,27 +55,18 @@ import MenuIcon from "@material-ui/icons/Menu";
 import NotificationsOffOutlinedIcon from "@material-ui/icons/NotificationsOffOutlined";
 import NotificationsNoneOutlinedIcon from "@material-ui/icons/NotificationsNoneOutlined";
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
-
-import "./adminPanel.css";
 import Catalog from "../../Icons/Catalog";
 import Dashboard from "../../Icons/Dashboard";
-
-import DashboardScreen from "./Components/DashboardScreen";
-import ProductsScreen from "./Components/ProductsScreen";
-import axios from "axios";
-import { returnErrors } from "../../redux/actions/errAction";
-import {
-	productLoading,
-	productsLoaded,
-	productErrors,
-} from "../../redux/actions/productsAction";
 import Users from "../../Icons/Users";
-import UsersScreen from "./Components/UsersScreen";
-import { dispatchGetAllUsers } from "../../redux/actions/usersAction";
-import OrdersScreen from "./Components/OrdersScreen";
 import OrdersMenuIcon from "../../Icons/OrdersMenuIcon";
-import Scrollbars from "react-custom-scrollbars";
 
+//Pages imports
+import DashboardScreen from "./Components/Dashboard/DashboardScreen";
+import ProductsScreen from "./Components/Products/ProductsScreen";
+import UsersScreen from "./Components/Users/UsersScreen";
+import OrdersScreen from "./Components/Orders/OrdersScreen";
+
+//AppBar Elevation Trigger
 function ElevationScroll(props) {
 	const { children } = props;
 
@@ -74,6 +80,7 @@ function ElevationScroll(props) {
 	});
 }
 
+//Notification Styled Menu
 const StyledMenu = withStyles({
 	paper: {
 		border: "1px solid #d3d4d5",
@@ -108,7 +115,7 @@ const monthNames = [
 	"November",
 	"Decembre",
 ];
-var weekdayNames = [
+const weekdayNames = [
 	"Dimanche",
 	"Lundi",
 	"Mardi",
@@ -118,6 +125,7 @@ var weekdayNames = [
 	"Samedi",
 ];
 
+//Transform date function
 function transformDate(date) {
 	const dateObj = new Date(date);
 

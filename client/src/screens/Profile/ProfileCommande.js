@@ -8,6 +8,8 @@ import {
 	Button,
 	Typography,
 	Divider,
+	Backdrop,
+	useTheme,
 } from "@material-ui/core";
 
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
@@ -32,12 +34,21 @@ import { CircularProgress } from "@material-ui/core";
 
 export default function Profile() {
 	const token = useSelector((state) => state.auth.token);
-
+	const theme = useTheme();
 	const [user, setUser] = useState(null);
 	const history = useHistory();
 	const dispatch = useDispatch();
 	const [isLoading, setIsLoading] = useState(false);
 	const [orders, setOrders] = useState([]);
+	const [backdropOpen, setBackdropOpen] = React.useState(false);
+
+	const handleBackdropOpen = () => {
+		setBackdropOpen(true);
+	};
+
+	const handleBackdropClose = () => {
+		setBackdropOpen(false);
+	};
 
 	React.useEffect(() => {
 		const loadUser = async () => {
@@ -68,6 +79,7 @@ export default function Profile() {
 	}, [dispatch, token]);
 
 	const handleCancelOrder = async (deletedOrder) => {
+		handleBackdropOpen();
 		// Headers
 		const config = {
 			headers: {
@@ -76,9 +88,10 @@ export default function Profile() {
 		};
 
 		await axios
-			.delete(`users/delete_order`, { deletedOrder }, config)
+			.post(`/users/delete_order`, { deletedOrder }, config)
 			.then((res) => {
 				setOrders(res.data.orders.reverse());
+				handleBackdropClose();
 			})
 			.catch((e) => {
 				console.log(e);
@@ -101,6 +114,12 @@ export default function Profile() {
 				<div className="profile_body">
 					<CssBaseline />
 					<MyAppBar cartLength={user ? user.cart.length : 0} />
+					<Backdrop
+						style={{ zIndex: theme.zIndex.drawer + 1, color: "#fff" }}
+						open={backdropOpen}
+					>
+						<CircularProgress size={60} thickness={5} color="primary" />
+					</Backdrop>
 					<Container
 						maxWidth="lg"
 						style={{

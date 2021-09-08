@@ -25,6 +25,7 @@ import ProfilePassword from "./screens/Profile/ProfilePassword";
 import SearchScreen from "./screens/SearchScreen/SearchScreen";
 import PromotedScreen from "./screens/PromotedScreen/PromotedScreen";
 import CommandeScreen from "./screens/CommandeScreen/CommandeScreen";
+import PackScreen from "./screens/PacksScreen/PackScreen";
 
 const theme = createMuiTheme({
 	palette: {
@@ -58,6 +59,7 @@ export default function App() {
 							path="/categorie/:categorie"
 							component={CategorieScreen}
 						/>
+						<Route exact path="/packs" component={PackScreen} />
 						<Route exact path="/promotion" component={PromotedScreen} />
 
 						<Route exact path="/cart" component={CartScreen} />
