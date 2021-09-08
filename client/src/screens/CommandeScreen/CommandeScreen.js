@@ -210,27 +210,29 @@ const ColorlibConnector = withStyles({
 	},
 })(StepConnector);
 
-const useColorlibStepIconStyles = makeStyles({
-	root: {
-		backgroundColor: "#ccc",
-		zIndex: 1,
-		color: "#fff",
-		width: 50,
-		height: 50,
-		display: "flex",
-		borderRadius: "50%",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	active: {
-		backgroundImage:
-			"linear-gradient(  #F58634 0%,  #F58634 50%,  #F58634 100%)",
-		boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
-	},
-	completed: {
-		backgroundImage:
-			"linear-gradient( 136deg,  #F58634 0%,  #F58634 50%,  #F58634 100%)",
-	},
+const useColorlibStepIconStyles = makeStyles((theme) => {
+	return {
+		root: {
+			backgroundColor: "#ccc",
+			zIndex: 1,
+			color: "#fff",
+			width: 50,
+			height: 50,
+			display: "flex",
+			borderRadius: "50%",
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		active: {
+			backgroundImage:
+				"linear-gradient(  #F58634 0%,  #F58634 50%,  #F58634 100%)",
+			boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
+		},
+		completed: {
+			backgroundImage:
+				"linear-gradient( 136deg,  #F58634 0%,  #F58634 50%,  #F58634 100%)",
+		},
+	};
 });
 
 const commandeInfo = {
@@ -325,6 +327,7 @@ export default function CommandeScreen() {
 	const [alertOpen, setAlertOpen] = React.useState(false);
 	const [alertType, setAlertType] = React.useState("");
 	const [disabled, setDisabled] = useState(false);
+	const [orderLoading, setOrderLoading] = useState(false);
 
 	const handleAlertOpen = () => {
 		setAlertOpen(true);
@@ -434,6 +437,8 @@ export default function CommandeScreen() {
 	};
 
 	const handleCommande = () => {
+		setDisabled(true);
+		setOrderLoading(true);
 		const {
 			name,
 			last_name,
@@ -492,10 +497,11 @@ export default function CommandeScreen() {
 				setMsg(res.data.msg);
 				setAlertType("success");
 				handleAlertOpen();
-				setDisabled(true);
+				setOrderLoading(false);
 				setCart([]);
 			})
 			.catch((e) => {
+				setOrderLoading(false);
 				console.log(e.response.data);
 			});
 	};
@@ -1363,15 +1369,21 @@ export default function CommandeScreen() {
 												</div>
 											</div>
 										</div>
-										<div style={{ marginTop: 30 }}>
-											<div>
-												<Button
-													disabled={activeStep === 0}
-													onClick={handleBack}
-													style={{ textTransform: "none", marginRight: 10 }}
-												>
-													Précédent
-												</Button>
+										<div
+											style={{
+												marginTop: 30,
+												display: "flex",
+												flexDirection: "row",
+											}}
+										>
+											<Button
+												disabled={activeStep === 0}
+												onClick={handleBack}
+												style={{ textTransform: "none", marginRight: 10 }}
+											>
+												Précédent
+											</Button>
+											<div className={classes.wrapper}>
 												<Button
 													variant="contained"
 													color="primary"
@@ -1381,6 +1393,12 @@ export default function CommandeScreen() {
 												>
 													Commander
 												</Button>
+												{orderLoading && (
+													<CircularProgress
+														size={24}
+														className={classes.buttonProgress}
+													/>
+												)}
 											</div>
 										</div>
 									</StepContent>

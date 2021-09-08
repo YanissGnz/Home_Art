@@ -21,6 +21,10 @@ const userSchema = new mongoose.Schema(
 			type: Number,
 			default: 1, // 0 = user, 1 = admin
 		},
+		notifications: {
+			type: Array,
+			default: [],
+		},
 	},
 	{
 		timestamps: true,

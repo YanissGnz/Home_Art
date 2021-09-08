@@ -55,7 +55,7 @@ export default function Profile() {
 				.then((res) => {
 					dispatch(dispatchUserLoaded(res));
 					setUser(res.data.user);
-					setOrders(res.data.user.orders);
+					setOrders(res.data.user.orders.reverse());
 					setIsLoading(false);
 				})
 				.catch((err) => {
@@ -78,7 +78,7 @@ export default function Profile() {
 		await axios
 			.delete(`users/delete_order`, { deletedOrder }, config)
 			.then((res) => {
-				setOrders(res.data.orders);
+				setOrders(res.data.orders.reverse());
 			})
 			.catch((e) => {
 				console.log(e);

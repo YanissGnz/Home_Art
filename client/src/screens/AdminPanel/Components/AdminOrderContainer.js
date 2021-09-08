@@ -114,10 +114,35 @@ export default function OrderContainer({ order, handleValidateOrder }) {
 			<CardContent style={{ paddingTop: 0 }}>
 				<div
 					style={{
+						display: "inline-flex",
+						marginRight: 20,
+						marginTop: 10,
+					}}
+				>
+					<Typography
+						style={{
+							fontSize: 18,
+							fontWeight: 500,
+							marginRight: 5,
+						}}
+					>
+						Date de commande :
+					</Typography>
+					<Typography
+						style={{
+							fontSize: 16,
+						}}
+					>
+						{order.date}
+					</Typography>
+				</div>
+				<div
+					style={{
 						display: "flex",
 						flexDirection: "row",
 						justifyContent: "space-between",
 						alignItems: "center",
+						marginTop: 10,
 					}}
 				>
 					<Typography color="primary" style={{ fontSize: 18, fontWeight: 450 }}>
@@ -285,7 +310,7 @@ export default function OrderContainer({ order, handleValidateOrder }) {
 							Etat de laivraison :
 						</Typography>
 						<Typography
-							color={order.isPaid ? "secondary" : "error"}
+							color={order.isDelivered ? "secondary" : "error"}
 							style={{
 								fontSize: 16,
 								fontWeight: 450,

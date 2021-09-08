@@ -1,6 +1,8 @@
+const Admins = require("../models/AdminModel");
 const Clients = require("../models/userModel");
 const Order = require("../models/OrderModel");
 const Product = require("../models/ProductModel");
+const Revenue = require("../models/RevenueModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./sendMail");
@@ -334,7 +336,7 @@ const userCtrl2 = {
 		const user_id = req.user.id;
 		const item = req.body.item;
 		try {
-			const user = await Clients.findById(req.user.id);
+			const user = await Clients.findById(user_id);
 			if (!user) return res.status(404).json({ msg: "User does not exist." });
 			const cart = user.cart;
 
@@ -343,7 +345,7 @@ const userCtrl2 = {
 			);
 
 			const newUser = await Clients.findOneAndUpdate(
-				{ _id: req.user.id },
+				{ _id: user_id },
 				{
 					cart: newCart,
 				}
@@ -622,6 +624,39 @@ const userCtrl2 = {
 		} = req.body;
 
 		try {
+			const monthNames = [
+				"Janvier",
+				"Février ",
+				"Mars",
+				"Avril",
+				"Mai",
+				"Juin",
+				"Juillet",
+				"Août ",
+				"Septembre",
+				"Octobre",
+				"November",
+				"Decembre",
+			];
+			var weekdayNames = [
+				"Dimanche",
+				"Lundi",
+				"Mardi",
+				"Mercredi",
+				"Jeudi",
+				"Vendredi",
+				"Samedi",
+			];
+
+			const dateObj = new Date();
+			const weekday = weekdayNames[dateObj.getDay()];
+			const day = String(dateObj.getDate()).padStart(2, "0");
+			const month = monthNames[dateObj.getMonth()];
+			const monthNumber = dateObj.getMonth();
+			const year = dateObj.getFullYear();
+
+			const date = weekday + ", " + day + " " + month + " " + year;
+
 			const newOrder = new Order({
 				user: { id, name, last_name, phoneNumber },
 				deliveryAddress: { address, region, ville },
@@ -631,6 +666,7 @@ const userCtrl2 = {
 				paymentInfo,
 				totalPrice,
 				isPaid,
+				date,
 			});
 			await newOrder.save();
 
@@ -667,6 +703,43 @@ const userCtrl2 = {
 					orders: newOrders,
 				}
 			);
+
+			const checkRevenue = await Revenue.findOne({ month: monthNumber });
+
+			if (checkRevenue) {
+				const revenue = checkRevenue.revenue + totalPrice;
+				if (checkRevenue.year === year) {
+					await Revenue.findOneAndUpdate({ month: monthNumber }, { revenue });
+				} else {
+					await Revenue.findOneAndUpdate(
+						{ month: monthNumber },
+						{ totalPrice, year }
+					);
+				}
+			} else {
+				const revenue = new Revenue({
+					month,
+					revenue: totalPrice,
+					year,
+				});
+				await revenue.save();
+			}
+
+			const admins = await Admins.find();
+			admins.forEach(async (admin) => {
+				var notifications = admin.notifications;
+
+				const notification = {
+					value: `Nouvelle commande par ${name} ${last_name}`,
+					date: new Date(),
+				};
+				await notifications.push(notification);
+
+				const newAdmin = await Admins.findOneAndUpdate(
+					{ _id: { $in: admin._id } },
+					{ notifications }
+				);
+			});
 
 			res.status(200).json({ msg: "La commande à été effectuer" });
 		} catch (err) {

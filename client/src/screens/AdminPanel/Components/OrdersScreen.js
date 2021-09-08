@@ -27,7 +27,7 @@ export default function OrdersScreen() {
 		axios
 			.get("/users/get_orders", config)
 			.then((res) => {
-				setOrders(res.data.orders);
+				setOrders(res.data.orders.reverse());
 			})
 			.catch((err) => {
 				console.log(err);

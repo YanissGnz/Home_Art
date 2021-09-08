@@ -9,8 +9,14 @@ router.post("/admin", userCtrl.login);
 router.get("/load_admin", auth, userCtrl.loadAdmin);
 router.get("/get_users", auth, userCtrl.getUsers);
 router.get("/get_orders", auth, userCtrl.getOrders);
+router.get("/get_revenue", auth, userCtrl.getRevenue);
 router.delete("/delete_user/:user_Id", auth, userCtrl.deleteUser);
 router.post("/validate_order", auth, userCtrl.validateOrder);
+router.post(
+	"/delete_admin_notification",
+	auth,
+	userCtrl.deleteAdminNotification
+);
 
 //Client Routes
 router.post("/login", userCtrl2.login);

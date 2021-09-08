@@ -84,7 +84,6 @@ export const useStyles = makeStyles((theme) => {
 		},
 		input: {
 			width: "20em",
-			marginLeft: theme.spacing(1),
 			flex: 1,
 		},
 		search_Button: {
@@ -279,6 +278,12 @@ export const useStyles = makeStyles((theme) => {
 		},
 		UsersContainer: {
 			display: "flex",
+			marginBottom: 50,
+		},
+		badge: {
+			color: "white",
+			fontSize: 12,
+			fontWeight: 550,
 		},
 	};
 });

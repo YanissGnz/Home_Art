@@ -14,8 +14,10 @@ export default function DashboardScreen({ usersCount }) {
 	const productCount = useSelector((state) => state.products.products);
 	const users = useSelector((state) => state.users.slice(0, 3));
 	const token = useSelector((state) => state.auth.token);
-
 	const [orders, setOrders] = useState([]);
+	const [recentOrders, setRecentOrders] = useState([]);
+	const [revenueData, setRevenueData] = useState(null);
+	const [revenue, setRevenue] = useState(0);
 
 	useEffect(() => {
 		// Headers
@@ -28,7 +30,76 @@ export default function DashboardScreen({ usersCount }) {
 		axios
 			.get("/users/get_orders", config)
 			.then((res) => {
-				setOrders(res.data.orders.slice(0, 3));
+				setRecentOrders(res.data.orders.slice(0, 3));
+				setOrders(res.data.orders);
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	}, [token]);
+
+	useEffect(() => {
+		// Headers
+		const config = {
+			headers: {
+				"x-auth-token": token,
+			},
+		};
+
+		axios
+			.get("/users/get_revenue", config)
+			.then((res) => {
+				var data = [];
+				var revenue = 0;
+				for (let index = 0; index < 12; index++) {
+					data[index] = res.data.revenue[index].revenue;
+					revenue = revenue + res.data.revenue[index].revenue;
+				}
+
+				setRevenue(revenue);
+
+				var revenueData = {
+					labels: [
+						"Janvier",
+						"Février ",
+						"Mars",
+						"Avril",
+						"Mai",
+						"Juin",
+						"Juillet",
+						"Août ",
+						"Septembre",
+						"Octobre",
+						"November",
+						"Decembre",
+					],
+					datasets: [
+						{
+							label: "Revenu (Da)",
+							data,
+							fill: false,
+							animation: false,
+							borderColor: "#F58634",
+							tension: 0.1,
+							backgroundColor: [
+								"#6b9d3b",
+								"#8aaa47",
+								"#a9b855",
+								"#c6c666",
+								"#e3d378",
+								"#ffe18d",
+								"#fcc876",
+								"#f7ae65",
+								"#f29459",
+								"#ea7852",
+								"#e15c50",
+								"#d43d51",
+							],
+						},
+					],
+				};
+
+				setRevenueData(revenueData);
 			})
 			.catch((err) => {
 				console.log(err);
@@ -65,49 +136,6 @@ export default function DashboardScreen({ usersCount }) {
 	const month = monthNames[dateObj.getMonth()];
 	const year = dateObj.getFullYear();
 
-	const data = {
-		labels: [
-			"Janvier",
-			"Février ",
-			"Mars",
-			"Avril",
-			"Mai",
-			"Juin",
-			"Juillet",
-			"Août ",
-			"Septembre",
-			"Octobre",
-			"November",
-			"Decembre",
-		],
-		datasets: [
-			{
-				label: "Revenu",
-				data: [
-					2000000, 5000000, 3000000, 2500000, 4000000, 5000000,
-					//3000000, 4000000, 5000000, 2000000, 3500000, 4500000,
-				],
-				fill: false,
-				borderColor: "#F58634",
-				tension: 0.1,
-				backgroundColor: [
-					"#6b9d3b",
-					"#8aaa47",
-					"#a9b855",
-					"#c6c666",
-					"#e3d378",
-					"#ffe18d",
-					"#fcc876",
-					"#f7ae65",
-					"#f29459",
-					"#ea7852",
-					"#e15c50",
-					"#d43d51",
-				],
-			},
-		],
-	};
-
 	const Productsdata = {
 		labels: [
 			"Janvier",
@@ -126,14 +154,16 @@ export default function DashboardScreen({ usersCount }) {
 		datasets: [
 			{
 				label: "Visiteur",
-				data: [200, 500, 300, 250, 400, 500],
+				data: [200, 500, 300, 250, 400, 500, 300, 400, 900, 100, 250, 400],
 				fill: false,
 				borderColor: "#F58634",
 				tension: 0.1,
+				animation: false,
 				backgroundColor: "#f7ae65",
 			},
 		],
 	};
+
 	return (
 		<Container maxWidth="xl" className="dashbord_container">
 			<Toolbar />
@@ -265,7 +295,7 @@ export default function DashboardScreen({ usersCount }) {
 							color="textPrimary"
 							style={{ fontSize: 28, fontWeight: 450, marginLeft: 10 }}
 						>
-							545000 Da
+							{revenue} Da
 						</Typography>
 					</div>
 				</div>
@@ -291,7 +321,7 @@ export default function DashboardScreen({ usersCount }) {
 					>
 						Revenue
 					</Typography>
-					<Bar data={data} />
+					<Bar data={revenueData} />
 				</Container>
 				<Container
 					style={{
@@ -313,7 +343,7 @@ export default function DashboardScreen({ usersCount }) {
 					>
 						Visituers
 					</Typography>
-					<Line data={Productsdata} />
+					<Line redraw={false} data={Productsdata} />
 				</Container>
 			</div>
 			<div
@@ -523,7 +553,7 @@ export default function DashboardScreen({ usersCount }) {
 							</Typography>
 						</div>
 					</div>
-					{orders.map((order) => (
+					{recentOrders.map((order) => (
 						<div
 							style={{
 								display: "flex",
@@ -562,7 +592,7 @@ export default function DashboardScreen({ usersCount }) {
 							>
 								<Typography
 									color="primary"
-									style={{ fontSize: 18, fontWeight: 500, marginLeft: 10 }}
+									style={{ fontSize: 18, fontWeight: 550, marginLeft: 10 }}
 								>
 									{order.totalPrice} Da
 								</Typography>
@@ -575,7 +605,7 @@ export default function DashboardScreen({ usersCount }) {
 								}}
 							>
 								<Typography
-									color={order.isValidated ? "primary" : "error"}
+									color={order.isValidated ? "secondary" : "error"}
 									style={{ fontSize: 18, fontWeight: 500, marginLeft: 10 }}
 								>
 									{order.isValidated ? "Valider" : "Non valider"}
