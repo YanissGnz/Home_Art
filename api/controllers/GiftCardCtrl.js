@@ -47,7 +47,7 @@ const productCtrl = {
 			const giftCard = await GiftCard.findOne({ code: giftCardCode });
 
 			if (giftCard) {
-				if (giftCard.budget <= parseInt(totalPrice)) {
+				if (giftCard.budget < parseInt(totalPrice)) {
 					res.status(200).json({
 						isValid: false,
 						msg: {
