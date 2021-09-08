@@ -50,6 +50,7 @@ import validator from "validator";
 import Paypal from "../../utils/Paypal";
 import { Snackbar } from "@material-ui/core";
 import MuiAlert from "@material-ui/lab/Alert";
+import { ContactSupportOutlined } from "@material-ui/icons";
 
 function Alert(props) {
 	return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -325,6 +326,8 @@ export default function CommandeScreen() {
 	const [alertOpen, setAlertOpen] = React.useState(false);
 	const [alertType, setAlertType] = React.useState("");
 	const [disabled, setDisabled] = useState(false);
+	const [Payment , setPayment] = React.useState("");
+	const [ShowBouton, setShowBouton] = useState(true);
 
 	const handleAlertOpen = () => {
 		setAlertOpen(true);
@@ -369,6 +372,10 @@ export default function CommandeScreen() {
 	const HandleGiftCardCodeChange = (e) => {
 		setGiftCardCode(e.target.value.toString());
 	};
+	const transactionSuccess =  (data) => {
+		 setPayment(data);
+		 setShowBouton(false);
+    };
 
 	const handleStepOneNext = () => {
 		if (commande.name === "") {
@@ -429,7 +436,9 @@ export default function CommandeScreen() {
 					});
 			}
 		} else if (commande.paymentMethod === "Paypal") {
+			if (Payment){
 			setActiveStep(2);
+			}
 		}else if (commande.paymentMethod === "Paiement à la livraison") {
 			setActiveStep(2);
 		}
@@ -455,7 +464,7 @@ export default function CommandeScreen() {
 			paymentInfo = giftCardCode;
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paypal") {
-			paymentInfo = 
+			paymentInfo = Payment ; 
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paiement à la livraison") {
 			paymentInfo = "Paiement à la livraison";
@@ -585,18 +594,14 @@ export default function CommandeScreen() {
 			});
 	};
 
-	const transactionSuccess =  (data) => {
-		paymentInfo = data ;
-		axios.post(	"/users/confirm_order",	paymentInfo);
-    }
 
 	const transactionError = () => {
         console.log('Paypal error')
-    }
+    };
 
     const transactionCanceled = () => {
         console.log('Transaction canceled')
-    }
+    };
 
 	return (
 		<div>
@@ -1112,12 +1117,14 @@ export default function CommandeScreen() {
 												</Collapse>
 												<Collapse in={commande.paymentMethod === "Paypal"}>
 													<div style={{ marginTop: 20, width: "92%" }}>
+													 {ShowBouton &&
 														<Paypal 
 														  toPay = {totalPrice}
 														  onSuccess={transactionSuccess} 
                                                           transactionError={transactionError}
                                                           transactionCanceled={transactionCanceled}					
 														/>
+													 }
 													</div>
 												</Collapse>
 												<Collapse
