@@ -116,10 +116,12 @@ const userCtrl = {
 		const { user_id, order_id } = req.body;
 
 		try {
-			const validOrders = await Order.findOneAndUpdate(
+			var validOrder = await Order.findOneAndUpdate(
 				{ _id: { $in: order_id } },
 				{ isValidated: true }
 			);
+
+			validOrder.isValidated = true;
 
 			const orders = await Order.find();
 
@@ -131,8 +133,11 @@ const userCtrl = {
 
 			const userOrders = user.orders;
 
-			const newOrders = userOrders.filter((order) => order._id != order_id);
-			newOrders.push(validOrders);
+			const newOrders = await userOrders.filter(
+				(order) => order._id != order_id
+			);
+			await newOrders.push(validOrder);
+			console.log(newOrders);
 
 			var notifications = user.notifications;
 
@@ -153,26 +158,6 @@ const userCtrl = {
 			);
 
 			sendEmail2(newUser.email);
-
-			res.status(200).json({ orders });
-		} catch (err) {
-			return res.status(400).json({ msg: err.message });
-		}
-	},
-	deleteOrder: async (req, res) => {
-		const id = req.user.id;
-		const { deletedOrder } = req.body;
-		try {
-			const user = await Clients.findOne({ _id: { $in: id } });
-
-			var orders = user.orders;
-
-			orders.splice(orders.indexOf(deletedOrder), 1);
-
-			const newUser = await Clients.findOneAndUpdate(
-				{ _id: { $in: id } },
-				{ orders }
-			);
 
 			res.status(200).json({ orders });
 		} catch (err) {

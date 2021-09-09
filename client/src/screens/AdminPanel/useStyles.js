@@ -128,6 +128,7 @@ export const useStyles = makeStyles((theme) => {
 			position: "fixed",
 			bottom: theme.spacing(4),
 			right: theme.spacing(1),
+			zIndex: 20,
 		},
 		fabIcon: {
 			marginRight: theme.spacing(1),
@@ -273,7 +274,7 @@ export const useStyles = makeStyles((theme) => {
 			backgroundColor: "#f5f5f5",
 		},
 		backdrop: {
-			zIndex: theme.zIndex.drawer + 1,
+			zIndex: theme.zIndex.drawer + 25,
 			color: "#fff",
 		},
 		UsersContainer: {

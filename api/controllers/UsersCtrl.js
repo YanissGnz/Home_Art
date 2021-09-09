@@ -7,7 +7,6 @@ const Revenue = require("../models/RevenueModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./sendMail");
-const sendEmail2 = require("./sendMail2");
 const { google } = require("googleapis");
 const { OAuth2 } = google.auth;
 const client = new OAuth2(process.env.MAILING_SERVICE_CLIENT_ID);
@@ -721,12 +720,9 @@ const userCtrl2 = {
 					orders: newOrders,
 				}
 			);
-			sendEmail2(newUser.email);
-			res
-				.status(200)
-				.json({
-					msg: "La commande a été passée, vous recevrez un mail une fois elle est validée",
-				});
+			res.status(200).json({
+				msg: "La commande a été passée, vous recevrez un mail une fois elle est validée",
+			});
 
 			const checkRevenue = await Revenue.findOne({ month: monthNumber });
 
@@ -783,6 +779,8 @@ const userCtrl2 = {
 
 			orders.splice(orders.indexOf(deletedOrder), 1);
 
+			await Order.findByIdAndDelete({ id: { $in: deletedOrder._id } });
+
 			const newUser = await Clients.findOneAndUpdate(
 				{
 					_id: { $in: id },
@@ -791,6 +789,13 @@ const userCtrl2 = {
 					orders,
 				}
 			);
+
+			const checkRevenue = await Revenue.findOne({ month: monthNumber });
+
+			if (checkRevenue) {
+				const revenue = checkRevenue.revenue - deletedOrder.totalPrice;
+				await Revenue.findOneAndUpdate({ month: monthNumber }, { revenue });
+			}
 
 			res.status(200).json({ orders });
 		} catch (err) {
