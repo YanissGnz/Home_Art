@@ -625,11 +625,11 @@ const productCtrl = {
 			}
 			const productImages = check.productImages;
 
-			productImages.forEach((image) => {
-				fs.unlinkSync(
-					`C:/Users/yanis/Projects/New folder/Home_Art/client/public/uploads/${image}`
-				);
-			});
+			// productImages.forEach((image) => {
+			// 	fs.unlinkSync(
+			// 		`C:/Users/yanis/Projects/New folder/Home_Art/client/public/uploads/${image}`
+			// 	);
+			// });
 
 			await Product.deleteOne({ _id: product_id });
 

@@ -65,6 +65,8 @@ import DashboardScreen from "./Components/Dashboard/DashboardScreen";
 import ProductsScreen from "./Components/Products/ProductsScreen";
 import UsersScreen from "./Components/Users/UsersScreen";
 import OrdersScreen from "./Components/Orders/OrdersScreen";
+import GiftCardsScreen from "./Components/GiftCards/GiftCardsScreen";
+import GiftCardIcon from "../../Icons/GiftCardIcon";
 
 //AppBar Elevation Trigger
 function ElevationScroll(props) {
@@ -476,11 +478,23 @@ export default function AdminPanel(props) {
 							</ListItemIcon>
 							<ListItemText primary="Utilisateur" />
 						</ListItem>
+						<ListItem
+							button
+							onClick={() => setScreen(4)}
+							className={screen === 4 && classes.active}
+							style={{ marginBottom: 5 }}
+						>
+							<ListItemIcon>
+								<GiftCardIcon />
+							</ListItemIcon>
+							<ListItemText primary="Cartes cadeau" />
+						</ListItem>
 					</Drawer>
 					{screen === 0 && <DashboardScreen usersCount={usersCount} />}
 					{screen === 1 && <ProductsScreen />}
 					{screen === 2 && <OrdersScreen />}
 					{screen === 3 && <UsersScreen />}
+					{screen === 4 && <GiftCardsScreen />}
 				</div>
 			)}
 		</div>
