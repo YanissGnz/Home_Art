@@ -163,7 +163,6 @@ export default function ProductsScreen() {
 	const [products, setProducts] = React.useState(
 		useSelector((state) => state.products.products)
 	);
-	const [packs, setPacks] = React.useState([]);
 	const dispatch = useDispatch();
 	const token = useSelector((state) => state.auth.token);
 	const nameMsg = useSelector((state) => state.err);
@@ -198,20 +197,6 @@ export default function ProductsScreen() {
 		setSubCategorie("");
 	};
 	/*______________________*/
-
-	React.useEffect(() => {
-		const loadPacks = async () => {
-			await axios
-				.post("/products/get_packs")
-				.then((res) => {
-					setPacks(res.data.Packs);
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-		};
-		loadPacks();
-	}, []);
 
 	/*          For Edit Product Dialog          */
 	const handleClickEditOpen = (editedProduct) => {
@@ -288,8 +273,9 @@ export default function ProductsScreen() {
 			images.push(URL.createObjectURL(e.target.files[i]));
 		}
 
-		setImageSlide(images.reverse());
+		setImageSlide(images);
 		setProductImage(e.target.files);
+		console.log(e.target.files);
 	};
 
 	const handleAddProduct = async (e) => {
@@ -335,7 +321,7 @@ export default function ProductsScreen() {
 				setMsg(res.data.msg);
 				imageMsg.msg = "";
 				handleAlertOpen();
-				setProducts(res.data.products);
+				setProducts(res.data.Products);
 			})
 			.catch((err) => {
 				setIsLoading(false);
@@ -387,7 +373,7 @@ export default function ProductsScreen() {
 				setMsg(res.data.msg);
 				imageMsg.msg = "";
 				handleAlertOpen();
-				setProducts(res.data.products);
+				setProducts(res.data.Products);
 			})
 			.catch((err) => {
 				setIsLoading(false);
@@ -422,7 +408,7 @@ export default function ProductsScreen() {
 			.put(`/products/promote_product/${promotedProductId}`, formData, config)
 			.then((res) => {
 				setIsLoading(false);
-				setProducts(res.data.products);
+				setProducts(res.data.Products);
 				dispatch(clearErrors());
 				setMsg(res.data.msg);
 				handleAlertOpen();
@@ -446,7 +432,7 @@ export default function ProductsScreen() {
 			.delete(`/products/delete_product/${deletedProductId}`, config)
 			.then((res) => {
 				setMsg(res.data.msg);
-				setProducts(res.data.products);
+				setProducts(res.data.Products);
 				handleAlertOpen();
 				handleBackdropClose();
 			})
@@ -477,7 +463,7 @@ export default function ProductsScreen() {
 				setMsg(res.data.msg);
 				handleAlertOpen();
 				handleBackdropClose();
-				setProducts(res.data.products);
+				setProducts(res.data.Products);
 			})
 			.catch((err) => {
 				setMsg(err.response.data.msg);
@@ -506,7 +492,7 @@ export default function ProductsScreen() {
 				setMsg(res.data.msg);
 				handleAlertOpen();
 				handleBackdropClose();
-				setProducts(res.data.products);
+				setProducts(res.data.Products);
 			})
 			.catch((err) => {
 				setMsg(err.response.data.msg);
@@ -1052,37 +1038,6 @@ export default function ProductsScreen() {
 				<Typography variant="h5" className={classes.dashboardText}>
 					List des produit
 				</Typography>
-				<Container
-					maxWidth="xl"
-					style={{
-						backgroundColor: "white",
-						borderRadius: 20,
-						padding: 20,
-					}}
-					className="main"
-				>
-					<Typography variant="h6" className={classes.dashboardText}>
-						Packs
-					</Typography>
-					<Divider style={{ marginBottom: 10 }} />
-					<Masonry
-						breakpointCols={breakpoints}
-						className="my-masonry-grid"
-						columnClassName="my-masonry-grid_column"
-						style={{ width: "100%" }}
-					>
-						{packs.map((product) => (
-							<ProductCard
-								product={product}
-								handleClickEditOpen={handleClickEditOpen}
-								handleDelete={handleDelete}
-								handleArchive={handleArchive}
-								handleReveal={handleReveal}
-								handleClickPromotionOpen={handleClickPromotionOpen}
-							/>
-						))}
-					</Masonry>
-				</Container>
 				<Container
 					maxWidth="xl"
 					style={{

@@ -127,7 +127,7 @@ export const useStyles = makeStyles((theme) => {
 			textTransform: "capitalize",
 			position: "fixed",
 			bottom: theme.spacing(4),
-			right: theme.spacing(4),
+			right: theme.spacing(1),
 		},
 		fabIcon: {
 			marginRight: theme.spacing(1),

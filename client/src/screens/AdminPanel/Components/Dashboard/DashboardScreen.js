@@ -11,8 +11,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 
 export default function DashboardScreen({ usersCount }) {
-	const [productsCount, setProductsCount] = useState(
-		useSelector((state) => state.products.products)
+	var productsCount = useState(
+		useSelector((state) => state.products.products.length)
 	);
 	const users = useSelector((state) => state.users.slice(0, 3));
 	const token = useSelector((state) => state.auth.token);
@@ -20,21 +20,6 @@ export default function DashboardScreen({ usersCount }) {
 	const [recentOrders, setRecentOrders] = useState([]);
 	const [revenueData, setRevenueData] = useState(null);
 	const [revenue, setRevenue] = useState(0);
-
-	React.useEffect(() => {
-		const loadPacks = async () => {
-			await axios
-				.post("/products/get_packs")
-				.then((res) => {
-					setProductsCount(productsCount + res.data.Packs.length);
-					console.log(productsCount + res.data.Packs.length);
-				})
-				.catch((err) => {
-					console.log(err);
-				});
-		};
-		loadPacks();
-	}, []);
 
 	useEffect(() => {
 		// Headers

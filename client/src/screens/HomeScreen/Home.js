@@ -233,6 +233,20 @@ export default function Home(props) {
 		loadPacks();
 	}, []);
 
+	React.useEffect(() => {
+		const loadNewProducts = async () => {
+			await axios
+				.post("/products/get_new_products", { skip: 0, limit: 5 })
+				.then((res) => {
+					setNewProducts(res.data.Products);
+				})
+				.catch((err) => {
+					console.log(err.message);
+				});
+		};
+		loadNewProducts();
+	}, []);
+
 	return (
 		<div>
 			{isLoading && (

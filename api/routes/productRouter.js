@@ -18,6 +18,7 @@ const upload = multer({ storage }).array("productImage", 6);
 
 router.post("/add_product", auth, upload, ProductCtrl.addProduct);
 router.post("/get_products", ProductCtrl.getProducts);
+router.post("/get_new_products", ProductCtrl.getNewProducts);
 router.post("/get_packs", ProductCtrl.getPacks);
 router.get("/get_product_by_id/", ProductCtrl.getProductById);
 router.post("/get_products_by_categorie/", ProductCtrl.getProductsByCategorie);

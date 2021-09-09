@@ -1,5 +1,5 @@
 const Product = require("../models/ProductModel");
-
+const fs = require("fs");
 const productCtrl = {
 	addProduct: async (req, res) => {
 		try {
@@ -60,13 +60,13 @@ const productCtrl = {
 					newPrice: 0,
 				});
 
-				newProduct.save();
+				await newProduct.save();
 
-				const products = await Product.find().sort([["_id", "desc"]]);
+				const Products = await Product.find().sort([["_id", "desc"]]);
 
 				return res
 					.status(200)
-					.json({ products, msg: "Le Produit a été ajouter" });
+					.json({ Products, msg: "Le Produit a été ajouter" });
 			}
 		} catch (err) {
 			console.log(err.message);
@@ -74,6 +74,25 @@ const productCtrl = {
 		}
 	},
 	getProducts: async (req, res) => {
+		const sortBy = req.body.sortBy ? req.body.sortBy : "_id";
+		const order = req.body.sortBy ? req.body.sortBy : "desc";
+		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
+		const skip = req.body.skip ? parseInt(req.body.skip) : 0;
+
+		try {
+			const Products = await Product.find()
+				.skip(skip)
+				.limit(limit)
+				.sort([[sortBy, order]]);
+
+			res.status(200).json({
+				Products,
+			});
+		} catch (e) {
+			res.status(400).json({ msg: e.message });
+		}
+	},
+	getNewProducts: async (req, res) => {
 		const sortBy = req.body.sortBy ? req.body.sortBy : "_id";
 		const order = req.body.sortBy ? req.body.sortBy : "desc";
 		const limit = req.body.limit ? parseInt(req.body.limit) : 100;
@@ -195,6 +214,7 @@ const productCtrl = {
 						price,
 						promoted,
 						subCategorie,
+						archived: false,
 					})
 						.skip(skip)
 						.limit(limit)
@@ -211,6 +231,7 @@ const productCtrl = {
 						categorie,
 						price,
 						subCategorie,
+						archived: false,
 					})
 						.skip(skip)
 						.limit(limit)
@@ -229,6 +250,7 @@ const productCtrl = {
 						categorie,
 						price,
 						promoted,
+						archived: false,
 					})
 						.skip(skip)
 						.limit(limit)
@@ -245,6 +267,7 @@ const productCtrl = {
 						categorie,
 						price,
 						pack: false,
+						archived: false,
 					})
 						.skip(skip)
 						.limit(limit)
@@ -299,6 +322,7 @@ const productCtrl = {
 						price,
 						categorie,
 						promoted,
+						archived: false,
 					})
 					.skip(skip)
 					.limit(limit);
@@ -313,6 +337,7 @@ const productCtrl = {
 					.find({
 						price,
 						categorie,
+						archived: false,
 					})
 					.skip(skip)
 					.limit(limit);
@@ -352,6 +377,7 @@ const productCtrl = {
 				price,
 				categorie,
 				promoted: true,
+				archived: false,
 			})
 				.skip(skip)
 				.limit(limit);
@@ -516,12 +542,11 @@ const productCtrl = {
 					}
 				);
 			}
-			const products = Product.find().sort([["_id", "desc"]]);
+			const Products = await Product.find().sort([["_id", "desc"]]);
 
-			return res.status(200).json({
-				products,
-				msg: "Le produit a été modifier",
-			});
+			return res
+				.status(200)
+				.json({ Products, msg: "Le produit a été modifier" });
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
@@ -542,12 +567,11 @@ const productCtrl = {
 				{ _id: product_id },
 				{ price: newPrice, oldPrice: oldPrice, promoted: true }
 			);
-			const products = Product.find().sort([["_id", "desc"]]);
+			const Products = await Product.find().sort([["_id", "desc"]]);
 
-			return res.status(200).json({
-				products,
-				msg: "Le produit a été promoter",
-			});
+			return res
+				.status(200)
+				.json({ Products, msg: "Le produit a été promoter" });
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
@@ -563,12 +587,11 @@ const productCtrl = {
 				{ _id: product_id },
 				{ archived: true }
 			);
-			const products = Product.find().sort([["_id", "desc"]]);
+			const Products = await Product.find().sort([["_id", "desc"]]);
 
-			return res.status(200).json({
-				products,
-				msg: "Le produit a été archiver",
-			});
+			return res
+				.status(200)
+				.json({ Products, msg: "Le produit a été archiver" });
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
@@ -584,12 +607,11 @@ const productCtrl = {
 				{ _id: product_id },
 				{ archived: false }
 			);
-			const products = Product.find().sort([["_id", "desc"]]);
+			const Products = await Product.find().sort([["_id", "desc"]]);
 
-			return res.status(200).json({
-				products,
-				msg: "Le produit a été reveler",
-			});
+			return res
+				.status(200)
+				.json({ Products, msg: "Le produit a été reveler" });
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
@@ -601,15 +623,24 @@ const productCtrl = {
 			if (!check) {
 				return res.status(400).json({ msg: "Produit n'exist pas." });
 			}
+			const productImages = check.productImages;
+
+			productImages.forEach((image) => {
+				fs.unlinkSync(
+					`C:/Users/yanis/Projects/New folder/Home_Art/client/public/uploads/${image}`
+				);
+			});
 
 			await Product.deleteOne({ _id: product_id });
-			const products = await Product.find().sort([["_id", "desc"]]);
+
+			const Products = await Product.find().sort([["_id", "desc"]]);
 
 			return res.status(200).json({
-				products,
+				Products,
 				msg: "Le produit a été supprimer",
 			});
 		} catch (err) {
+			0;
 			return res.status(400).json({ msg: err.message });
 		}
 	},
