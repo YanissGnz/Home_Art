@@ -69,7 +69,6 @@ export default function GiftCardsScreen() {
 				.get("/gift_card/get_gift_Cards", config)
 				.then((res) => {
 					setGiftCards(res.data.giftCards);
-					console.log(res.data.giftCards);
 				})
 				.catch((e) => {
 					console.log(e);

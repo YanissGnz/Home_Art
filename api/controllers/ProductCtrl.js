@@ -1,4 +1,5 @@
 const Product = require("../models/ProductModel");
+const Client = require("../models/userModel");
 const fs = require("fs");
 const productCtrl = {
 	addProduct: async (req, res) => {
@@ -426,7 +427,7 @@ const productCtrl = {
 		const user_id = req.user.id;
 
 		try {
-			const user = await Users2.findOne({ _id: user_id });
+			const user = await Client.findOne({ _id: user_id });
 
 			const name = user.name;
 			const product = await Product.findOne({ _id: { $in: product_id } });

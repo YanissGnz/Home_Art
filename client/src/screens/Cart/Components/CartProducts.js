@@ -130,6 +130,7 @@ export default function UserCard({
 						color: "black",
 						fontWeight: 450,
 						overflow: "hidden",
+						height: 200,
 					}}
 					className="fotter_links"
 				>
