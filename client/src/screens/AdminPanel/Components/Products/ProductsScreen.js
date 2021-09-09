@@ -88,7 +88,7 @@ const categories = [
 	"Vaisselle",
 	"Literie",
 	"Décoration",
-	"Electroménager",
+	"Robots",
 	"Autre",
 ];
 

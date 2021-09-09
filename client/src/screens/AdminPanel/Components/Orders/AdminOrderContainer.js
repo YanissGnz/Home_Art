@@ -157,6 +157,7 @@ export default function OrderContainer({ order, handleValidateOrder }) {
 						>
 							{order.user.name} {order.user.last_name}
 						</Typography>
+
 						<Typography style={{ fontSize: 16, marginTop: 5 }}>
 							+213 {order.user.phoneNumber}
 						</Typography>

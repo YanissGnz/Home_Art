@@ -137,7 +137,6 @@ const userCtrl = {
 				(order) => order._id != order_id
 			);
 			await newOrders.push(validOrder);
-			console.log(newOrders);
 
 			var notifications = user.notifications;
 

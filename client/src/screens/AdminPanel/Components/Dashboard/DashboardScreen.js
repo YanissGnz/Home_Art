@@ -267,7 +267,7 @@ export default function DashboardScreen({ usersCount }) {
 							color="textPrimary"
 							style={{ fontSize: 28, fontWeight: 450, marginLeft: 10 }}
 						>
-						
+							{productsCount}
 						</Typography>
 					</div>
 				</div>
