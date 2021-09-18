@@ -475,32 +475,30 @@ export default function ProductDetails(props) {
 									{product.categorie}
 								</a>
 							</div>
+							<Typography
+								color={product.stock > 0 ? "secondary" : "error"}
+								style={{
+									fontSize: 16,
+									fontWeight: 400,
+									marginBottom: 20,
+									display: "flex",
+									alignItems: "center",
+								}}
+							>
+								{product.stock > 0 ? (
+									<CheckBoxOutlinedIcon
+										fontSize="small"
+										style={{ marginRight: 5 }}
+									/>
+								) : (
+									<IndeterminateCheckBoxOutlinedIcon
+										fontSize="small"
+										style={{ marginRight: 5 }}
+									/>
+								)}
+								{product.stock > 0 ? "En stock" : "Hors stock"}
+							</Typography>
 
-							{product.stock > 0 && (
-								<Typography
-									style={{
-										color: "green",
-										fontSize: 16,
-										fontWeight: 400,
-										marginBottom: 20,
-										display: "flex",
-										alignItems: "center",
-									}}
-								>
-									{product.stock > 0 ? (
-										<CheckBoxOutlinedIcon
-											fontSize="small"
-											style={{ marginRight: 5 }}
-										/>
-									) : (
-										<IndeterminateCheckBoxOutlinedIcon
-											fontSize="small"
-											style={{ marginRight: 5 }}
-										/>
-									)}
-									{product.stock > 0 ? "En stock" : "Hors stock"}
-								</Typography>
-							)}
 							<div
 								style={{
 									display: "flex",
@@ -567,7 +565,7 @@ export default function ProductDetails(props) {
 										marginTop: 50,
 									}}
 									onClick={handleAddToCart}
-									disabled={addProductLoading}
+									disabled={product.stock === 0 || addProductLoading}
 								>
 									Ajouter au panier
 								</Button>
@@ -721,7 +719,7 @@ export default function ProductDetails(props) {
 					<Divider style={{ marginBottom: 10 }} />
 					<div style={{ display: "flex", width: "100%" }}>
 						<div style={{ width: "25%" }}>
-							<Typography variant="h6">Évaliations</Typography>
+							<Typography variant="h6">Évaluations</Typography>
 							<div
 								style={{
 									width: "80%",

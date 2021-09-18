@@ -294,6 +294,7 @@ export default function DashboardScreen({ usersCount }) {
 							Revenue
 						</Typography>
 						<Typography
+							noWrap
 							color="textPrimary"
 							style={{ fontSize: 28, fontWeight: 450, marginLeft: 10 }}
 						>

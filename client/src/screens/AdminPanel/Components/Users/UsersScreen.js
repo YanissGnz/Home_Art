@@ -103,36 +103,37 @@ export default function UsersScreen() {
 								height: 50,
 							}}
 						>
-							<Typography
-								style={{ position: "absolute", left: "2%" }}
-								variant="body1"
+							<div
+								style={{
+									width: "23%",
+								}}
 							>
-								Nom
-							</Typography>
-							<Typography
-								style={{ position: "absolute", left: "24%" }}
-								variant="body1"
+								<Typography variant="body1">Nom</Typography>
+							</div>
+							<div
+								style={{
+									width: "23%",
+								}}
 							>
-								Email
-							</Typography>
-							<Typography
-								style={{ position: "absolute", left: "47%" }}
-								variant="body1"
+								<Typography variant="body1">Email</Typography>
+							</div>
+							<div
+								style={{
+									width: "23%",
+								}}
 							>
-								Date
-							</Typography>
-							<Typography
-								style={{ position: "absolute", left: "70%" }}
-								variant="body1"
+								<Typography variant="body1">Date</Typography>
+							</div>
+							<div
+								style={{
+									width: "23%",
+								}}
 							>
-								Status de compte
-							</Typography>
-							<Typography
-								style={{ position: "absolute", left: "95%" }}
-								variant="body1"
-							>
-								Actions
-							</Typography>
+								<Typography variant="body1">Status de compte</Typography>
+							</div>
+							<div>
+								<Typography variant="body1">Actions</Typography>
+							</div>
 						</CardContent>
 						{users.map((user) => (
 							<UserCard user={user} handleDeleteUser={handleDeleteUser} />

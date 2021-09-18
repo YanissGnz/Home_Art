@@ -33,6 +33,7 @@ export default function ProductCard({
 	const classes = useStyles();
 	const [expanded, setExpanded] = React.useState(false);
 	const [anchorEl, setAnchorEl] = React.useState(null);
+	const [className, setClassName] = React.useState(classes.productCard);
 
 	const handleExpandClick = () => {
 		setExpanded(!expanded);
@@ -55,13 +56,21 @@ export default function ProductCard({
 		images.push(`/uploads/${product.productImages[index]}`)
 	);
 
+	React.useEffect(() => {
+		if (product.archived) {
+			setClassName(classes.archivedproductCard);
+		} else if (product.stock === 0) {
+			setClassName(classes.outOfStockProductCard);
+		}
+	}, [
+		classes.archivedproductCard,
+		classes.outOfStockProductCard,
+		product.archived,
+		product.stock,
+	]);
+
 	return (
-		<Card
-			elevation={4}
-			className={
-				product.archived ? classes.archivedproductCard : classes.productCard
-			}
-		>
+		<Card elevation={4} className={className}>
 			<CardHeader
 				action={
 					<div>
@@ -169,7 +178,11 @@ export default function ProductCard({
 				<Typography variant="body1" className={classes.padding}>
 					Prix: {product.price} Da
 				</Typography>
-				<Typography variant="body1" className={classes.padding}>
+				<Typography
+					color={product.stock > 0 ? "textPrimary" : "error"}
+					variant="body1"
+					className={classes.padding}
+				>
 					Stock: {product.stock} unité(s)
 				</Typography>
 				<div className={classes.productCardActionDiv}>

@@ -33,11 +33,10 @@ export default function UserCard({ user, handleDeleteUser }) {
 					<div
 						style={{
 							height: 50,
+							width: "23%",
 							display: "flex",
 							flexDirection: "row",
 							alignItems: "center",
-							position: "absolute",
-							left: "2%",
 						}}
 					>
 						<Avatar
@@ -52,39 +51,71 @@ export default function UserCard({ user, handleDeleteUser }) {
 						>
 							{user.name[0]}
 						</Avatar>
-						<Typography>{user.name}</Typography>
+						<Typography noWrap style={{ width: "70%" }}>
+							{user.name}
+						</Typography>
 					</div>
-
-					<Typography
-						style={{ position: "absolute", left: "24%" }}
-						variant="body1"
-						component="p"
-					>
-						{user.email}
-					</Typography>
-					<Typography
-						style={{ position: "absolute", left: "47%" }}
-						variant="body1"
-						component="p"
-					>
-						{user.createdAt.slice(0, 10)}
-					</Typography>
-					<Typography
-						style={{ position: "absolute", left: "70%" }}
-						variant="body1"
-						component="p"
-					>
-						Activé
-					</Typography>
-
-					<IconButton
-						style={{ position: "absolute", left: "95.4%" }}
-						onClick={() => {
-							handleDeleteUser(user._id);
+					<div
+						style={{
+							height: 50,
+							width: "23%",
+							display: "flex",
+							flexDirection: "row",
+							alignItems: "center",
 						}}
 					>
-						<DeleteOutlined />
-					</IconButton>
+						<Typography noWrap variant="body1" component="p">
+							{user.email}
+						</Typography>
+					</div>
+					<div
+						style={{
+							height: 50,
+							width: "23%",
+							display: "flex",
+							flexDirection: "row",
+							alignItems: "center",
+						}}
+					>
+						<Typography variant="body1" component="p">
+							{user.createdAt.slice(0, 10)}
+						</Typography>
+					</div>
+					<div
+						style={{
+							height: 50,
+							width: "23%",
+							display: "flex",
+							flexDirection: "row",
+							alignItems: "center",
+							marginLeft: 4,
+						}}
+					>
+						<Typography
+							style={{ fontWeight: 500 }}
+							variant="body1"
+							component="p"
+							color="secondary"
+						>
+							Activé
+						</Typography>
+					</div>
+					<div
+						style={{
+							height: 50,
+							display: "flex",
+							flexDirection: "row",
+							alignItems: "center",
+						}}
+					>
+						<IconButton
+							onClick={() => {
+								handleDeleteUser(user._id);
+							}}
+						>
+							<DeleteOutlined />
+						</IconButton>
+					</div>
 				</CardContent>
 			</Card>
 		</div>

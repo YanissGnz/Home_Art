@@ -1,6 +1,7 @@
 const Product = require("../models/ProductModel");
 const Client = require("../models/userModel");
 const fs = require("fs");
+const deleteImages = require("../../client/public/uploads/DeleteImages");
 const productCtrl = {
 	addProduct: async (req, res) => {
 		try {
@@ -429,7 +430,7 @@ const productCtrl = {
 		try {
 			const user = await Client.findOne({ _id: user_id });
 
-			const name = user.name;
+			const name = user.name + " " + user.last_name;
 			const product = await Product.findOne({ _id: { $in: product_id } });
 			var comments = product.comments;
 			const newComment = {
@@ -584,10 +585,7 @@ const productCtrl = {
 			if (!check) {
 				return res.status(400).json({ msg: "Produit n'exist pas." });
 			}
-			const archivedProduct = await Product.updateOne(
-				{ _id: product_id },
-				{ archived: true }
-			);
+			await Product.updateOne({ _id: product_id }, { archived: true });
 			const Products = await Product.find().sort([["_id", "desc"]]);
 
 			return res
@@ -624,13 +622,7 @@ const productCtrl = {
 			if (!check) {
 				return res.status(400).json({ msg: "Produit n'exist pas." });
 			}
-			const productImages = check.productImages;
-
-			// productImages.forEach((image) => {
-			// 	fs.unlinkSync(
-			// 		`C:/Users/yanis/Projects/New folder/Home_Art/client/public/uploads/${image}`
-			// 	);
-			// });
+			deleteImages(check.productImages);
 
 			await Product.deleteOne({ _id: product_id });
 

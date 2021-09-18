@@ -37,7 +37,7 @@ const theme = createMuiTheme({
 		},
 	},
 	typography: {
-		fontFamily: "Poppins",
+		fontFamily: ["Poppins", "Dancing Script"].join(","),
 	},
 });
 

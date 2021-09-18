@@ -17,8 +17,6 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Masonry from "react-masonry-css";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import ClearRoundedIcon from "@material-ui/icons/ClearRounded";
-import { useSelector } from "react-redux";
-import axios from "axios";
 
 /*For The Masonary Container*/
 const breakpoints = {

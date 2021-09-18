@@ -1,3 +1,4 @@
 {
-	"mongoURL": "mongodb+srv://dev:homeart123@home-cluster.5rwk6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+	"mongoURL": "mongodb+srv://dev:homeart123@home-cluster.5rwk6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+	"localURL": "mongodb://localhost:27017/homeart"
 }

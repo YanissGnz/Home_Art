@@ -1,30 +1,41 @@
-const { isValid } = require("shortid");
 const GiftCard = require("../models/GiftCardModal");
 
-const productCtrl = {
+const GiftCardCtrl = {
 	addGiftCard: async (req, res) => {
 		try {
-			if (req.body.code == "") {
-				return res.status(400).json({ msg: "Enter le code de carte", id: 0 });
-			}
-			if (req.body.budget === null && req.body.budget === 0) {
+			if (!req.body.code || req.body.code == "") {
 				return res
 					.status(400)
-					.json({ msg: "Entrer le budget de carte cadeau", id: 1 });
+					.json({ msg: { msg: "Enter le code de carte", id: 0 } });
+			} else if (req.body.code.length < 12) {
+				return res
+					.status(400)
+					.json({ msg: { msg: "Le code doit ètre 12 caractère", id: 0 } });
+			} else if (!req.body.budget || req.body.budget == 0) {
+				return res
+					.status(400)
+					.json({ msg: { msg: "Entrer le budget de carte cadeau", id: 1 } });
 			} else {
 				const newGiftCard = new GiftCard({
-					code: req.body.code,
+					code:
+						req.body.code.substring(0, 4) +
+						" " +
+						req.body.code.substring(4, 8) +
+						" " +
+						req.body.code.substring(8, 12) +
+						" " +
+						req.body.code.substring(12, 16),
 					budget: req.body.budget,
 				});
 
-				newGiftCard
-					.save()
-					.then(() =>
-						res.status(200).json({
-							msg: "Le carte cadeau a été ajouté.",
-						})
-					)
-					.catch((err) => res.status(400).json({ msg: err }));
+				await newGiftCard.save();
+
+				const giftCards = await GiftCard.find();
+
+				return res.status(200).json({
+					giftCards,
+					msg: "Le carte cadeau a été ajouté.",
+				});
 			}
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
@@ -79,11 +90,15 @@ const productCtrl = {
 				return res.status(400).json({ msg: "Carte cadeau n'exist pas." });
 			}
 			await GiftCard.deleteOne({ _id: giftCardId });
-			res.json({ msg: "Carte cadeau a été supprimé" });
+			const giftCards = await GiftCard.find();
+			res.json({
+				giftCards,
+				msg: { msg: "Carte cadeau a été supprimé", id: 3 },
+			});
 		} catch (err) {
 			return res.status(400).json({ msg: err.message });
 		}
 	},
 };
 
-module.exports = productCtrl;
+module.exports = GiftCardCtrl;

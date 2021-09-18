@@ -380,7 +380,7 @@ export default function CategorieScreen(props) {
 							</div>
 							<Slider
 								value={priceRange}
-								max={1000000}
+								max={100000}
 								step={100}
 								onChange={handleChange}
 								valueLabelDisplay="off"

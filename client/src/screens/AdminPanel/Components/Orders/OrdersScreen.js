@@ -4,7 +4,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import Masonry from "react-masonry-css";
 import AdminOrderContainer from "./AdminOrderContainer";
-
+import NoOrdersIcon from "../../../../Icons/NoOrdersIcon";
 /*For The Masonary Container*/
 const breakpoints = {
 	default: 2,
@@ -34,7 +34,7 @@ export default function OrdersScreen() {
 			});
 	}, [token]);
 
-	const handleValidateOrder = (order_id, user_id) => {
+	const handleValidateOrder = async (order_id, user_id) => {
 		// Headers
 		const config = {
 			headers: {
@@ -42,7 +42,7 @@ export default function OrdersScreen() {
 			},
 		};
 
-		axios
+		await axios
 			.post("/users/validate_order", { order_id, user_id }, config)
 			.then((res) => {
 				setOrders(res.data.orders);
@@ -56,7 +56,7 @@ export default function OrdersScreen() {
 		<Container maxWidth="xl" className="dashbord_container">
 			<Toolbar />
 			<Typography variant="h4" style={{ fontWeight: 450 }}>
-				Commaneds
+				Commandes
 			</Typography>
 			<Container
 				maxWidth="xl"
@@ -67,19 +67,40 @@ export default function OrdersScreen() {
 				}}
 				className="main"
 			>
-				<Masonry
-					breakpointCols={breakpoints}
-					className="my-masonry-grid"
-					columnClassName="my-masonry-grid_column"
-					style={{ width: "100%" }}
-				>
-					{orders.map((order) => (
-						<AdminOrderContainer
-							order={order}
-							handleValidateOrder={handleValidateOrder}
+				{orders.length === 0 ? (
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+							justifyContent: "center",
+						}}
+					>
+						<NoOrdersIcon
+							style={{ height: 100, width: 100, color: "rgba(0, 0, 0, 0.54)" }}
 						/>
-					))}
-				</Masonry>
+						<Typography
+							color="textSecondary"
+							style={{ fontSize: 30, fontWeight: 500, marginTop: 20 }}
+						>
+							Pas de commandes
+						</Typography>
+					</div>
+				) : (
+					<Masonry
+						breakpointCols={breakpoints}
+						className="my-masonry-grid"
+						columnClassName="my-masonry-grid_column"
+						style={{ width: "100%" }}
+					>
+						{orders.map((order) => (
+							<AdminOrderContainer
+								order={order}
+								handleValidateOrder={handleValidateOrder}
+							/>
+						))}
+					</Masonry>
+				)}
 			</Container>
 		</Container>
 	);

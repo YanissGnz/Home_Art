@@ -16,7 +16,7 @@ const giftCardRoutes = require("./api/routes/giftCardRouter");
 app.use(express.json());
 
 //DB Config
-const db = require("./config/database.json").mongoURL;
+const db = require("./config/database.json").localURL;
 
 //Connect to Mongo
 mongoose

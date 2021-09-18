@@ -176,10 +176,9 @@ export default function ProductsScreen() {
 
 	/*For The Masonary Container*/
 	const breakpoints = {
-		default: 5,
-		1600: 4,
-		1100: 2,
-		700: 1,
+		default: 3,
+		1500: 2,
+		900: 1,
 	};
 
 	/*For Add Product Dialog */
@@ -477,7 +476,7 @@ export default function ProductsScreen() {
 				handleBackdropClose();
 			});
 	};
-	const handleReveal = (revealedProductId) => {
+	const handleReveal = async (revealedProductId) => {
 		handleBackdropOpen();
 		//Header
 		const config = {
@@ -486,7 +485,7 @@ export default function ProductsScreen() {
 			},
 		};
 
-		axios
+		await axios
 			.put(`/products/reveal_product/${revealedProductId}`, null, config)
 			.then((res) => {
 				setMsg(res.data.msg);
@@ -522,7 +521,7 @@ export default function ProductsScreen() {
 			</Fab>
 
 			<Typography variant="h5" className={classes.dashboardText}>
-				Produit
+				Produits
 			</Typography>
 
 			{/*_____________________Add Dialog_____________________*/}
@@ -1036,7 +1035,7 @@ export default function ProductsScreen() {
 			{/*__________________Product Container__________________*/}
 			<Container maxWidth="xl">
 				<Typography variant="h5" className={classes.dashboardText}>
-					List des produit
+					List des produits
 				</Typography>
 				<Container
 					maxWidth="xl"

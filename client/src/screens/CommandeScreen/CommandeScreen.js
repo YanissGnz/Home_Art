@@ -274,7 +274,6 @@ const deliveryModes = [
 
 const paymentMethods = [
 	"Carte bancaire",
-	"Facture",
 	"Carte cadeau",
 	"Paypal",
 	"Paiement à la livraison",
@@ -333,7 +332,7 @@ export default function CommandeScreen() {
 	const [user, setUser] = React.useState(null);
 	const [commande, setCommande] = useState(commandeInfo);
 	const [addresses, setAddresses] = useState([]);
-	const [selectedAddress, setSelectedAddress] = useState({});
+	var selectedAddress = {};
 	const [creditCard, setCreditCard] = useState(creditCartInfo);
 	const [giftCardCode, setGiftCardCode] = useState("");
 	const isLoading = useSelector((state) => state.auth.isLoading);
@@ -384,6 +383,7 @@ export default function CommandeScreen() {
 
 	const HandleCreditCartChange = (e) => {
 		const { name, value } = e.target;
+
 		setCreditCard({ ...creditCard, [name]: value });
 	};
 
@@ -442,7 +442,14 @@ export default function CommandeScreen() {
 			} else {
 				await axios
 					.post("/gift_card/verify_gift_card", {
-						giftCardCode,
+						giftCardCode:
+							giftCardCode.substring(0, 4) +
+							" " +
+							giftCardCode.substring(4, 8) +
+							" " +
+							giftCardCode.substring(8, 12) +
+							" " +
+							giftCardCode.substring(12, 16),
 						totalPrice: subTotalPrice,
 					})
 					.then((res) => {
@@ -466,7 +473,7 @@ export default function CommandeScreen() {
 		}
 	};
 	var paymentInfo;
-	const handleCommande = () => {
+	const handleCommande = async () => {
 		setDisabled(true);
 		setOrderLoading(true);
 		const {
@@ -485,15 +492,20 @@ export default function CommandeScreen() {
 			paymentInfo = creditCard;
 			isPaid = true;
 		} else if (commande.paymentMethod === "Carte cadeau") {
-			paymentInfo = giftCardCode;
+			paymentInfo =
+				giftCardCode.substring(0, 4) +
+				" " +
+				giftCardCode.substring(4, 8) +
+				" " +
+				giftCardCode.substring(8, 12) +
+				" " +
+				giftCardCode.substring(12, 16);
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paypal") {
 			paymentInfo = Payment;
 			isPaid = true;
 		} else if (commande.paymentMethod === "Paiement à la livraison") {
 			paymentInfo = "Paiement à la livraison";
-		} else if (commande.paymentMethod === "Facture") {
-			paymentInfo = "Facture";
 		}
 
 		// Headers
@@ -503,7 +515,7 @@ export default function CommandeScreen() {
 			},
 		};
 
-		axios
+		await axios
 			.post(
 				"/users/confirm_order",
 				{
@@ -765,7 +777,7 @@ export default function CommandeScreen() {
 													<TextField
 														name="address"
 														select
-														label="Selectionner un address"
+														label="Selectionner un addresse"
 														value={selectedAddress.address}
 														onChange={handleAddressChange}
 														variant="outlined"
@@ -796,7 +808,33 @@ export default function CommandeScreen() {
 																			}}
 																			color="primary"
 																		>
-																			Address :{" "}
+																			Nom :{" "}
+																		</Typography>
+																		<Typography
+																			style={{
+																				fontSize: 16,
+																				fontWeight: 400,
+																				marginLeft: 5,
+																			}}
+																		>
+																			{" "}
+																			{option.name}
+																		</Typography>
+																	</div>
+																	<div
+																		style={{
+																			display: "inline-flex",
+																			marginBottom: 3,
+																		}}
+																	>
+																		<Typography
+																			style={{
+																				fontSize: 16,
+																				fontWeight: 500,
+																			}}
+																			color="primary"
+																		>
+																			Addresse :{" "}
 																		</Typography>
 																		<Typography
 																			style={{

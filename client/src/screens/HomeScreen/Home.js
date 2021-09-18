@@ -8,7 +8,6 @@ import {
 import {
 	Card,
 	CardActionArea,
-	CardContent,
 	CircularProgress,
 	Container,
 	CssBaseline,
@@ -434,44 +433,55 @@ export default function Home(props) {
 							}}
 						>
 							<Slider {...settings}>
-								{packs.map((product) => (
-									<a
-										href={`/product/${product._id}`}
-										style={{
-											width: "19%",
-											textDecoration: "none",
-											marginRight: 15,
-										}}
-									>
-										<Card
+								{packs.length === 0 ? (
+									<div>
+										<Skeleton
 											style={{
-												width: "100%",
 												height: 400,
-												marginRight: 30,
+												transform: "none",
 											}}
-											elevation={0}
+										/>
+									</div>
+								) : (
+									packs.map((product) => (
+										<a
+											href={`/product/${product._id}`}
+											style={{
+												width: "19%",
+												textDecoration: "none",
+												marginRight: 15,
+											}}
 										>
-											<CardActionArea
-												disableRipple
+											<Card
 												style={{
 													width: "100%",
-													height: "100%",
-													position: "relative",
+													height: 400,
+													marginRight: 30,
 												}}
+												elevation={0}
 											>
-												<img
+												<CardActionArea
+													disableRipple
 													style={{
 														width: "100%",
-														maxHeight: "100%",
-														objectFit: "contain",
+														height: "100%",
+														position: "relative",
 													}}
-													src={`/uploads/${product.productImages[0]}`}
-													alt="Product"
-												/>
-											</CardActionArea>
-										</Card>
-									</a>
-								))}
+												>
+													<img
+														style={{
+															width: "100%",
+															maxHeight: "100%",
+															objectFit: "contain",
+														}}
+														src={`/uploads/${product.productImages[0]}`}
+														alt="Product"
+													/>
+												</CardActionArea>
+											</Card>
+										</a>
+									))
+								)}
 							</Slider>
 						</Container>
 						<Container

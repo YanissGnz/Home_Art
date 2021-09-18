@@ -245,6 +245,10 @@ export const useStyles = makeStyles((theme) => {
 			border: "solid 4px #F58634",
 			borderRadius: 10,
 		},
+		outOfStockProductCard: {
+			border: "solid 4px #ff0000",
+			borderRadius: 10,
+		},
 		productCardActionDiv: {
 			display: "flex",
 			flexDirection: "row",

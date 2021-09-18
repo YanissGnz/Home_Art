@@ -9,9 +9,6 @@ const giftCardSchema = new mongoose.Schema({
 		type: Number,
 		required: true,
 	},
-	expiry: {
-		type: Date,
-	},
 });
 
 module.exports = mongoose.model("GiftCard", giftCardSchema);

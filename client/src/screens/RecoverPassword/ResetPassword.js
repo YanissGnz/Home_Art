@@ -154,7 +154,7 @@ export default function ResetPassword() {
 	};
 	return (
 		<div className="body">
-			<Card className={classes.main_card} elevation={10}>
+			<Card className={classes.main_card} elevation={0}>
 				<div className={classes.img_div}>
 					<ForgetPassword />
 				</div>

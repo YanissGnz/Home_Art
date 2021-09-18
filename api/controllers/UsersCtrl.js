@@ -22,13 +22,13 @@ const userCtrl2 = {
 				return res.status(400).json({ msg: "Enter votre nom.", id: 2 });
 			}
 			if (!validateName(name)) {
-				return res.status(400).json({ msg: "Invalid name", id: 2 });
+				return res.status(400).json({ msg: "nom invalid", id: 2 });
 			}
 			if (last_name == "") {
 				return res.status(400).json({ msg: "Enter votre prénom.", id: 3 });
 			}
 			if (!validateLast_Name(last_name)) {
-				return res.status(400).json({ msg: "Invalid last_name", id: 3 });
+				return res.status(400).json({ msg: "prénom invalid", id: 3 });
 			}
 			if (email == "") {
 				return res.status(400).json({ msg: "Enter votre email.", id: 0 });
@@ -48,14 +48,12 @@ const userCtrl2 = {
 
 			const user = await Clients.findOne({ email });
 			if (user)
-				return res
-					.status(400)
-					.json({ msg: "This email already exists.", id: 0 });
+				return res.status(400).json({ msg: "Ce email exist déja.", id: 0 });
 
 			if (password.length < 6)
 				return res
 					.status(400)
-					.json({ msg: "Password must be at least 6 characters.", id: 1 });
+					.json({ msg: "Mot de pass doit étre au moin 6 caractère.", id: 1 });
 
 			if (!isMatch(password, cf_password))
 				return res.status(400).json({ msg: "Password did not match.", id: 4 });
@@ -81,7 +79,7 @@ const userCtrl2 = {
 			sendEmail(email, url, "Verify your email address");
 
 			res.json({
-				msg: "Register Success! Please activate your email to start.",
+				msg: "Inscription succès ! Veuillez activer votre email pour commencer.",
 			});
 		} catch (err) {
 			return res.status(500).json({ msg: err.message });
@@ -195,7 +193,7 @@ const userCtrl2 = {
 
 			sendEmail(email, url, "Reset your password");
 			res.json({
-				msg: "Re-send the password, please check your email.",
+				msg: "L'e-mail de restauration du mot de passe a été envoyé, veuillez vérifier votre e-mail.",
 				access_token,
 			});
 		} catch (err) {
@@ -232,7 +230,7 @@ const userCtrl2 = {
 				}
 			);
 
-			res.json({ msg: "Password successfully changed!" });
+			res.json({ msg: "Mot de passe changé avec succès" });
 		} catch (err) {
 			return res.status(500).json({ msg: err.message });
 		}
@@ -303,7 +301,8 @@ const userCtrl2 = {
 		const user_id = req.user.id;
 		try {
 			const user = await Clients.findById(req.user.id);
-			if (!user) return res.status(400).json({ msg: "User does not exist." });
+			if (!user)
+				return res.status(400).json({ msg: "L'utilisateur n'existe pas" });
 
 			var newCart = user.cart;
 
@@ -338,7 +337,8 @@ const userCtrl2 = {
 		const item = req.body.item;
 		try {
 			const user = await Clients.findById(user_id);
-			if (!user) return res.status(404).json({ msg: "User does not exist." });
+			if (!user)
+				return res.status(404).json({ msg: "L'utilisateur n'existe pas" });
 			const cart = user.cart;
 
 			const newCart = cart.filter(
@@ -375,14 +375,16 @@ const userCtrl2 = {
 			if (!email_verified)
 				return res
 					.status(400)
-					.json({ msg: "Email verification failed.", id: 0 });
+					.json({ msg: "Échec de la vérification de l'e-mail.", id: 0 });
 
 			const user = await Clients.findOne({ email });
 
 			if (user) {
 				const isMatch = await bcrypt.compare(password, user.password);
 				if (!isMatch)
-					return res.status(400).json({ msg: "Password is incorrect." });
+					return res
+						.status(400)
+						.json({ msg: "Le mot de passe est incorrect." });
 
 				const access_token = createAccessToken({ id: user._id });
 
@@ -440,7 +442,10 @@ const userCtrl2 = {
 			user = await Clients.updateOne({ _id: user_Id }, { favoriteProducts });
 			return res
 				.status(200)
-				.json({ favoriteProducts, msg: "Supprimer des favoris" });
+				.json({
+					favoriteProducts,
+					msg: "Le produit a été supprimer des favoris",
+				});
 		} catch (e) {
 			res.status(400).json({ msg: e.message });
 		}
@@ -484,28 +489,26 @@ const userCtrl2 = {
 	},
 	addAddress: async (req, res) => {
 		const user_id = req.user.id;
-		const { address, ville, region } = req.body;
+		const { name, address, ville, region } = req.body;
 
 		try {
+			if (name === "") {
+				return res.status(400).json({ msg: "Enter le nom d'address.", id: 0 });
+			}
 			if (address === "") {
-				return res.status(400).json({ msg: "Enter votre address.", id: 0 });
+				return res.status(400).json({ msg: "Enter votre address.", id: 1 });
 			}
 			if (region === "") {
-				return res.status(400).json({ msg: "Enter votre région.", id: 1 });
+				return res.status(400).json({ msg: "Enter votre région.", id: 2 });
 			}
 			if (ville === "") {
-				return res.status(400).json({ msg: "Enter votre ville.", id: 2 });
+				return res.status(400).json({ msg: "Enter votre ville.", id: 3 });
 			}
 
 			const user = await Clients.findOne({ _id: user_id });
 			var addresses = user.addresses;
-
-			const newAddress = {
-				address: address,
-				ville: ville,
-				region: region,
-			};
 			addresses.push({
+				name: name,
 				address: address,
 				ville: ville,
 				region: region,
@@ -530,14 +533,12 @@ const userCtrl2 = {
 
 		try {
 			const user = await Clients.findById(req.user.id);
-			if (!user) return res.status(404).json({ msg: "User does not exist." });
+			if (!user)
+				return res.status(404).json({ msg: "Utilisateur n´éxiste pas." });
 			var addresses = user.addresses;
 
 			const newAddresses = addresses.filter(
-				(item) =>
-					item.address != address.address &&
-					item.ville != address.ville &&
-					item.region != address.region
+				(item) => item.name != address.name
 			);
 
 			const newUser = await Clients.findOneAndUpdate(
@@ -676,13 +677,14 @@ const userCtrl2 = {
 				if (giftCard) {
 					if (giftCard.budget === parseInt(totalPrice)) {
 						await GiftCard.deleteOne({ code: paymentInfo });
-					} else if (parseInt(totalPrice) < giftCard.budget) {
-						const newGiftCard = await GiftCard.findOneAndUpdate(
+					} else if (totalPrice < giftCard.budget) {
+						console.log();
+						await GiftCard.findOneAndUpdate(
 							{
-								code: { $in: giftCard.code },
+								code: { $in: paymentInfo },
 							},
 							{
-								budget: giftCard.budget - parseInt(totalPrice),
+								budget: giftCard.budget - totalPrice,
 							}
 						);
 					}
@@ -766,13 +768,12 @@ const userCtrl2 = {
 			return res.status(400).json({ msg: err.message });
 		}
 	},
-
 	deleteOrder: async (req, res) => {
 		const id = req.user.id;
 		const { deletedOrder } = req.body;
 		try {
 			const user = await Clients.findOne({
-				_id: { $in: id },
+				_id: { $in: id.toString() },
 			});
 
 			var orders = user.orders;
@@ -783,7 +784,7 @@ const userCtrl2 = {
 
 			const newUser = await Clients.findOneAndUpdate(
 				{
-					_id: { $in: id },
+					_id: { $in: id.toString() },
 				},
 				{
 					orders,

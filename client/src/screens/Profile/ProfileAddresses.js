@@ -44,6 +44,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 const address = {
+	name: "",
 	address: "",
 	ville: "",
 	region: "",
@@ -127,9 +128,9 @@ export default function Profile() {
 			},
 		};
 
-		const { address, ville, region } = newAddress;
+		const { name, address, ville, region } = newAddress;
 		axios
-			.post("/users/add_Address", { address, ville, region }, config)
+			.post("/users/add_Address", { name, address, ville, region }, config)
 			.then((res) => {
 				setMsg(res.data.msg);
 				setAddresses(res.data.addresses);
@@ -395,6 +396,32 @@ export default function Profile() {
 																}}
 																color="primary"
 															>
+																Nom d'address :{" "}
+															</Typography>
+															<Typography
+																style={{
+																	fontSize: 16,
+																	fontWeight: 400,
+																	marginLeft: 5,
+																}}
+															>
+																{" "}
+																{address.name}
+															</Typography>
+														</div>
+														<div
+															style={{
+																display: "inline-flex",
+																marginBottom: 3,
+															}}
+														>
+															<Typography
+																style={{
+																	fontSize: 16,
+																	fontWeight: 500,
+																}}
+																color="primary"
+															>
 																Address :{" "}
 															</Typography>
 															<Typography
@@ -523,6 +550,18 @@ export default function Profile() {
 							>
 								<TextField
 									autoFocus
+									name="name"
+									label="Nom"
+									fullWidth
+									style={{ marginBottom: 50 }}
+									variant="outlined"
+									onChange={handleChangeInput}
+									value={newAddress.name}
+									helperText={msg.id === 0 && msg.msg}
+									error={msg.id === 0}
+								/>
+								<TextField
+									autoFocus
 									name="address"
 									label="Address"
 									fullWidth
@@ -530,8 +569,8 @@ export default function Profile() {
 									variant="outlined"
 									onChange={handleChangeInput}
 									value={newAddress.address}
-									helperText={msg.id === 0 && msg.msg}
-									error={msg.id === 0}
+									helperText={msg.id === 1 && msg.msg}
+									error={msg.id === 1}
 								/>
 								<div style={{ display: "flex", marginBottom: 50 }}>
 									<TextField
@@ -543,8 +582,8 @@ export default function Profile() {
 										variant="outlined"
 										onChange={handleChangeInput}
 										value={newAddress.region}
-										helperText={msg.id === 1 && msg.msg}
-										error={msg.id === 1}
+										helperText={msg.id === 2 && msg.msg}
+										error={msg.id === 2}
 									/>
 									<TextField
 										autoFocus
@@ -554,8 +593,8 @@ export default function Profile() {
 										variant="outlined"
 										onChange={handleChangeInput}
 										value={newAddress.ville}
-										helperText={msg.id === 2 && msg.msg}
-										error={msg.id === 2}
+										helperText={msg.id === 3 && msg.msg}
+										error={msg.id === 3}
 									/>
 								</div>
 								<div

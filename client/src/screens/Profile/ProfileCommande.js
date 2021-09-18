@@ -95,6 +95,7 @@ export default function Profile() {
 			})
 			.catch((e) => {
 				console.log(e);
+				handleBackdropClose();
 			});
 	};
 

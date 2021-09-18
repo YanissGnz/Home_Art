@@ -29,7 +29,6 @@ import {
 	Divider,
 	Drawer,
 	IconButton,
-	InputBase,
 	List,
 	ListItem,
 	ListItemIcon,
@@ -48,7 +47,6 @@ import "./adminPanel.css";
 
 //Icons imports
 import Logo from "../../Icons/Logo";
-import SearchIcon from "@material-ui/icons/Search";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -237,8 +235,6 @@ export default function AdminPanel(props) {
 		setNotificationAnchorEl(null);
 	};
 
-	const handleSearch = (event) => event.preventDefault();
-
 	const handleLogout = (event) => {
 		dispatch(dispatchLogout());
 		history.push("/admin");
@@ -304,21 +300,7 @@ export default function AdminPanel(props) {
 										component="form"
 										className={classes.searchPaper}
 										elevation={0}
-										variant="outlined"
-									>
-										<InputBase
-											className={classes.input}
-											placeholder="Rechercher"
-										/>
-										<IconButton
-											type="submit"
-											className={classes.search_Button}
-											aria-label="search"
-											onClick={handleSearch}
-										>
-											<SearchIcon />
-										</IconButton>
-									</Paper>
+									></Paper>
 								</div>
 								<IconButton
 									aria-label="account of current user"

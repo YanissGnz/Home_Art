@@ -1,9 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Lato&display=swap");
 
 * {
 	margin: 0;
 	padding: 0;
-	font-family: "Poppins", sans-serif;
+	font-family: "Poppins", "Dancing Script", sans-serif;
 }
 .root {
 	height: 100vh;
@@ -90,4 +91,8 @@
 
 .profile_body {
 	background-color: #f1f1f1;
+}
+.gift-card-text {
+	font-family: "Dancing Script";
+	font-weight: 700;
 }
